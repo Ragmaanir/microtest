@@ -1,0 +1,5 @@
+files: ./**/*.cr
+run: (crystal spec && spd-say 'success') || spd-say 'error'
+---
+files: ./shard.yml
+run: crystal deps
