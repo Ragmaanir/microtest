@@ -2,8 +2,9 @@ module Microtest
 
   abstract class Runner
     getter reporters : Array(Reporter)
+    getter suites
 
-    def initialize(@reporters : Array(Reporter))
+    def initialize(@reporters : Array(Reporter), @suites = Test.test_classes)
     end
 
     abstract def call
@@ -11,13 +12,17 @@ module Microtest
 
   class DefaultRunner < Runner
     def call
-      suites = Test.test_classes
-      methods = suites.map(&.test_methods.size)
-      
-      ctx = DefaultExecutionContext.new(reporters)
+      ctx = ExecutionContext.new(reporters, suites)
       ctx.started
-      Test.test_classes.each{ |testcase| testcase.run_tests(ctx) }
-      reporters.each(&.finish(ctx))
+
+      suites.each do |suite|
+        suite.run_tests(ctx)
+      end
+
+      puts
+
+      ctx.finished
+
       !ctx.errors?
     end
   end

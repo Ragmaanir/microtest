@@ -11,7 +11,13 @@ describe Microtest do
   end
 
   test "succeeds" do
-    assert 1 == 5 - 4
+    a = 1
+    bob = 5
+
+    assert bob == a - 4
   end
-  
+
+  test "raise" do
+    raise "something"
+  end
 end

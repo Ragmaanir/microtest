@@ -4,11 +4,4 @@ version: 0.1.0
 authors:
   - ragmaanir <ragmaanir@gmail.com>
 
-dependencies:
-  power_assert:
-    #github: rosylilly/power_assert.cr
-    #version: ~> 0.2
-    github: ragmaanir/power_assert.cr
-    branch: ahead
-
 license: MIT

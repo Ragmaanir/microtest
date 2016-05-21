@@ -26,6 +26,7 @@ module Microtest
 
   class Test
     include TestClassDSL
+    include Microtest::PowerAssert
 
     getter context : ExecutionContext
 
@@ -37,23 +38,27 @@ module Microtest
     end
 
     macro def self.test_methods : Array(String)
-      {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
-      {% if names.empty? %}
-        [] of String
-      {% else %}
-        [{{*names.map(&.stringify)}}]
+      {% begin %}
+        {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
+        {% if names.empty? %}
+          [] of String
+        {% else %}
+          [{{*names.map(&.stringify)}}]
+        {% end %}
       {% end %}
     end
 
     macro def self.run_tests(context) : Nil
-      {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
+      {% begin %}
+        {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
 
-      context.test_suite(self.class) do
-        {% for name in names %}
-          %test = new(context)
-          %test.call("{{name}}") { %test.{{ name }} }
-        {% end %}
-      end
+        context.test_suite(self.class) do
+          {% for name in names %}
+            %test = new(context)
+            %test.call("{{name}}") { %test.{{ name }} }
+          {% end %}
+        end
+      {% end %}
 
       nil
     end
@@ -62,11 +67,17 @@ module Microtest
       context.test_case(name) do
         before_hooks
 
-        result = capture_exception(name) do
+        time = Time.now
+        exc = capture_exception(name) do
           yield
         end
+        duration = Time.now.ticks - time.ticks
 
-        context.record_result(result)
+        if exc
+          context.record_result(TestResult.failure(self.class.name, name, duration, exc))
+        else
+          context.record_result(TestResult.success(self.class.name, name, duration))
+        end
 
         after_hooks
       end
@@ -77,10 +88,11 @@ module Microtest
     def capture_exception(name)
       begin
         yield
+        nil
+      rescue ex : AssertionFailure
+        ex
       rescue ex : Exception
-        TestResult.failure(self.class.name, name, ex)
-      else
-        TestResult.success(self.class.name, name)
+        UnexpectedError.new(ex)
       end
     end
 
@@ -90,6 +102,13 @@ module Microtest
 
     def after_hooks
       # FIXME
+    end
+
+    def pass
+    end
+
+    def fail(msg, file, line)
+      raise AssertionFailure.new(msg, file, line)
     end
 
   end

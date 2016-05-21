@@ -1,28 +1,29 @@
 module Microtest
   abstract class TestResult
-    def self.failure(suite, test, error)
-      TestFailure.new(suite, test, error)
+    def self.failure(suite, test, duration, error)
+      TestFailure.new(suite, test, duration, error)
     end
 
-    def self.success(suite, test)
-      TestSuccess.new(suite, test)
+    def self.success(suite, test, duration)
+      TestSuccess.new(suite, test, duration)
     end
 
     #getter suite : Test.class
     getter suite : String
     getter test : String
+    getter duration : Int64
 
-    def initialize(@suite, @test)
+    def initialize(@suite, @test, @duration)
     end
 
     abstract def success?
   end
 
   class TestFailure < TestResult
-    getter error
+    getter exception : Exception
 
-    def initialize(suite, test, @error)
-      super(suite, test)
+    def initialize(suite, test, duration, @exception)
+      super(suite, test, duration)
     end
 
     def success?
@@ -30,7 +31,6 @@ module Microtest
     end
 
     def inspect(io)
-      #io << "#{suite}.#{test}:"
       io << "#{suite}.#{test}: #{error}"
     end
   end

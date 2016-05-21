@@ -1,27 +1,28 @@
 module Microtest
+  class ExecutionContext
 
-  abstract class ExecutionContext
     getter results : Array(TestResult)
     getter reporters : Array(Reporter)
+    getter suites : Array(Test.class)
 
-    abstract def record_result(result : TestResult)
-    abstract def errors? : Bool
-    def started
-    end
-    def ended
-    end
-  end
-
-  class DefaultExecutionContext < ExecutionContext
-
-    getter results : Array(TestResult)
-
-    def initialize(@reporters : Array(Reporter))
+    def initialize(@reporters : Array(Reporter), @suites)
       @results = [] of TestResult
     end
 
+    def errors : Array(TestFailure)
+      results.map{ |res| res if res.is_a?(TestFailure) }.compact
+    end
+
     def errors?
-      results.any?{ |res| !res.success? }
+      errors.any?
+    end
+
+    def started
+      reporters.each(&.started(self))
+    end
+
+    def finished
+      reporters.each(&.finished(self))
     end
 
     def test_suite(cls)
@@ -37,6 +38,18 @@ module Microtest
       @reporters.each(&.report(result))
       # FIXME
     end
-  end
 
+    def total_tests
+      suites.map(&.test_methods.size).sum
+    end
+
+    def total_success
+      results.count(&.success?)
+    end
+
+    def total_failure
+      results.count{|r| !r.success?}
+    end
+
+  end
 end
