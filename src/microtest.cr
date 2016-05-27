@@ -9,7 +9,6 @@ require "./microtest/runner"
 require "./microtest/reporter"
 
 module Microtest
-
   class AssertionFailure < Exception
     getter file : String
     getter line : Int32
@@ -39,12 +38,16 @@ module Microtest
     runner.call
   end
 
+  def self.run!(*args)
+    success = run(*args)
+    exit success ? 0 : -1
+  end
+
   module DSL
-    macro describe(cls, focus=:nofocus, &block)
+    macro describe(cls, focus = :nofocus, &block)
       class {{cls.id}}Test < Microtest::Test
         {{block.body}}
       end
     end
   end
-
 end

@@ -46,10 +46,10 @@ module Microtest
       puts
       case ex = error.exception
       when AssertionFailure
-        puts format_string({:red, "%-3d" % (number+1), ex.file})
+        puts format_string({:red, "# %-3d" % (number+1), ex.file})
         puts ex.message
       when UnexpectedError
-        puts format_string({:red, "%-3d" % (number+1), ex.message})
+        puts format_string({:red, "# %-3d" % (number+1), ex.message})
         puts ex.backtrace.join("\n")
       else raise "Invalid Exception"
       end

@@ -1,6 +1,5 @@
 module Microtest
   module PowerAssert
-
     class Evaluation
       getter expression : String
       getter value : Value
@@ -19,6 +18,10 @@ module Microtest
       getter value : T
 
       def initialize(@value)
+      end
+
+      def to_s(io)
+        io << value.to_s
       end
 
       def inspect(io)
@@ -49,16 +52,16 @@ module Microtest
     end
 
     class Call(T, B) < Node
-      OPERATORS = %w[
+      OPERATORS = %w(
         ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
-      ]
+      )
 
       getter receiver : Node
       getter arguments : Array(Node)
 
-      def initialize( name : String, expression : String, value : T,
-                      @receiver : Node, @arguments : Array(Node),
-                      @named_arguments : Array(NamedArg), @block : B)
+      def initialize(name : String, expression : String, value : T,
+                     @receiver : Node, @arguments : Array(Node),
+                     @named_arguments : Array(NamedArg), @block : B)
         super(name, expression, value)
       end
 
@@ -71,7 +74,7 @@ module Microtest
 
         result += receiver.nested_expressions
 
-        #result += arguments.map(&.nested_expressions).flatten
+        # result += arguments.map(&.nested_expressions).flatten
         result += arguments.map(&.nested_expressions).reduce([] of Evaluation) { |list, exps| list + exps }
 
         result << Evaluation.new(expression, value)
@@ -92,7 +95,6 @@ module Microtest
     end
 
     class TerminalNode < Node
-
       def self.build(expression, value : T)
         TerminalNode.new(expression, value)
       end
@@ -119,7 +121,7 @@ module Microtest
     class ListFormatter < Formatter
       def call(node : Node)
         node.nested_expressions.map do |ev|
-          "%-10s : %s" % [ev.expression, ev.value.inspect]
+          "%-16s : %s" % [ev.expression, ev.value.inspect]
         end.join("\n")
       end
     end
@@ -155,7 +157,7 @@ module Microtest
         )
       {% elsif expression.is_a? StringLiteral %}
         Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}.inspect, {{expression}})
-      {% elsif %w{SymbolLiteral RangeLiteral}.includes?(expression.class_name) %}
+      {% elsif %w(SymbolLiteral RangeLiteral).includes?(expression.class_name) %}
         Microtest::PowerAssert::TerminalNode.build({{expression}}.inspect, {{expression}})
       {% else %}
         Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}, {{expression}})
@@ -175,6 +177,5 @@ module Microtest
         fail %message, {{ file }}, {{ line }}
       end
     end
-
   end
 end

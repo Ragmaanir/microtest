@@ -1,7 +1,5 @@
 module Microtest
-
   module TestClassDSL
-
     macro before(&block)
       def before_hooks
         super
@@ -16,12 +14,11 @@ module Microtest
       end
     end
 
-    macro test(name="anonymous", focus=:nofocus, &block)
-      def test__{{name.gsub(/\s+/,"_").id}}
+    macro test(name = "anonymous", focus = :nofocus, &block)
+      def test__{{name.gsub(/\s+/, "_").id}}
         {{block.body}}
       end
     end
-
   end
 
   class Test
@@ -108,9 +105,8 @@ module Microtest
     end
 
     def fail(msg, file, line)
+      # raise AssertionFailure.new(msg, file, line)
       raise AssertionFailure.new(msg, file, line)
     end
-
   end
-
 end
