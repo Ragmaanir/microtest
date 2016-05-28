@@ -22,10 +22,10 @@ module Microtest
   end
 
   class UnexpectedError < Exception
-    getter exception
+    getter exception, test
 
-    def initialize(@exception : Exception)
-      super("Unexpected error: #{exception.message}")
+    def initialize(@test : String, @exception : Exception)
+      super("Unexpected error in #{test}: #{exception.message}")
     end
   end
 

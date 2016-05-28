@@ -89,7 +89,7 @@ module Microtest
       rescue ex : AssertionFailure
         ex
       rescue ex : Exception
-        UnexpectedError.new(ex)
+        UnexpectedError.new(name, ex)
       end
     end
 
