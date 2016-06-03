@@ -31,7 +31,7 @@ module Microtest
     end
 
     macro def self.test_classes : Array(Test.class)
-      [{{ @type.all_subclasses.join(", ").id }}] of Test.class
+      {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
     end
 
     macro def self.test_methods : Array(String)
