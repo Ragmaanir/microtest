@@ -1,5 +1,13 @@
 module Microtest
   module TestClassDSL
+    macro around(&block)
+      def around_hooks
+        super do
+          {{block.body}}
+        end
+      end
+    end
+
     macro before(&block)
       def before_hooks
         super
@@ -62,21 +70,23 @@ module Microtest
 
     def call(name)
       context.test_case(name) do
-        before_hooks
+        around_hooks do
+          before_hooks
 
-        time = Time.now
-        exc = capture_exception(name) do
-          yield
+          time = Time.now
+          exc = capture_exception(name) do
+            yield
+          end
+          duration = Time.now.ticks - time.ticks
+
+          if exc
+            context.record_result(TestResult.failure(self.class.name, name, duration, exc))
+          else
+            context.record_result(TestResult.success(self.class.name, name, duration))
+          end
+
+          after_hooks
         end
-        duration = Time.now.ticks - time.ticks
-
-        if exc
-          context.record_result(TestResult.failure(self.class.name, name, duration, exc))
-        else
-          context.record_result(TestResult.success(self.class.name, name, duration))
-        end
-
-        after_hooks
       end
 
       nil
@@ -93,12 +103,14 @@ module Microtest
       end
     end
 
+    def around_hooks
+      yield
+    end
+
     def before_hooks
-      # FIXME
     end
 
     def after_hooks
-      # FIXME
     end
 
     def pass

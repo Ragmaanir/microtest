@@ -29,6 +29,34 @@ module Microtest
     end
   end
 
+  module GlobalHookDSL
+    macro around(&block)
+      class Microtest::Test
+        def around_hooks
+          {{block.body}}
+        end
+      end
+    end
+
+    macro before(&block)
+      class Microtest::Test
+        def before_hooks
+          {{block.body}}
+        end
+      end
+    end
+
+    macro after(&block)
+      class Microtest::Test
+        def after_hooks
+          {{block.body}}
+        end
+      end
+    end
+  end
+
+  include GlobalHookDSL
+
   def self.power_assert_formatter
     @@formatter ||= PowerAssert::ListFormatter.new
   end
