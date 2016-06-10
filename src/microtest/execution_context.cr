@@ -1,6 +1,5 @@
 module Microtest
   class ExecutionContext
-
     getter results : Array(TestResult)
     getter reporters : Array(Reporter)
     getter suites : Array(Test.class)
@@ -10,7 +9,8 @@ module Microtest
     end
 
     def errors : Array(TestFailure)
-      results.map{ |res| res if res.is_a?(TestFailure) }.compact
+      arr = results.map { |res| res if res.is_a?(TestFailure) }
+      arr.compact
     end
 
     def errors?
@@ -48,8 +48,7 @@ module Microtest
     end
 
     def total_failure
-      results.count{|r| !r.success?}
+      results.count { |r| !r.success? }
     end
-
   end
 end
