@@ -8,7 +8,7 @@ module Microtest
       TestSuccess.new(suite, test, duration)
     end
 
-    #getter suite : Test.class
+    # getter suite : Test.class
     getter suite : String
     getter test : String
     getter duration : Int64

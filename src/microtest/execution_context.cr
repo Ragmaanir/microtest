@@ -3,9 +3,12 @@ module Microtest
     getter results : Array(TestResult)
     getter reporters : Array(Reporter)
     getter suites : Array(Test.class)
+    getter random_seed : UInt32
+    getter random : Random
 
-    def initialize(@reporters : Array(Reporter), @suites)
+    def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
       @results = [] of TestResult
+      @random = Random.new(@random_seed)
     end
 
     def errors : Array(TestFailure)

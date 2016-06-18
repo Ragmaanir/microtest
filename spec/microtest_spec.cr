@@ -1,6 +1,10 @@
 require "./spec_helper"
 
 describe Microtest do
+  test "raise" do
+    raise "something"
+  end
+
   test "power asserts" do
     assert true == !false
     assert 1 > 0
@@ -15,9 +19,5 @@ describe Microtest do
     bob = 5
 
     assert bob == a - 4
-  end
-
-  test "raise" do
-    raise "something"
   end
 end

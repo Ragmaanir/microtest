@@ -10,10 +10,9 @@ module Microtest
   end
 
   class ProgressReporter < Reporter
-
     CHARS = {
-      dot: ["\u2022","\u2022"],
-      ticks: ["\u2713","\u2715"]
+      dot:   ["\u2022", "\u2022"],
+      ticks: ["\u2713", "\u2715"],
     }
 
     @chars : Array(String)
@@ -42,15 +41,17 @@ module Microtest
     end
 
     private def print_error(number, error)
-      #puts "|%03d| %s" % {number+1, "-"*25}
+      # puts "|%03d| %s" % {number+1, "-"*25}
       puts
       case ex = error.exception
       when AssertionFailure
-        puts format_string({:red, "# %-3d" % (number+1), ex.file})
+        puts format_string({:red, "# %-3d" % (number + 1), ex.file})
         puts ex.message
       when UnexpectedError
-        puts format_string({:red, "# %-3d" % (number+1), ex.message})
-        puts ex.backtrace.join("\n")
+        puts format_string({:red, "# %-3d" % (number + 1), ex.message})
+        if ex.backtrace?
+          puts ex.backtrace.join("\n")
+        end
       else raise "Invalid Exception"
       end
     end
@@ -66,13 +67,12 @@ module Microtest
       puts
       microseconds = ctx.results.map(&.duration).sum
       total = format_large_number(microseconds)
-      puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} microseconds"})
+      puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} microseconds with seed #{ctx.random_seed}"})
       puts format_string({:white,
         {:green, "Success: ", ctx.total_success},
         ", ",
-        {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure}
+        {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure},
       })
     end
-
   end
 end

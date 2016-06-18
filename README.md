@@ -50,12 +50,12 @@ the computer voice to report build/test failure/success.
 - hooks (before, after, around), and global ones for e.g. global transactional fixtures
 - Customizable reporters
 - Capture timing info
+- Randomization + configurable seed
 
 ## TODO
 
 - crtl+c to halt tests
 - fail fast
-- Randomization + configurable seed
 - Number of tests and assertions
 - Focus & skip
 - Reporter: list N slowest tests
