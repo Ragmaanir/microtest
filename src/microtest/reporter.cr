@@ -1,11 +1,20 @@
 module Microtest
   abstract class Reporter
+    getter io : IO
+
+    def initialize(@io)
+    end
+
     abstract def report(result : TestResult)
 
     def started(ctx : ExecutionContext)
     end
 
     def finished(ctx : ExecutionContext)
+    end
+
+    private def puts(*args)
+      io.puts(*args)
     end
   end
 
@@ -17,7 +26,8 @@ module Microtest
 
     @chars : Array(String)
 
-    def initialize(@chars = CHARS[:dot])
+    def initialize(@chars = CHARS[:dot], io = STDOUT)
+      super(io)
     end
 
     def report(result)
@@ -26,10 +36,18 @@ module Microtest
       when TestFailure then print @chars[1].colorize(:red)
       end
     end
+
+    def finished(ctx : ExecutionContext)
+      puts
+    end
   end
 
   class ErrorListReporter < Reporter
     include StringFormatting
+
+    def initialize(io = STDOUT)
+      super(io)
+    end
 
     def report(result : TestResult)
     end
@@ -42,10 +60,9 @@ module Microtest
 
     private def print_error(number, error)
       # puts "|%03d| %s" % {number+1, "-"*25}
-      puts
       case ex = error.exception
       when AssertionFailure
-        puts format_string({:red, "# %-3d" % (number + 1), ex.file})
+        puts format_string({:red, "# %-3d" % (number + 1), error.test_method})
         puts ex.message
       when UnexpectedError
         puts format_string({:red, "# %-3d" % (number + 1), ex.message})
@@ -54,25 +71,70 @@ module Microtest
         end
       else raise "Invalid Exception"
       end
+
+      puts
     end
   end
 
   class SummaryReporter < Reporter
     include StringFormatting
 
+    def initialize(io = STDOUT)
+      super(io)
+    end
+
     def report(result : TestResult)
     end
 
     def finished(ctx : ExecutionContext)
-      puts
-      microseconds = ctx.results.map(&.duration).sum
-      total = format_large_number(microseconds)
-      puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} microseconds with seed #{ctx.random_seed}"})
+      ms = ctx.results.map(&.duration).sum.milliseconds
+      total = format_large_number(ms)
+      puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"})
       puts format_string({:white,
         {:green, "Success: ", ctx.total_success},
         ", ",
         {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure},
       })
+      puts
+    end
+  end
+
+  class SlowTestsReporter < Reporter
+    include StringFormatting
+
+    getter count : Int32
+    getter threshold : Duration
+
+    def initialize(@count = 10, @threshold = Duration.milliseconds(1), io = STDOUT)
+      super(io)
+    end
+
+    def report(result : TestResult)
+    end
+
+    def finished(ctx : ExecutionContext)
+      res = ctx.results.select { |r| r.duration >= threshold }.sort { |l, r| l.duration <=> r.duration }.first(count)
+
+      if res.empty?
+        puts format_string({:dark_gray, "No slow tests (threshold: #{threshold.milliseconds}ms)"})
+      else
+        puts format_string({:blue, "Slowest #{res.size} tests"})
+        puts
+
+        res.each do |r|
+          name = if r.success?
+                   {:green, r.suite, "::", r.test}
+                 else
+                   {:red, r.suite, "::", r.test}
+                 end
+
+          duration_str = "%6d" % r.duration.milliseconds
+
+          puts format_string({:white, duration_str, {:dark_gray, " ms "}, name})
+        end
+      end
+
+      puts
     end
   end
 end

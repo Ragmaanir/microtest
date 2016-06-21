@@ -79,16 +79,16 @@ module Microtest
         around_hooks do
           before_hooks
 
-          time = Time.now
+          time = Time.now.epoch_ms
           exc = capture_exception(name) do
             yield
           end
-          duration = Time.now.ticks - time.ticks
+          duration = (Time.now.epoch_ms - time).to_i32
 
           if exc
-            context.record_result(TestResult.failure(self.class.name, name, duration, exc))
+            context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
           else
-            context.record_result(TestResult.success(self.class.name, name, duration))
+            context.record_result(TestResult.success(self.class.name, name, Duration.milliseconds(duration)))
           end
 
           after_hooks
@@ -105,7 +105,7 @@ module Microtest
       rescue ex : AssertionFailure
         ex
       rescue ex : Exception
-        UnexpectedError.new(name, ex)
+        UnexpectedError.new(self.class.name, name, ex)
       end
     end
 

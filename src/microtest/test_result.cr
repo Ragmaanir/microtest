@@ -1,3 +1,5 @@
+require "./duration"
+
 module Microtest
   abstract class TestResult
     def self.failure(suite, test, duration, error)
@@ -11,18 +13,22 @@ module Microtest
     # getter suite : Test.class
     getter suite : String
     getter test : String
-    getter duration : Int64
+    getter duration : Duration
 
     def initialize(@suite, @test, @duration)
     end
 
     abstract def success?
+
+    def test_method
+      [suite, test].join("#")
+    end
   end
 
   class TestFailure < TestResult
     getter exception : Exception
 
-    def initialize(suite, test, duration, @exception)
+    def initialize(suite, test, duration : Duration, @exception)
       super(suite, test, duration)
     end
 

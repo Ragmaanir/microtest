@@ -22,10 +22,10 @@ module Microtest
   end
 
   class UnexpectedError < Exception
-    getter exception, test
+    getter exception, suite, test
 
-    def initialize(@test : String, @exception : Exception)
-      super("Unexpected error in #{test}: #{exception.message}")
+    def initialize(@suite : String, @test : String, @exception : Exception)
+      super("Unexpected error in #{suite}##{test}: #{exception.message}")
     end
   end
 
@@ -61,7 +61,7 @@ module Microtest
     @@formatter ||= PowerAssert::ListFormatter.new
   end
 
-  def self.run(reporters : Array(Reporter) = [ProgressReporter.new, ErrorListReporter.new, SummaryReporter.new] of Reporter, random_seed : UInt32 = ENV.fetch("SEED", Random.new_seed.to_s).to_u32)
+  def self.run(reporters : Array(Reporter) = [ProgressReporter.new, ErrorListReporter.new, SlowTestsReporter.new, SummaryReporter.new] of Reporter, random_seed : UInt32 = ENV.fetch("SEED", Random.new_seed.to_s).to_u32)
     runner = DefaultRunner.new(reporters, random_seed)
     runner.call
   end

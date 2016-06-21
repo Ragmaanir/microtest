@@ -11,13 +11,13 @@ describe Microtest do
   end
 
   test "fails" do
-    assert true != !false
+    assert 2**5 == 4 * 2**4
   end
 
   test "succeeds" do
     a = 1
     bob = 5
 
-    assert bob == a - 4
+    assert bob == 4 + a
   end
 end
