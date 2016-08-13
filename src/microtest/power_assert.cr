@@ -6,6 +6,14 @@ module Microtest
 
       def initialize(@expression, @value)
       end
+
+      def ==(other : Evaluation)
+        expression == other.expression
+      end
+
+      def hash
+        0
+      end
     end
 
     abstract class Value
@@ -120,7 +128,7 @@ module Microtest
 
     class ListFormatter < Formatter
       def call(node : Node)
-        node.nested_expressions.map do |ev|
+        node.nested_expressions.uniq.map do |ev|
           "%-16s : %s" % [ev.expression, ev.value.inspect]
         end.join("\n")
       end
@@ -176,6 +184,14 @@ module Microtest
 
         fail %message, {{ file }}, {{ line }}
       end
+    end
+
+    def assert_raises(exception_type : Exception.class, file : String = __FILE__, line : String = __LINE__, &block)
+      yield
+    rescue exception_type
+      pass
+    else
+      raise AssertionFailure.new("Expected block to raise #{exception_type} but it didn't", file, line)
     end
   end
 end

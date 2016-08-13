@@ -5,7 +5,7 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 ## Features
 
 - This framework is opinionated
-- It uses power asserts by default. There are no `assert_equals`, `assert_xyz`, just power asserts
+- It uses power asserts by default. There are no `assert_equals`, `assert_xyz`, just power asserts (except for `assert_raises`)
 - It uses the spec syntax for test case structure (`describe`, `test`, `before`, `after`). Reasons: No test-case name-clashes when using describe. Not forgetting to call super in setup/teardown methods.
 - No nesting of describe blocks. IMO nesting of those blocks is an anti-pattern.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
@@ -27,6 +27,7 @@ dependencies:
 
 
 ```crystal
+# spec_helper.cr
 require "microtest"
 
 Microtest.around do
@@ -37,6 +38,40 @@ end
 
 include Microtest::DSL
 Microtest.run!(reporters: [MyFancyReporter.new] of Reporter)
+
+# water_pump_spec.cr
+describe MyLib::WaterPump do
+  test "that it pumps water" do
+    p = MyLib::WaterPump.new("main")
+    p.enable
+    p.start
+
+    assert(p.pumps_water?)
+  end
+
+  test "that it pumps with a certain speed" do
+    p = MyLib::WaterPump.new("main", speed: 100)
+    p.enable
+    p.start
+
+    assert(p.pump_speed > 50)
+  end
+end
+```
+
+When a power-assert fails you get output like this:
+
+```crystal
+assert 2**5 == 4 * 2**4
+
+# output
+# - subexpressions first
+# - complete expression last
+# - expression on the left, result on the right
+2 ** 5           : 32
+2 ** 4           : 16
+4 * (2 ** 4)     : 64
+(2 ** 5) == (4 * (2 ** 4)) : false
 ```
 
 
@@ -51,6 +86,8 @@ the computer voice to report build/test failure/success.
 - Customizable reporters
 - Capture timing info
 - Randomization + configurable seed
+- Reporter: list N slowest tests
+- assert_raises
 
 ## TODO
 
@@ -58,10 +95,10 @@ the computer voice to report build/test failure/success.
 - fail fast
 - Number of tests and assertions
 - Focus & skip
-- Reporter: list N slowest tests
 - Alternatives to nesting? (Use separate describe blocks)
 - Group tests and specify hooks and helper methods for the group only
 - save results to file and compare current results to last results, including timings
+- Write real tests for Microtest
 
 ## Problems
 

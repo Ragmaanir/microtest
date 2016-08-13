@@ -23,7 +23,7 @@ module Microtest
     end
 
     macro test(name = "anonymous", focus = :nofocus, &block)
-      def test__{{name.gsub(/\s+/, "_").id}}
+      def test__{{name.gsub(/\s+|-/, "_").id}}
         {{block.body}}
       end
     end
