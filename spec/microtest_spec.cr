@@ -37,3 +37,7 @@ describe Microtest do
     end
   end
 end
+
+# Make sure an empty describe block compiles
+describe Array do
+end

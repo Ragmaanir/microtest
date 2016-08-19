@@ -57,18 +57,20 @@ module Microtest
       {% begin %}
         {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
 
-        context.test_suite(self.class) do
-          calls = [
-            {% for name in names %}
-              -> {
-                test = new(context)
-                test.call("{{name}}") { test.{{ name }} }
-              },
-            {% end %}
-          ]
+        {% if !names.empty? %}
+          context.test_suite(self.class) do
+            calls = [
+              {% for name in names %}
+                -> {
+                  test = new(context)
+                  test.call("{{name}}") { test.{{ name }} }
+                },
+              {% end %}
+            ]
 
-          calls.shuffle(context.random).each(&.call)
-        end
+            calls.shuffle(context.random).each(&.call)
+          end
+        {% end %}
       {% end %}
 
       nil
