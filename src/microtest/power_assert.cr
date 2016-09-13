@@ -188,8 +188,12 @@ module Microtest
 
     def assert_raises(exception_type : Exception.class, file : String = __FILE__, line : String = __LINE__, &block)
       yield
-    rescue exception_type
-      pass
+    rescue e
+      case e
+      when exception_type
+        pass
+      else raise AssertionFailure.new("Expected block to raise #{exception_type} but it raised #{e}", file, line)
+      end
     else
       raise AssertionFailure.new("Expected block to raise #{exception_type} but it didn't", file, line)
     end

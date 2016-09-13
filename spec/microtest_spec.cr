@@ -35,6 +35,12 @@ describe Microtest do
       assert_raises(ArgumentError) do
       end
     end
+
+    assert_raises(Microtest::AssertionFailure) do
+      assert_raises(ArgumentError) do
+        raise "unexpected exception"
+      end
+    end
   end
 end
 
