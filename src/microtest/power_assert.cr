@@ -183,6 +183,7 @@ module Microtest
         %message = Microtest.power_assert_formatter.call(%ast)
 
         fail %message, {{ file }}, {{ line }}
+        #fail %message, {{ expression.filename }}, {{ expression.line_number }}
       end
     end
 

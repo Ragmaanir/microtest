@@ -87,8 +87,10 @@ module Microtest
           end
           duration = (Time.now.epoch_ms - time).to_i32
 
-          if exc
-            context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
+          case exc
+          when AssertionFailure then context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
+          when UnexpectedError  then context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
+          when SkipException    then context.record_result(TestResult.skip(self.class.name, name, Duration.milliseconds(duration), exc))
           else
             context.record_result(TestResult.success(self.class.name, name, Duration.milliseconds(duration)))
           end
@@ -105,6 +107,8 @@ module Microtest
         yield
         nil
       rescue ex : AssertionFailure
+        ex
+      rescue ex : SkipException
         ex
       rescue ex : Exception
         UnexpectedError.new(self.class.name, name, ex)
@@ -125,8 +129,11 @@ module Microtest
     end
 
     def fail(msg, file, line)
-      # raise AssertionFailure.new(msg, file, line)
       raise AssertionFailure.new(msg, file, line)
+    end
+
+    macro skip(msg, file = __FILE__, line = __LINE__)
+      raise Microtest::SkipException.new({{msg}}, {{file}}, {{line}})
     end
   end
 end

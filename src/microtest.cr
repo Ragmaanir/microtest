@@ -9,7 +9,7 @@ require "./microtest/runner"
 require "./microtest/reporter"
 
 module Microtest
-  class AssertionFailure < Exception
+  class StandardException < Exception
     getter file : String
     getter line : Int32
 
@@ -18,14 +18,19 @@ module Microtest
     end
   end
 
-  class Skip < Exception
+  class AssertionFailure < StandardException
   end
 
-  class UnexpectedError < Exception
+  class SkipException < StandardException
+  end
+
+  class UnexpectedError < StandardException
     getter exception, suite, test
 
     def initialize(@suite : String, @test : String, @exception : Exception)
-      super("Unexpected error in #{suite}##{test}: #{exception.message}")
+      # super("Unexpected error in #{suite}##{test}: #{exception.message}")
+      # super("Unexpected error: #{exception.message}", exception.file, exception.line)
+      super("Unexpected error: #{exception.message}", "unknown", 0)
     end
   end
 

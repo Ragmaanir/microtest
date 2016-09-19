@@ -5,14 +5,14 @@ describe Microtest do
     raise "something"
   end
 
+  test "fails" do
+    a = 2
+    assert 2**4 == a * a * a
+  end
+
   test "power asserts" do
     assert true == !false
     assert 1 > 0
-  end
-
-  test "fails" do
-    a = 4
-    assert 2**5 == a * 2**a + a - a
   end
 
   test "succeeds" do
@@ -41,6 +41,10 @@ describe Microtest do
         raise "unexpected exception"
       end
     end
+  end
+
+  test "skip this" do
+    skip "this is pending"
   end
 end
 

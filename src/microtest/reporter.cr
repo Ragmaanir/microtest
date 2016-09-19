@@ -20,8 +20,8 @@ module Microtest
 
   class ProgressReporter < Reporter
     CHARS = {
-      dot:   ["\u2022", "\u2022"],
-      ticks: ["\u2713", "\u2715"],
+      dot:   ["\u2022", "\u2022", "\u2022"],
+      ticks: ["\u2713", "\u2715", "\u2715"],
     }
 
     @chars : Array(String)
@@ -33,7 +33,8 @@ module Microtest
     def report(result)
       case result
       when TestSuccess then print @chars[0].colorize(:green)
-      when TestFailure then print @chars[1].colorize(:red)
+      when TestSkip    then print @chars[1].colorize(:yellow)
+      when TestFailure then print @chars[2].colorize(:red)
       end
     end
 
@@ -53,6 +54,12 @@ module Microtest
     end
 
     def finished(ctx : ExecutionContext)
+      ctx.skips.each do |skip|
+        ex = skip.exception
+        puts format_string({:yellow, skip.test_method, " : ", ex.message})
+        puts
+      end
+
       ctx.errors.each_with_index do |error, i|
         print_error(i, error)
       end
@@ -65,7 +72,7 @@ module Microtest
         puts format_string({:red, "# %-3d" % (number + 1), error.test_method})
         puts ex.message
       when UnexpectedError
-        puts format_string({:red, "# %-3d" % (number + 1), ex.message})
+        puts format_string({:red, "# %-3d" % (number + 1), error.test_method, " : ", ex.message})
         if ex.backtrace?
           puts ex.backtrace.join("\n")
         end
@@ -92,6 +99,8 @@ module Microtest
       puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"})
       puts format_string({:white,
         {:green, "Success: ", ctx.total_success},
+        ", ",
+        {(:yellow if ctx.total_skip > 0), "Skips: ", ctx.total_skip},
         ", ",
         {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure},
       })
@@ -122,15 +131,16 @@ module Microtest
         puts
 
         res.each do |r|
-          name = if r.success?
-                   {:green, r.suite, "::", r.test}
-                 else
-                   {:red, r.suite, "::", r.test}
-                 end
+          color = case r
+                  when TestSuccess then :green
+                  when TestFailure then :red
+                  when TestSkip    then :yellow
+                  end
 
           duration_str = "%6d" % r.duration.milliseconds
+          meth = [r.suite, "::", r.test].join
 
-          puts format_string({:white, duration_str, {:dark_gray, " ms "}, name})
+          puts format_string({:white, duration_str, {:dark_gray, " ms "}, {color, meth}})
         end
       end
 

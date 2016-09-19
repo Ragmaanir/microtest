@@ -10,6 +10,10 @@ module Microtest
       TestSuccess.new(suite, test, duration)
     end
 
+    def self.skip(suite, test, duration, error)
+      TestSkip.new(suite, test, duration, error)
+    end
+
     # getter suite : Test.class
     getter suite : String
     getter test : String
@@ -17,8 +21,6 @@ module Microtest
 
     def initialize(@suite, @test, @duration)
     end
-
-    abstract def success?
 
     def test_method
       [suite, test].join("#")
@@ -32,20 +34,24 @@ module Microtest
       super(suite, test, duration)
     end
 
-    def success?
-      false
-    end
-
     def inspect(io)
       io << "#{suite}.#{test}: #{error}"
     end
   end
 
-  class TestSuccess < TestResult
-    def success?
-      true
+  class TestSkip < TestResult
+    getter exception : SkipException
+
+    def initialize(suite, test, duration : Duration, @exception)
+      super(suite, test, duration)
     end
 
+    def inspect(io)
+      io << "TestSkip"
+    end
+  end
+
+  class TestSuccess < TestResult
     def inspect(io)
       io << "TestSuccess"
     end

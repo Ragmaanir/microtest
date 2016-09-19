@@ -88,13 +88,14 @@ the computer voice to report build/test failure/success.
 - Randomization + configurable seed
 - Reporter: list N slowest tests
 - assert_raises
+- skip
 
 ## TODO
 
 - crtl+c to halt tests
 - fail fast
 - Number of tests and assertions
-- Focus & skip
+- focus
 - Alternatives to nesting? (Use separate describe blocks)
 - Group tests and specify hooks and helper methods for the group only
 - save results to file and compare current results to last results, including timings

@@ -19,6 +19,10 @@ module Microtest
       errors.any?
     end
 
+    def skips
+      results.compact_map(&.as?(TestSkip))
+    end
+
     def started
       reporters.each(&.started(self))
     end
@@ -46,11 +50,15 @@ module Microtest
     end
 
     def total_success
-      results.count(&.success?)
+      results.count(&.as?(TestSuccess))
     end
 
     def total_failure
-      results.count { |r| !r.success? }
+      results.count(&.as?(TestFailure))
+    end
+
+    def total_skip
+      results.count(&.as?(TestSkip))
     end
   end
 end
