@@ -104,6 +104,7 @@ module Microtest
         ", ",
         {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure},
       })
+
       puts
     end
   end
@@ -135,6 +136,7 @@ module Microtest
                   when TestSuccess then :green
                   when TestFailure then :red
                   when TestSkip    then :yellow
+                  else                  :white
                   end
 
           duration_str = "%6d" % r.duration.milliseconds
