@@ -6,7 +6,7 @@ module Microtest
 
     macro format_string(str)
       {%
-        color = str[0] || :white
+        color = str[0]
         output = [] of String
       %}
       {% for e, i in str %}
@@ -21,7 +21,7 @@ module Microtest
 
       {% output = output.join(",") %}
 
-      {% res = "[" + output + "]" + ".join.colorize(#{color})" %}
+      {% res = "[" + output + "]" + ".join.colorize(#{color} || :white)" %}
 
       {{res.id}}
     end

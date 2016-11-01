@@ -58,7 +58,7 @@ module Microtest
         {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
 
         {% if !names.empty? %}
-          context.test_suite(self.class) do
+          context.test_suite(self) do
             calls = [
               {% for name in names %}
                 -> {

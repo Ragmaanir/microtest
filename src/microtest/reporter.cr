@@ -13,6 +13,12 @@ module Microtest
     def finished(ctx : ExecutionContext)
     end
 
+    def suite_started(ctx : ExecutionContext, cls : String)
+    end
+
+    def suite_finished(ctx : ExecutionContext, cls : String)
+    end
+
     private def puts(*args)
       io.puts(*args)
     end
@@ -35,6 +41,36 @@ module Microtest
       when TestSuccess then print @chars[0].colorize(:green)
       when TestSkip    then print @chars[1].colorize(:yellow)
       when TestFailure then print @chars[2].colorize(:red)
+      end
+    end
+
+    def finished(ctx : ExecutionContext)
+      puts
+    end
+  end
+
+  class DescriptionReporter < Reporter
+    include StringFormatting
+
+    TICK  = "\u2713"
+    DOT   = "\u2022"
+    CROSS = "\u2715"
+
+    def initialize(io = STDOUT)
+      super(io)
+    end
+
+    def suite_started(ctx : ExecutionContext, cls : String)
+      puts
+      puts cls.colorize(:magenta).underline
+    end
+
+    def report(result)
+      t = result.test
+      case result
+      when TestSuccess then puts format_string({:green, " ", TICK, " ", t})
+      when TestSkip    then puts format_string({:yellow, " ", DOT, " ", t})
+      when TestFailure then puts format_string({:red, " ", CROSS, " ", t})
       end
     end
 

@@ -32,7 +32,9 @@ module Microtest
     end
 
     def test_suite(cls)
+      reporters.each(&.suite_started(self, cls.name))
       yield # FIXME
+      reporters.each(&.suite_finished(self, cls.name))
     end
 
     def test_case(name)
