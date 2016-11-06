@@ -1,3 +1,5 @@
+require "json"
+
 module Microtest
   abstract class Reporter
     getter io : IO
@@ -142,6 +144,34 @@ module Microtest
       })
 
       puts
+    end
+  end
+
+  class JsonSummaryReporter < Reporter
+    def initialize(io = STDOUT)
+      super(io)
+    end
+
+    def report(result : TestResult)
+    end
+
+    def finished(ctx : ExecutionContext)
+      results = ctx.results.reduce({} of String => Hash(String, String)) do |hash, res|
+        entry = {
+          :suite    => res.suite,
+          :test     => res.test,
+          :type     => res.class.name,
+          :duration => res.duration.milliseconds,
+        }
+
+        case res
+        when TestFailure, TestSkip then entry = entry.merge({:exception => res.exception.to_s})
+        end
+
+        hash.merge({"#{res.suite}##{res.test}" => entry})
+      end
+
+      puts(results.to_json)
     end
   end
 

@@ -35,7 +35,7 @@ module Microtest
     end
 
     def inspect(io)
-      io << "#{suite}.#{test}: #{error}"
+      io << "#{suite}.#{test}: #{exception}"
     end
   end
 

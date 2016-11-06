@@ -89,6 +89,8 @@ the computer voice to report build/test failure/success.
 - Reporter: list N slowest tests
 - assert_raises
 - skip
+- Write real tests for Microtest (uses JSON report to check for correct test output). Now tests are green.
+- JSON reporter
 
 ## TODO
 
@@ -99,7 +101,6 @@ the computer voice to report build/test failure/success.
 - Alternatives to nesting? (Use separate describe blocks)
 - Group tests and specify hooks and helper methods for the group only
 - save results to file and compare current results to last results, including timings
-- Write real tests for Microtest
 
 ## Problems
 
