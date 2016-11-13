@@ -23,8 +23,14 @@ module Microtest
     end
 
     macro test(name = "anonymous", focus = :nofocus, &block)
-      def test__{{name.gsub(/\s+|-/, "_").id}}
-        {{block.body}}
+      {% testname = name.gsub(/\s+|-/, "_").id %}
+
+      def test__{{testname}}
+        {% if block %}
+          {{block.body}}
+        {% else %}
+          skip "not implemented"
+        {% end %}
       end
     end
   end

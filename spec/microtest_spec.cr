@@ -34,7 +34,7 @@ describe Microtest do
     end
   end
 
-  test "test failing tests" do
+  test "test results" do
     result = microtest_test do
       test "assertion failure message" do
         a = 2
@@ -44,6 +44,8 @@ describe Microtest do
       test "skip this" do
         skip "this is pending"
       end
+
+      test "pending"
 
       test "raise" do
         raise "something"
@@ -61,11 +63,12 @@ describe Microtest do
     EXC
 
     assert result["MicrotestTest#test__skip_this"]["type"] == "Microtest::TestSkip"
+    assert result["MicrotestTest#test__pending"]["type"] == "Microtest::TestSkip"
     assert result["MicrotestTest#test__raise"]["type"] == "Microtest::TestFailure"
   end
 
   test "progress reporter" do
-    result = reporter_test([Microtest::ProgressReporter.new], 1337.to_u32) do
+    result = reporter_test([Microtest::ProgressReporter.new]) do
       test "success" do
         assert true == true
       end

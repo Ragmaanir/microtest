@@ -32,7 +32,7 @@ macro microtest_test(&block)
   end
 end
 
-macro reporter_test(reporters, seed, &block)
+macro reporter_test(reporters, &block)
   {%
     c = <<-CRYSTAL
       require "../src/microtest"
@@ -43,7 +43,7 @@ macro reporter_test(reporters, seed, &block)
         #{block.body.id}
       end
 
-      Microtest.run!(#{reporters} of Microtest::Reporter, #{seed})
+      Microtest.run!(#{reporters} of Microtest::Reporter)
     CRYSTAL
   %}
 

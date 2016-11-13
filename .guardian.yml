@@ -1,5 +1,5 @@
 files: ./**/*.cr
-run: (crystal spec && spd-say 'success') || spd-say 'error'
+run: (crystal spec && espeak -ven-us+f5 'success') || espeak -ven-us+f5 'error'
 ---
 files: ./shard.yml
 run: crystal deps
