@@ -1,4 +1,4 @@
-# microtest
+# microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -91,12 +91,14 @@ the computer voice to report build/test failure/success.
 - skip
 - Write real tests for Microtest (uses JSON report to check for correct test output). Now tests are green.
 - JSON reporter
+- SummaryRepoter
+- Continuous Integration with travis
 
 ## TODO
 
 - crtl+c to halt tests
 - fail fast
-- Number of tests and assertions
+- Number of assertions
 - focus
 - Alternatives to nesting? (Use separate describe blocks)
 - Group tests and specify hooks and helper methods for the group only
