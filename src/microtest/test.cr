@@ -22,10 +22,17 @@ module Microtest
       end
     end
 
-    macro test(name = "anonymous", focus = :nofocus, &block)
-      {% testname = name.gsub(/\s+|-/, "_").id %}
+    macro test!(name = "anonymous", &block)
+      test({{name}}, :focus) {{block}}
+    end
 
-      def test__{{testname}}
+    macro test(name = "anonymous", focus = :nofocus, &block)
+      {%
+        testname = name.gsub(/\s+|-/, "_").id
+        focus_str = focus == :focus ? "f" : ""
+      %}
+
+      def __test{{focus_str.id}}__{{testname}}
         {% if block %}
           {{block.body}}
         {% else %}
@@ -39,29 +46,65 @@ module Microtest
     include TestClassDSL
     include Microtest::PowerAssert
 
+    GENERAL_TESTNAME_PREFIX = "__test"
+    FOCUSED_TESTNAME_PREFIX = "__testf"
+    GENERAL_TESTNAME_REGEX  = /__test(f)?__/
+
     getter context : ExecutionContext
 
     def initialize(@context)
     end
 
     macro def self.test_classes : Array(Test.class)
-      {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
+      {{ ("[" + Test.all_subclasses.join(", ") + "] of Test.class").id }}
+    end
+
+    macro def self.using_focus? : Boolean
+      {{
+        Test.all_subclasses.any? do |c|
+          c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
+        end
+      }}
     end
 
     macro def self.test_methods : Array(String)
       {% begin %}
-        {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
-        {% if names.empty? %}
-          [] of String
-        {% else %}
-          [{{*names.map(&.stringify)}}]
-        {% end %}
+        {%
+          using_focus = Test.all_subclasses.any? do |c|
+            c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
+          end
+
+          methods = if using_focus
+                      @type.methods.map(&.name).select(&.starts_with?(FOCUSED_TESTNAME_PREFIX)).map(&.stringify)
+                    else
+                      @type.methods.map(&.name).select(&.starts_with?(GENERAL_TESTNAME_PREFIX)).map(&.stringify)
+                    end
+        %}
+        [ {{ *methods }} ] of String
       {% end %}
     end
 
+    # NOTE:
+    # These macro methods are ugly. They contain a lot of duplication,
+    # but i don't know how to get rid of it. The duplication seems necessary, since
+    # a macro def cannot invoke another macro def. And a macro-level array of
+    # method names is required in order to be able to iterate over test method
+    # names to generate the "send(...)" like code.
     macro def self.run_tests(context) : Nil
       {% begin %}
-        {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
+        {%
+          test_methods = @type.methods.map(&.name).select(&.starts_with?(GENERAL_TESTNAME_PREFIX)).map(&.stringify)
+
+          focus = Test.all_subclasses.any? do |c|
+            c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
+          end
+
+          names = if focus
+                    test_methods.select(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
+                  else
+                    test_methods.select(&.starts_with?(GENERAL_TESTNAME_PREFIX))
+                  end
+        %}
 
         {% if !names.empty? %}
           context.test_suite(self) do
@@ -69,7 +112,7 @@ module Microtest
               {% for name in names %}
                 -> {
                   test = new(context)
-                  test.call("{{name}}") { test.{{ name }} }
+                  test.call("{{name.id}}".sub(GENERAL_TESTNAME_REGEX, "")) { test.{{ name.id }} }
                 },
               {% end %}
             ]

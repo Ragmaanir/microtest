@@ -19,7 +19,7 @@ macro microtest_test(&block)
     CRYSTAL
   %}
 
-  output = MemoryIO.new
+  output = IO::Memory.new
 
   s = Process.run("crystal", ["eval", {{c}}], output: output)
 
@@ -47,7 +47,7 @@ macro reporter_test(reporters, &block)
     CRYSTAL
   %}
 
-  output = MemoryIO.new
+  output = IO::Memory.new
 
   s = Process.run("crystal", ["eval", {{c}}], output: output)
 

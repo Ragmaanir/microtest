@@ -1,4 +1,4 @@
-# microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)
+# microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -56,6 +56,14 @@ describe MyLib::WaterPump do
 
     assert(p.pump_speed > 50)
   end
+
+  test "this one is pending since it got no body"
+
+  test "only run this focused test", :focus do
+  end
+
+  test! "and this one too since it is focused also" do
+  end
 end
 ```
 
@@ -92,14 +100,14 @@ the computer voice to report build/test failure/success.
 - Write real tests for Microtest (uses JSON report to check for correct test output). Now tests are green.
 - JSON reporter
 - SummaryRepoter
-- Continuous Integration with travis
+- Continuous Integration with Travis
+- focus
 
 ## TODO
 
 - crtl+c to halt tests
 - fail fast
 - Number of assertions
-- focus
 - Alternatives to nesting? (Use separate describe blocks)
 - Group tests and specify hooks and helper methods for the group only
 - save results to file and compare current results to last results, including timings
@@ -107,15 +115,3 @@ the computer voice to report build/test failure/success.
 ## Problems
 
 - Display correct line numbers. This is difficult since macros are used everywhere.
-
-## Contributing
-
-1. Fork it ( https://github.com/ragmaanir/microtest/fork )
-2. Create your feature branch (git checkout -b my-new-feature)
-3. Commit your changes (git commit -am 'Add some feature')
-4. Push to the branch (git push origin my-new-feature)
-5. Create a new Pull Request
-
-## Contributors
-
-- [ragmaanir](https://github.com/ragmaanir) ragmaanir - creator, maintainer

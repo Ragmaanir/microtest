@@ -111,8 +111,8 @@ module Microtest
         puts ex.message
       when UnexpectedError
         puts format_string({:red, "# %-3d" % (number + 1), error.test_method, " : ", ex.message})
-        if ex.backtrace?
-          puts ex.backtrace.join("\n")
+        if ex.exception.backtrace?
+          puts ex.exception.backtrace.join("\n")
         end
       else raise "Invalid Exception"
       end

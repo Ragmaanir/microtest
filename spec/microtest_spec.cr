@@ -52,7 +52,7 @@ describe Microtest do
       end
     end
 
-    exc = result["MicrotestTest#test__assertion_failure_message"]["exception"].as_s
+    exc = result["MicrotestTest#assertion_failure_message"]["exception"].as_s
 
     assert exc == <<-EXC
     2 ** 4           : 16
@@ -62,9 +62,9 @@ describe Microtest do
     (2 ** 4) == ((a * a) * a) : false
     EXC
 
-    assert result["MicrotestTest#test__skip_this"]["type"] == "Microtest::TestSkip"
-    assert result["MicrotestTest#test__pending"]["type"] == "Microtest::TestSkip"
-    assert result["MicrotestTest#test__raise"]["type"] == "Microtest::TestFailure"
+    assert result["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
+    assert result["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
+    assert result["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
   end
 
   test "progress reporter" do
@@ -87,6 +87,21 @@ describe Microtest do
     assert result.includes?(dot.colorize(:red).to_s)
     assert result.includes?(dot.colorize(:yellow).to_s)
     assert result.includes?(dot.colorize(:green).to_s)
+  end
+
+  test "focusing" do
+    result = microtest_test do
+      test "in focus", :focus do
+        assert true
+      end
+
+      test "not in focus" do
+        assert false
+      end
+    end
+
+    assert result["MicrotestTest#in_focus"]["type"] == "Microtest::TestSuccess"
+    assert !result.as_h.has_key?("MicrotestTest#not_in_focus")
   end
 end
 
