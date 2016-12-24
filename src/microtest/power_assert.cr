@@ -42,7 +42,7 @@ module Microtest
       getter expression : String
       getter value : Value
 
-      def initialize(@name, @expression, value : T)
+      def initialize(@name, @expression, value : T) forall T
         @value = ValueWrapper(T).new(value)
       end
 
@@ -103,7 +103,7 @@ module Microtest
     end
 
     class TerminalNode < Node
-      def self.build(expression, value : T)
+      def self.build(expression, value : T) forall T
         TerminalNode.new(expression, value)
       end
 
