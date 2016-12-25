@@ -9,7 +9,7 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 - It uses the spec syntax for test case structure (`describe`, `test`, `before`, `after`). Reasons: No test-case name-clashes when using describe. Not forgetting to call super in setup/teardown methods.
 - No nesting of describe blocks. IMO nesting of those blocks is an anti-pattern.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
-- Tests have to be started explicitly by `Microtest.run`, no at-exit hook.
+- Tests have to be started explicitly by `Microtest.run!`, no at-exit hook.
 
 ## Installation
 
@@ -82,6 +82,10 @@ assert 2**5 == 4 * 2**4
 (2 ** 5) == (4 * (2 ** 4)) : false
 ```
 
+## Reporters / Output
+
+![Description Reporter](/assets/run1.gif?raw=true)
+![Progress Reporter](/assets/run2.gif?raw=true)
 
 ## Development
 
