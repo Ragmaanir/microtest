@@ -1,6 +1,6 @@
 require "colorize"
+require "regnbue"
 
-require "./microtest/string_formatting"
 require "./microtest/test_result"
 require "./microtest/execution_context"
 require "./microtest/power_assert"

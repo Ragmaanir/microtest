@@ -54,12 +54,12 @@ describe Microtest do
 
     exc = result["MicrotestTest#assertion_failure_message"]["exception"].as_s
 
-    assert exc == <<-EXC
-    2 ** 4           : 16
-    a                : 2
-    a * a            : 4
-    (a * a) * a      : 8
-    (2 ** 4) == ((a * a) * a) : false
+    assert Regnbue.uncolor(exc) == <<-EXC
+    2 ** 4           => 16
+    a                => 2
+    a * a            => 4
+    (a * a) * a      => 8
+    (2 ** 4) == ((a * a) * a) => false
     EXC
 
     assert result["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"

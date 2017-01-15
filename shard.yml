@@ -5,3 +5,8 @@ authors:
   - ragmaanir <ragmaanir@gmail.com>
 
 license: MIT
+
+dependencies:
+  regnbue:
+    github: ragmaanir/regnbue
+    branch: master

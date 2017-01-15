@@ -52,8 +52,6 @@ module Microtest
   end
 
   class DescriptionReporter < Reporter
-    include StringFormatting
-
     TICK  = "\u2713"
     DOT   = "\u2022"
     CROSS = "\u2715"
@@ -70,9 +68,9 @@ module Microtest
     def report(result)
       t = result.test
       case result
-      when TestSuccess then puts format_string({:green, " ", TICK, " ", t})
-      when TestSkip    then puts format_string({:yellow, " ", DOT, " ", t})
-      when TestFailure then puts format_string({:red, " ", CROSS, " ", t})
+      when TestSuccess then puts Regnbue.format_string({:green, " ", TICK, " ", t})
+      when TestSkip    then puts Regnbue.format_string({:yellow, " ", DOT, " ", t})
+      when TestFailure then puts Regnbue.format_string({:red, " ", CROSS, " ", t})
       end
     end
 
@@ -82,8 +80,6 @@ module Microtest
   end
 
   class ErrorListReporter < Reporter
-    include StringFormatting
-
     def initialize(io = STDOUT)
       super(io)
     end
@@ -94,7 +90,7 @@ module Microtest
     def finished(ctx : ExecutionContext)
       ctx.skips.each do |skip|
         ex = skip.exception
-        puts format_string({:yellow, skip.test_method, " : ", ex.message})
+        puts Regnbue.format_string({:yellow, skip.test_method, " : ", ex.message})
         puts
       end
 
@@ -107,10 +103,10 @@ module Microtest
       # puts "|%03d| %s" % {number+1, "-"*25}
       case ex = error.exception
       when AssertionFailure
-        puts format_string({:red, "# %-3d" % (number + 1), error.test_method})
+        puts Regnbue.format_string({:red, "# %-3d" % (number + 1), error.test_method})
         puts ex.message
       when UnexpectedError
-        puts format_string({:red, "# %-3d" % (number + 1), error.test_method, " : ", ex.message})
+        puts Regnbue.format_string({:red, "# %-3d" % (number + 1), error.test_method, " : ", ex.message})
         if ex.exception.backtrace?
           puts ex.exception.backtrace.join("\n")
         end
@@ -122,8 +118,6 @@ module Microtest
   end
 
   class SummaryReporter < Reporter
-    include StringFormatting
-
     def initialize(io = STDOUT)
       super(io)
     end
@@ -133,9 +127,9 @@ module Microtest
 
     def finished(ctx : ExecutionContext)
       ms = ctx.results.map(&.duration).sum.milliseconds
-      total = format_large_number(ms)
-      puts format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"})
-      puts format_string({:white,
+      total = Regnbue.format_large_number(ms)
+      puts Regnbue.format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"})
+      puts Regnbue.format_string({:white,
         {:green, "Success: ", ctx.total_success},
         ", ",
         {(:yellow if ctx.total_skip > 0), "Skips: ", ctx.total_skip},
@@ -176,8 +170,6 @@ module Microtest
   end
 
   class SlowTestsReporter < Reporter
-    include StringFormatting
-
     getter count : Int32
     getter threshold : Duration
 
@@ -192,9 +184,9 @@ module Microtest
       res = ctx.results.select { |r| r.duration >= threshold }.sort { |l, r| l.duration <=> r.duration }.first(count)
 
       if res.empty?
-        puts format_string({:dark_gray, "No slow tests (threshold: #{threshold.milliseconds}ms)"})
+        puts Regnbue.format_string({:dark_gray, "No slow tests (threshold: #{threshold.milliseconds}ms)"})
       else
-        puts format_string({:blue, "Slowest #{res.size} tests"})
+        puts Regnbue.format_string({:blue, "Slowest #{res.size} tests"})
         puts
 
         res.each do |r|
@@ -208,7 +200,7 @@ module Microtest
           duration_str = "%6d" % r.duration.milliseconds
           meth = [r.suite, "::", r.test].join
 
-          puts format_string({:white, duration_str, {:dark_gray, " ms "}, {color, meth}})
+          puts Regnbue.format_string({:white, duration_str, {:dark_gray, " ms "}, {color, meth}})
         end
       end
 

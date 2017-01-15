@@ -128,8 +128,29 @@ module Microtest
 
     class ListFormatter < Formatter
       def call(node : Node)
+        sizes = node.nested_expressions.uniq.map do |ev|
+          {left: ev.expression.size, right: ev.value.inspect.size}
+        end
+
+        max_sizes = sizes.reduce({left: 0, right: 0}) do |max, s|
+          {
+            left:  [max[:left], s[:left]].max,
+            right: [max[:right], s[:right]].max,
+          }
+        end
+
+        is_compact = max_sizes[:left] < 32 && max_sizes[:right] < 50
+
         node.nested_expressions.uniq.map do |ev|
-          "%-16s : %s" % [ev.expression, ev.value.inspect]
+          val = ev.value.inspect
+
+          Regnbue.format_string({
+            :white,
+            ("%-16s" % ev.expression).colorize.fore(:light_blue),
+            {:yellow, (is_compact ? " => " : "\n")},
+            val,
+            ("\n" if !is_compact),
+          })
         end.join("\n")
       end
     end
