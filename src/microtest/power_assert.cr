@@ -82,8 +82,7 @@ module Microtest
 
         result += receiver.nested_expressions
 
-        # result += arguments.map(&.nested_expressions).flatten
-        result += arguments.map(&.nested_expressions).reduce([] of Evaluation) { |list, exps| list + exps }
+        result += arguments.map(&.nested_expressions).flatten
 
         result << Evaluation.new(expression, value)
 
@@ -114,7 +113,7 @@ module Microtest
       end
 
       def nested_expressions : Array(Evaluation)
-        if expression == value.to_s
+        if expression == value.inspect
           [] of Evaluation
         else
           [Evaluation.new(expression, value)] of Evaluation
@@ -128,7 +127,11 @@ module Microtest
 
     class ListFormatter < Formatter
       def call(node : Node)
-        sizes = node.nested_expressions.uniq.map do |ev|
+        # FIXME too much complex code, refactor into two methods, compact and complex or so
+        expressions = node.nested_expressions.uniq
+        complete_expression = expressions.last
+
+        sizes = expressions.map do |ev|
           {left: ev.expression.size, right: ev.value.inspect.size}
         end
 
@@ -139,19 +142,45 @@ module Microtest
           }
         end
 
+        big_bar = "=" * 50
+        small_bar = "-" * 50
+
         is_compact = max_sizes[:left] < 32 && max_sizes[:right] < 50
 
-        node.nested_expressions.uniq.map do |ev|
-          val = ev.value.inspect
+        exp_width = [8, 12, 16, 20, 24].find { |limit| max_sizes[:left] < limit } || 24
 
-          Regnbue.format_string({
-            :white,
-            ("%-16s" % ev.expression).colorize.fore(:light_blue),
-            {:yellow, (is_compact ? " => " : "\n")},
+        assert_line = [
+          "assert ".colorize(:red),
+          complete_expression.expression.to_s.colorize(:yellow),
+          " # ".colorize(:dark_gray),
+          complete_expression.value.inspect.colorize(:dark_gray),
+        ].join
+
+        expression_values = expressions[0..-2].map do |ev|
+          val = ev.value.inspect
+          exp_str = if is_compact
+                      "%-#{exp_width}s" % ev.expression
+                    else
+                      ev.expression.to_s
+                    end
+
+          [
+            exp_str.colorize.fore(:yellow),
+            (is_compact ? " => " : "\n").colorize(:light_blue),
             val,
-            ("\n" if !is_compact),
-          })
+            ("\n" + small_bar.colorize(:light_blue).to_s if !is_compact),
+          ].join.colorize(:white)
         end.join("\n")
+
+        [
+          assert_line,
+          if expressions.size > 1
+            [
+              big_bar.colorize(:light_blue),
+              expression_values,
+            ].join("\n")
+          end,
+        ].join("\n")
       end
     end
 

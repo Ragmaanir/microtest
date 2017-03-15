@@ -22,6 +22,16 @@ module Microtest
       end
     end
 
+    macro pending(name = "anonymous", &block)
+      {%
+        testname = name.gsub(/\s+|-/, "_").id
+      %}
+
+      def __test__{{testname}}
+        skip "pending"
+      end
+    end
+
     macro test!(name = "anonymous", &block)
       test({{name}}, :focus) {{block}}
     end
@@ -125,14 +135,14 @@ module Microtest
       nil
     end
 
-    def call(name)
+    def call(name, &block)
       context.test_case(name) do
         around_hooks do
           before_hooks
 
           time = Time.now.epoch_ms
           exc = capture_exception(name) do
-            yield
+            block.call
           end
           duration = (Time.now.epoch_ms - time).to_i32
 
@@ -151,9 +161,9 @@ module Microtest
       nil
     end
 
-    def capture_exception(name)
+    def capture_exception(name, &block)
       begin
-        yield
+        block.call
         nil
       rescue ex : AssertionFailure
         ex
@@ -164,8 +174,8 @@ module Microtest
       end
     end
 
-    def around_hooks
-      yield
+    def around_hooks(&block)
+      block.call
     end
 
     def before_hooks

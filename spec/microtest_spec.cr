@@ -41,11 +41,24 @@ describe Microtest do
         assert 2**4 == a * a * a
       end
 
+      test "long assertion failure message" do
+        long_name = 2
+        assert 2**4 == long_name + long_name + long_name
+      end
+
+      test "hide literals in failure message" do
+        assert "left" == "right"
+      end
+
       test "skip this" do
         skip "this is pending"
       end
 
       test "pending"
+
+      pending "pending too" do
+        raise ""
+      end
 
       test "raise" do
         raise "something"
@@ -54,16 +67,41 @@ describe Microtest do
 
     exc = result["MicrotestTest#assertion_failure_message"]["exception"].as_s
 
-    assert Regnbue.uncolor(exc) == <<-EXC
-    2 ** 4           => 16
-    a                => 2
-    a * a            => 4
-    (a * a) * a      => 8
-    (2 ** 4) == ((a * a) * a) => false
+    assert uncolor(exc) == <<-EXC
+    assert (2 ** 4) == ((a * a) * a) # false
+    ==================================================
+    2 ** 4                   => 16
+    a                        => 2
+    a * a                    => 4
+    (a * a) * a              => 8
     EXC
+
+    exc = result["MicrotestTest#long_assertion_failure_message"]["exception"].as_s
+
+    assert uncolor(exc) == <<-EXC
+    assert (2 ** 4) == ((long_name + long_name) + long_name) # false
+    ==================================================
+    2 ** 4
+    16
+    --------------------------------------------------
+    long_name
+    2
+    --------------------------------------------------
+    long_name + long_name
+    4
+    --------------------------------------------------
+    (long_name + long_name) + long_name
+    6
+    --------------------------------------------------
+    EXC
+
+    exc = result["MicrotestTest#hide_literals_in_failure_message"]["exception"].as_s
+
+    assert uncolor(exc) == %(assert "left" == "right" # false\n)
 
     assert result["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
     assert result["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
+    assert result["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
     assert result["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
   end
 
@@ -102,6 +140,57 @@ describe Microtest do
 
     assert result["MicrotestTest#in_focus"]["type"] == "Microtest::TestSuccess"
     assert !result.as_h.has_key?("MicrotestTest#not_in_focus")
+  end
+
+  test "before and after hook" do
+    result = full_microtest_test do
+      describe Microtest do
+        before do
+          @@value = true
+        end
+
+        after do
+          assert @@value == false
+        end
+
+        test "first" do
+          assert @@value == true
+          @@value = false
+        end
+
+        test "second" do
+          assert @@value == true
+          @@value = false
+        end
+      end
+    end
+
+    assert result["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
+    assert result["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
+  end
+
+  test "around hook" do
+    skip "crashes in power assert formatter when specific combination of tests is run"
+    result = microtest_test do
+      around do |block|
+        @@value = true
+        block.call
+        assert @@value == false
+      end
+
+      test "first" do
+        assert @@value == true
+        @@value = false
+      end
+
+      test "second" do
+        assert @@value == true
+        @@value = false
+      end
+    end
+
+    assert result["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
+    assert result["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
   end
 end
 

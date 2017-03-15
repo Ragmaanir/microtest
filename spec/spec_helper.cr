@@ -2,6 +2,40 @@ require "../src/microtest"
 
 include Microtest::DSL
 
+COLOR_REGEX = %r{\e\[\d\d?m}
+
+def uncolor(str)
+  str.gsub(COLOR_REGEX, "")
+end
+
+macro full_microtest_test(&block)
+  {%
+    c = <<-CRYSTAL
+      require "../src/microtest"
+
+      include Microtest::DSL
+
+      #{block.body.id}
+
+      Microtest.run!([
+        Microtest::JsonSummaryReporter.new
+      ] of Microtest::Reporter)
+    CRYSTAL
+  %}
+
+  output = IO::Memory.new
+
+  s = Process.run("crystal", ["eval", {{c}}], output: output)
+
+  begin
+    res = JSON.parse(output.to_s)
+  rescue e
+    puts "Error parsing JSON:"
+    p output.to_s
+    raise e
+  end
+end
+
 macro microtest_test(&block)
   {%
     c = <<-CRYSTAL

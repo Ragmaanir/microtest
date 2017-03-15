@@ -1,6 +1,14 @@
 require "json"
 
 module Microtest
+  module Formatter
+    # format_large_number(1234567)
+    # #=> "1,234,567"
+    def self.format_large_number(number, separator : String = ",")
+      number.to_s.reverse.gsub(/(\d{3})(?=.)/, "\\1#{separator}").reverse
+    end
+  end
+
   abstract class Reporter
     getter io : IO
 
@@ -68,9 +76,9 @@ module Microtest
     def report(result)
       t = result.test
       case result
-      when TestSuccess then puts Regnbue.format_string({:green, " ", TICK, " ", t})
-      when TestSkip    then puts Regnbue.format_string({:yellow, " ", DOT, " ", t})
-      when TestFailure then puts Regnbue.format_string({:red, " ", CROSS, " ", t})
+      when TestSuccess then puts [" ", TICK, " ", t].join.colorize(:green)
+      when TestSkip    then puts [" ", DOT, " ", t].join.colorize(:yellow)
+      when TestFailure then puts [" ", CROSS, " ", t].join.colorize(:red)
       end
     end
 
@@ -90,7 +98,7 @@ module Microtest
     def finished(ctx : ExecutionContext)
       ctx.skips.each do |skip|
         ex = skip.exception
-        puts Regnbue.format_string({:yellow, skip.test_method, " : ", ex.message})
+        puts [skip.test_method, " : ", ex.message].join.colorize(:yellow)
         puts
       end
 
@@ -103,10 +111,10 @@ module Microtest
       # puts "|%03d| %s" % {number+1, "-"*25}
       case ex = error.exception
       when AssertionFailure
-        puts Regnbue.format_string({:red, "# %-3d" % (number + 1), error.test_method})
+        puts ["# %-3d" % (number + 1), error.test_method].join.colorize(:red)
         puts ex.message
       when UnexpectedError
-        puts Regnbue.format_string({:red, "# %-3d" % (number + 1), error.test_method, " : ", ex.message})
+        puts ["# %-3d" % (number + 1), error.test_method, " : ", ex.message].join.colorize(:red)
         if ex.exception.backtrace?
           puts ex.exception.backtrace.join("\n")
         end
@@ -127,15 +135,15 @@ module Microtest
 
     def finished(ctx : ExecutionContext)
       ms = ctx.results.map(&.duration).sum.milliseconds
-      total = Regnbue.format_large_number(ms)
-      puts Regnbue.format_string({:blue, "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"})
-      puts Regnbue.format_string({:white,
-        {:green, "Success: ", ctx.total_success},
+      total = Formatter.format_large_number(ms)
+      puts ["Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"].join.colorize(:blue)
+      puts [
+        ["Success: ", ctx.total_success].join.colorize(:green),
         ", ",
-        {(:yellow if ctx.total_skip > 0), "Skips: ", ctx.total_skip},
+        ["Skips: ", ctx.total_skip].join.colorize(:yellow).toggle(ctx.total_skip > 0),
         ", ",
-        {(:red if ctx.total_failure > 0), "Failures: ", ctx.total_failure},
-      })
+        ["Failures: ", ctx.total_failure].join.colorize(:red).toggle(ctx.total_failure > 0),
+      ].join.colorize(:white)
 
       puts
     end
@@ -184,9 +192,9 @@ module Microtest
       res = ctx.results.select { |r| r.duration >= threshold }.sort { |l, r| l.duration <=> r.duration }.first(count)
 
       if res.empty?
-        puts Regnbue.format_string({:dark_gray, "No slow tests (threshold: #{threshold.milliseconds}ms)"})
+        puts "No slow tests (threshold: #{threshold.milliseconds}ms)".colorize(:dark_gray)
       else
-        puts Regnbue.format_string({:blue, "Slowest #{res.size} tests"})
+        puts "Slowest #{res.size} tests".colorize(:blue)
         puts
 
         res.each do |r|
@@ -200,7 +208,11 @@ module Microtest
           duration_str = "%6d" % r.duration.milliseconds
           meth = [r.suite, "::", r.test].join
 
-          puts Regnbue.format_string({:white, duration_str, {:dark_gray, " ms "}, {color, meth}})
+          puts [
+            duration_str,
+            " ms ".colorize(:dark_gray),
+            meth.colorize(color),
+          ].join
         end
       end
 

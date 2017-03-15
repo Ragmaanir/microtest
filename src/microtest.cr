@@ -1,5 +1,4 @@
 require "colorize"
-require "regnbue"
 
 require "./microtest/test_result"
 require "./microtest/execution_context"
@@ -37,7 +36,7 @@ module Microtest
   module GlobalHookDSL
     macro around(&block)
       class Microtest::Test
-        def around_hooks
+        def around_hooks(&block)
           {{block.body}}
         end
       end

@@ -6,7 +6,7 @@ authors:
 
 license: MIT
 
-dependencies:
-  regnbue:
-    github: ragmaanir/regnbue
-    branch: master
+# dependencies:
+#   regnbue:
+#     github: ragmaanir/regnbue
+#     branch: master
