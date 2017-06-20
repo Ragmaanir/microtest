@@ -1,5 +1,6 @@
 require "colorize"
 
+require "./microtest/backtrace_printer"
 require "./microtest/test_result"
 require "./microtest/execution_context"
 require "./microtest/power_assert"

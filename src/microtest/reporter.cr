@@ -116,7 +116,8 @@ module Microtest
       when UnexpectedError
         puts ["# %-3d" % (number + 1), error.test_method, " : ", ex.message].join.colorize(:red)
         if ex.exception.backtrace?
-          puts ex.exception.backtrace.join("\n")
+          puts ("-" * 60).colorize(:red)
+          BacktracePrinter.new.call(ex.exception.backtrace)
         end
       else raise "Invalid Exception"
       end
