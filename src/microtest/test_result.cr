@@ -1,5 +1,3 @@
-require "./duration"
-
 module Microtest
   abstract class TestResult
     def self.failure(suite, test, duration, error)
@@ -17,7 +15,7 @@ module Microtest
     # getter suite : Test.class
     getter suite : String
     getter test : String
-    getter duration : Duration
+    getter duration : Time::Span
 
     def initialize(@suite, @test, @duration)
     end
@@ -25,13 +23,19 @@ module Microtest
     def test_method
       [suite, test].join("#")
     end
+
+    abstract def kind : Symbol
   end
 
   class TestFailure < TestResult
     getter exception : Exception
 
-    def initialize(suite, test, duration : Duration, @exception)
+    def initialize(suite, test, duration : Time::Span, @exception)
       super(suite, test, duration)
+    end
+
+    def kind
+      :failure
     end
 
     def inspect(io)
@@ -42,8 +46,12 @@ module Microtest
   class TestSkip < TestResult
     getter exception : SkipException
 
-    def initialize(suite, test, duration : Duration, @exception)
+    def initialize(suite, test, duration : Time::Span, @exception)
       super(suite, test, duration)
+    end
+
+    def kind
+      :skip
     end
 
     def inspect(io)
@@ -52,6 +60,10 @@ module Microtest
   end
 
   class TestSuccess < TestResult
+    def kind
+      :success
+    end
+
     def inspect(io)
       io << "TestSuccess"
     end

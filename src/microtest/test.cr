@@ -140,18 +140,18 @@ module Microtest
         around_hooks do
           before_hooks
 
-          time = Time.now.epoch_ms
+          time = Time.now
           exc = capture_exception(name) do
             block.call
           end
-          duration = (Time.now.epoch_ms - time).to_i32
+          duration = Time.now - time
 
           case exc
-          when AssertionFailure then context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
-          when UnexpectedError  then context.record_result(TestResult.failure(self.class.name, name, Duration.milliseconds(duration), exc))
-          when SkipException    then context.record_result(TestResult.skip(self.class.name, name, Duration.milliseconds(duration), exc))
+          when AssertionFailure then context.record_result(TestResult.failure(self.class.name, name, duration, exc))
+          when UnexpectedError  then context.record_result(TestResult.failure(self.class.name, name, duration, exc))
+          when SkipException    then context.record_result(TestResult.skip(self.class.name, name, duration, exc))
           else
-            context.record_result(TestResult.success(self.class.name, name, Duration.milliseconds(duration)))
+            context.record_result(TestResult.success(self.class.name, name, duration))
           end
 
           after_hooks

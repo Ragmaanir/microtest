@@ -1,11 +1,26 @@
 require "json"
 
+require "./formatter"
+
 module Microtest
-  module Formatter
-    # format_large_number(1234567)
-    # #=> "1,234,567"
-    def self.format_large_number(number, separator : String = ",")
-      number.to_s.reverse.gsub(/(\d{3})(?=.)/, "\\1#{separator}").reverse
+  module Helper
+    alias ResultSymbols = {success: String, failure: String, skip: String}
+    alias ResultColors = {success: Symbol, failure: Symbol, skip: Symbol}
+
+    DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow}
+
+    DOT   = "\u2022"
+    TICK  = "\u2713"
+    CROSS = "\u2715"
+
+    DOTS  = {success: DOT, failure: DOT, skip: DOT}
+    TICKS = {success: TICK, failure: CROSS, skip: TICK}
+
+    def self.result_style(result : TestResult, symbols : ResultSymbols = TICKS, colors : ResultColors = DEFAULT_COLORS)
+      {
+        symbol: symbols[result.kind],
+        color:  colors[result.kind],
+      }
     end
   end
 
@@ -35,23 +50,15 @@ module Microtest
   end
 
   class ProgressReporter < Reporter
-    CHARS = {
-      dot:   ["\u2022", "\u2022", "\u2022"],
-      ticks: ["\u2713", "\u2715", "\u2715"],
-    }
+    @chars : Helper::ResultSymbols
 
-    @chars : Array(String)
-
-    def initialize(@chars = CHARS[:dot], io = STDOUT)
+    def initialize(@chars = Helper::DOTS, io = STDOUT)
       super(io)
     end
 
     def report(result)
-      case result
-      when TestSuccess then print @chars[0].colorize(:green)
-      when TestSkip    then print @chars[1].colorize(:yellow)
-      when TestFailure then print @chars[2].colorize(:red)
-      end
+      style = Helper.result_style(result, @chars)
+      print style[:symbol].colorize(style[:color])
     end
 
     def finished(ctx : ExecutionContext)
@@ -60,10 +67,6 @@ module Microtest
   end
 
   class DescriptionReporter < Reporter
-    TICK  = "\u2713"
-    DOT   = "\u2022"
-    CROSS = "\u2715"
-
     def initialize(io = STDOUT)
       super(io)
     end
@@ -74,12 +77,12 @@ module Microtest
     end
 
     def report(result)
-      t = result.test
-      case result
-      when TestSuccess then puts [" ", TICK, " ", t].join.colorize(:green)
-      when TestSkip    then puts [" ", DOT, " ", t].join.colorize(:yellow)
-      when TestFailure then puts [" ", CROSS, " ", t].join.colorize(:red)
-      end
+      style = Helper.result_style(result, Helper::TICKS)
+
+      symbol = style[:symbol].colorize(style[:color])
+      name = result.test.colorize(style[:color])
+
+      puts " #{symbol} #{name}"
     end
 
     def finished(ctx : ExecutionContext)
@@ -127,16 +130,24 @@ module Microtest
   end
 
   class SummaryReporter < Reporter
+    @started_at : Time
+
     def initialize(io = STDOUT)
       super(io)
+      @started_at = Time.now
     end
 
     def report(result : TestResult)
     end
 
+    def started(ctx : ExecutionContext)
+      @started_at = Time.now
+    end
+
     def finished(ctx : ExecutionContext)
-      ms = ctx.results.map(&.duration).sum.milliseconds
-      total = Formatter.format_large_number(ms)
+      ms = (Time.now - @started_at).total_milliseconds
+      total = Formatter.format_large_number(ms.to_i)
+
       puts ["Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"].join.colorize(:blue)
       puts [
         ["Success: ", ctx.total_success].join.colorize(:green),
@@ -164,7 +175,7 @@ module Microtest
           :suite    => res.suite,
           :test     => res.test,
           :type     => res.class.name,
-          :duration => res.duration.milliseconds,
+          :duration => res.duration.total_milliseconds,
         }
 
         case res
@@ -180,9 +191,11 @@ module Microtest
 
   class SlowTestsReporter < Reporter
     getter count : Int32
-    getter threshold : Duration
+    getter threshold : Time::Span
 
-    def initialize(@count = 10, @threshold = Duration.milliseconds(1), io = STDOUT)
+    COLORS = [:yellow, :red, :light_red, :light_red]
+
+    def initialize(@count = 10, @threshold = Time::Span.new(0, 0, 0, 0, 50), io = STDOUT)
       super(io)
     end
 
@@ -190,29 +203,35 @@ module Microtest
     end
 
     def finished(ctx : ExecutionContext)
-      res = ctx.results.select { |r| r.duration >= threshold }.sort { |l, r| l.duration <=> r.duration }.first(count)
+      res = ctx.results
+               .select { |r| r.duration >= threshold }
+               .sort { |l, r| l.duration <=> r.duration }
+               .first(count)
 
       if res.empty?
-        puts "No slow tests (threshold: #{threshold.milliseconds}ms)".colorize(:dark_gray)
+        puts "No slow tests (threshold: #{threshold.total_milliseconds}ms)".colorize(:dark_gray)
       else
         puts "Slowest #{res.size} tests".colorize(:blue)
         puts
 
         res.each do |r|
-          color = case r
-                  when TestSuccess then :green
-                  when TestFailure then :red
-                  when TestSkip    then :yellow
-                  else                  :white
-                  end
+          style = Helper.result_style(r)
 
-          duration_str = "%6d" % r.duration.milliseconds
           meth = [r.suite, "::", r.test].join
 
+          duration, unit = Formatter.format_duration(r.duration)
+
+          idx = 3.times.find { |i| threshold * (10**i) > r.duration } || 3
+          color = COLORS[idx]
+
           puts [
-            duration_str,
-            " ms ".colorize(:dark_gray),
-            meth.colorize(color),
+            " ",
+            style[:symbol].colorize(style[:color]),
+            [
+              "%6s" % duration,
+              " %-2s " % unit,
+              meth,
+            ].join.colorize(color),
           ].join
         end
       end

@@ -120,7 +120,7 @@ describe Microtest do
       end
     end
 
-    dot = Microtest::ProgressReporter::CHARS[:dot][0]
+    dot = Microtest::Helper::DOTS[:success]
 
     assert result.includes?(dot.colorize(:red).to_s)
     assert result.includes?(dot.colorize(:yellow).to_s)
