@@ -217,7 +217,8 @@ module Microtest
         res.each do |r|
           style = Helper.result_style(r)
 
-          meth = [r.suite, "::", r.test].join
+          meth_color = Helper.result_style(r)[:color]
+          meth = [r.suite, "::", r.test].join.colorize(meth_color)
 
           duration, unit = Formatter.format_duration(r.duration)
 
@@ -230,8 +231,8 @@ module Microtest
             [
               "%6s" % duration,
               " %-2s " % unit,
-              meth,
             ].join.colorize(color),
+            meth,
           ].join
         end
       end
