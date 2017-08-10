@@ -36,36 +36,40 @@ describe Microtest do
 
   test "test results" do
     result = microtest_test do
-      test "assertion failure message" do
-        a = 2
-        assert 2**4 == a * a * a
-      end
+      describe Microtest do
+        test "assertion failure message" do
+          a = 2
+          assert 2**4 == a * a * a
+        end
 
-      test "long assertion failure message" do
-        long_name = 2
-        assert 2**4 == long_name + long_name + long_name
-      end
+        test "long assertion failure message" do
+          long_name = 2
+          assert 2**4 == long_name + long_name + long_name
+        end
 
-      test "hide literals in failure message" do
-        assert "left" == "right"
-      end
+        test "hide literals in failure message" do
+          assert "left" == "right"
+        end
 
-      test "skip this" do
-        skip "this is pending"
-      end
+        test "skip this" do
+          skip "this is pending"
+        end
 
-      test "pending"
+        test "pending"
 
-      pending "pending too" do
-        raise ""
-      end
+        pending "pending too" do
+          raise ""
+        end
 
-      test "raise" do
-        raise "something"
+        test "raise" do
+          raise "something"
+        end
       end
     end
 
-    exc = result["MicrotestTest#assertion_failure_message"]["exception"].as_s
+    assert !result.success?
+
+    exc = result.json["results"]["MicrotestTest#assertion_failure_message"]["exception"].as_s
 
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((a * a) * a) # false
@@ -76,7 +80,7 @@ describe Microtest do
     (a * a) * a              => 8
     EXC
 
-    exc = result["MicrotestTest#long_assertion_failure_message"]["exception"].as_s
+    exc = result.json["results"]["MicrotestTest#long_assertion_failure_message"]["exception"].as_s
 
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((long_name + long_name) + long_name) # false
@@ -95,78 +99,93 @@ describe Microtest do
     --------------------------------------------------
     EXC
 
-    exc = result["MicrotestTest#hide_literals_in_failure_message"]["exception"].as_s
+    exc = result.json["results"]["MicrotestTest#hide_literals_in_failure_message"]["exception"].as_s
 
     assert uncolor(exc) == %(assert "left" == "right" # false\n)
 
-    assert result["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
-    assert result["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
-    assert result["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
-    assert result["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
+    assert result.json["results"]["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
+    assert result.json["results"]["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
+    assert result.json["results"]["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
+    assert result.json["results"]["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
   end
 
   test "progress reporter" do
     result = reporter_test([Microtest::ProgressReporter.new]) do
-      test "success" do
-        assert true == true
-      end
+      describe Microtest do
+        test "success" do
+          assert true == true
+        end
 
-      test "failure" do
-        assert 3 > 5
-      end
+        test "failure" do
+          assert 3 > 5
+        end
 
-      test "skip" do
-        skip "skip this one"
+        test "skip" do
+          skip "skip this one"
+        end
       end
     end
 
     dot = Microtest::Helper::DOTS[:success]
 
-    assert result.includes?(dot.colorize(:red).to_s)
-    assert result.includes?(dot.colorize(:yellow).to_s)
-    assert result.includes?(dot.colorize(:green).to_s)
+    assert result.stdout.includes?(dot.colorize(:red).to_s)
+    assert result.stdout.includes?(dot.colorize(:yellow).to_s)
+    assert result.stdout.includes?(dot.colorize(:green).to_s)
   end
 
   test "focusing" do
     result = microtest_test do
-      test "in focus", :focus do
-        assert true
-      end
+      describe Focus do
+        test "in focus", :focus do
+          assert true
+        end
 
-      test "not in focus" do
-        assert false
+        test "not in focus" do
+          assert false
+        end
       end
     end
 
-    assert result["MicrotestTest#in_focus"]["type"] == "Microtest::TestSuccess"
-    assert !result.as_h.has_key?("MicrotestTest#not_in_focus")
+    assert result.success?
+
+    assert result.json["results"]["FocusTest#in_focus"]["type"] == "Microtest::TestSuccess"
+    assert !result.json["results"].as_h.has_key?("FocusTest#not_in_focus")
   end
 
   test "before and after hook" do
-    result = full_microtest_test do
-      describe Microtest do
-        before do
-          @@value = true
-        end
-
-        after do
-          assert @@value == false
-        end
-
-        test "first" do
-          assert @@value == true
-          @@value = false
-        end
-
-        test "second" do
-          assert @@value == true
-          @@value = false
-        end
-      end
+    result = microtest_test do
+      {{`cat spec/examples/hooks.cr`}}
     end
 
-    assert result["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
-    assert result["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
+    assert result.success?
+
+    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
+    assert result.json["results"]["HooksTest#second"]["type"] == "Microtest::TestSuccess"
+  end
+
+  test "error in before hook" do
+    result = microtest_test do
+      {{`cat spec/examples/before_hook_error.cr`}}
+    end
+
+    assert !result.success?
+    assert !result.status.success?
+    assert result.json["success"] == false
+    assert result.json["aborted"] == true
+    assert result.json["results"].as_h.empty?
+  end
+
+  test "error in after hook" do
+    result = microtest_test do
+      {{`cat spec/examples/after_hook_error.cr`}}
+    end
+
+    assert !result.success?
+    assert !result.status.success?
+    assert result.json["success"] == false
+    assert result.json["aborted"] == true
+    assert /Unexpected error/ === result.json["aborting_exception"]
+    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
   end
 
   test "around hook" do
@@ -189,8 +208,8 @@ describe Microtest do
       end
     end
 
-    assert result["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
-    assert result["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
+    assert result.json["results"]["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
+    assert result.json["results"]["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
   end
 end
 

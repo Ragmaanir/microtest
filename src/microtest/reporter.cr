@@ -32,6 +32,9 @@ module Microtest
 
     abstract def report(result : TestResult)
 
+    def abort(ctx : ExecutionContext, exception : HookException)
+    end
+
     def started(ctx : ExecutionContext)
     end
 
@@ -44,8 +47,14 @@ module Microtest
     def suite_finished(ctx : ExecutionContext, cls : String)
     end
 
+    private def print(*args)
+      io.print(*args)
+      io.flush
+    end
+
     private def puts(*args)
       io.puts(*args)
+      io.flush
     end
   end
 
@@ -62,6 +71,7 @@ module Microtest
     end
 
     def finished(ctx : ExecutionContext)
+      puts
       puts
     end
   end
@@ -148,7 +158,8 @@ module Microtest
       ms = (Time.now - @started_at).total_milliseconds
       total = Formatter.format_large_number(ms.to_i)
 
-      puts ["Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}"].join.colorize(:blue)
+      focus_hint = "USING FOCUS: " if Test.using_focus?
+      puts [focus_hint.colorize.back(:red), "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}".colorize(:blue)].join
       puts [
         ["Success: ", ctx.total_success].join.colorize(:green),
         ", ",
@@ -162,15 +173,22 @@ module Microtest
   end
 
   class JsonSummaryReporter < Reporter
+    @started_at : Time
+
     def initialize(io = STDOUT)
       super(io)
+      @started_at = Time.now
     end
 
     def report(result : TestResult)
     end
 
+    def started(ctx : ExecutionContext)
+      @started_at = Time.now
+    end
+
     def finished(ctx : ExecutionContext)
-      results = ctx.results.reduce({} of String => Hash(String, String)) do |hash, res|
+      test_results = ctx.results.reduce({} of String => Hash(String, String)) do |hash, res|
         entry = {
           :suite    => res.suite,
           :test     => res.test,
@@ -185,7 +203,20 @@ module Microtest
         hash.merge({"#{res.suite}##{res.test}" => entry})
       end
 
-      puts(results.to_json)
+      ms = (Time.now - @started_at).total_milliseconds
+
+      puts({
+        using_focus:        Test.using_focus?,
+        success:            !ctx.errors? && !ctx.aborted?,
+        aborted:            ctx.aborted?,
+        aborting_exception: ctx.aborting_exception.try(&.message),
+        total_count:        ctx.total_tests,
+        success_count:      ctx.total_success,
+        skips_count:        ctx.total_skip,
+        failure_count:      ctx.total_failure,
+        total_duration:     ms,
+        results:            test_results,
+      }.to_json)
     end
   end
 

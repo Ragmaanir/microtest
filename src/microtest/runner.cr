@@ -15,15 +15,16 @@ module Microtest
       ctx = ExecutionContext.new(reporters, suites, random_seed)
       ctx.started
 
-      suites.shuffle(ctx.random).each do |suite|
-        suite.run_tests(ctx)
+      begin
+        suites.shuffle(ctx.random).each do |suite|
+          suite.run_tests(ctx)
+        end
+      rescue e : FatalException
       end
-
-      puts
 
       ctx.finished
 
-      !ctx.errors?
+      !ctx.errors? && !ctx.aborted?
     end
   end
 end

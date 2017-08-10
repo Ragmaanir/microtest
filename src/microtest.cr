@@ -25,13 +25,26 @@ module Microtest
   end
 
   class UnexpectedError < StandardException
-    getter exception, suite, test
+    getter exception : Exception
+    getter suite : String
+    getter test : String
 
-    def initialize(@suite : String, @test : String, @exception : Exception)
+    def initialize(@suite, @test, @exception)
       # super("Unexpected error in #{suite}##{test}: #{exception.message}")
       # super("Unexpected error: #{exception.message}", exception.file, exception.line)
       super("Unexpected error: #{exception.message}", "unknown", 0)
     end
+  end
+
+  class HookException < UnexpectedError
+    getter test_exception : StandardException | Symbol | Nil
+
+    def initialize(suite, test, exception, @test_exception)
+      super(suite, test, exception)
+    end
+  end
+
+  class FatalException < Exception
   end
 
   module GlobalHookDSL

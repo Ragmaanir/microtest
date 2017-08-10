@@ -1,6 +1,6 @@
 # microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
-### Version 0.9.0
+### Version <%= Microtest::VERSION %>
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -29,105 +29,41 @@ dependencies:
 
 
 ```crystal
-describe MyLib::WaterPump do
-  test "that it pumps water" do
-    p = MyLib::WaterPump.new("main")
-    p.enable
-    p.start
-
-    assert(p.pumps_water?)
-  end
-
-  test "that it pumps with a certain speed" do
-    p = MyLib::WaterPump.new("main", speed: 100)
-    p.enable
-    p.start
-
-    assert(p.pump_speed > 50)
-  end
-
-  test "this one is pending since it got no body"
-
-  test "only run this focused test", :focus do
-  end
-
-  test! "and this one too since it is focused also" do
-  end
-end
-
+<%= File.read("spec/examples/waterpump.cr") %>
 ```
 
 ## Power Assert Output
 
 ```crystal
-describe AssertionFailure do
-  test "assertion failure" do
-    a = 5
-    b = "aaaaaa"
-    assert "a" * a == b
-  end
-end
-
+<%= File.read("spec/examples/assertion_failure.cr") %>
 ```
 
 Generates:
 
-![Assertion Failure](assets/assertion_failure.png?raw=true)
+<%= image("Assertion Failure", "assets/assertion_failure") %>
 
 ### Microtest Test Output (default reporter)
-![Default](assets/spec.png?raw=true)
+<%= image("Default", "assets/spec") %>
 
 ## Reporters
 
 ```crystal
-describe First do
-  test "success" do
-  end
-
-  test "skip this"
-end
-
-describe Second do
-  def raise_an_error
-    raise "Oh, this is wrong"
-  end
-
-  test "first failure" do
-    a = 5
-    b = 7
-    assert a == b * 2
-  end
-
-  test "error" do
-    raise_an_error
-  end
-end
-
+<%= File.read("spec/examples/multiple_tests.cr") %>
 ```
 
 ### Progress Reporter
-![Progress Reporter](assets/progress_reporter.png?raw=true)
+<%= image("Progress Reporter", "assets/progress_reporter") %>
 
 ### Description Reporter
-![Description Reporter](assets/description_reporter.png?raw=true)
+<%= image("Description Reporter", "assets/description_reporter") %>
 
 ### When focus active
 
 ```crystal
-describe Focus do
-  test "not focuesd" do
-  end
-
-  test! "focused" do
-  end
-
-  test "focused too", :focus do
-  end
-end
-
+<%= File.read("spec/examples/focus.cr") %>
 ```
 
-![Focus](assets/focus.png?raw=true)
+<%= image("Focus", "assets/focus") %>
 
 ## Development
 

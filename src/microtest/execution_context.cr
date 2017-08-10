@@ -5,6 +5,7 @@ module Microtest
     getter suites : Array(Test.class)
     getter random_seed : UInt32
     getter random : Random
+    getter aborting_exception : HookException? = nil
 
     def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
       @results = [] of TestResult
@@ -17,6 +18,10 @@ module Microtest
 
     def errors?
       errors.any?
+    end
+
+    def aborted?
+      !!aborting_exception
     end
 
     def skips
@@ -45,6 +50,11 @@ module Microtest
       @results << result
       @reporters.each(&.report(result))
       # FIXME
+    end
+
+    def abort!(exception : HookException)
+      @reporters.each(&.abort(self, exception))
+      @aborting_exception = exception
     end
 
     def total_tests
