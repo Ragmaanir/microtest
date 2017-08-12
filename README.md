@@ -1,6 +1,6 @@
 # microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
-### Version 0.9.0
+### Version 1.0.0
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
