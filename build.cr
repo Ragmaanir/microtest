@@ -29,7 +29,9 @@ class Readme
 
   def generate_image_from_html(file)
     system("sudo", ["docker", "run", "-v", "#{Dir.current}:/root/", "alpine-microtest", "/bin/sh", "-c", "wkhtmltoimage --width 800 /root/#{file}.html /root/#{file}.png"])
-    system("rm", ["#{file}.html"])
+    # remove metadata
+    system("sudo", ["docker", "run", "-v", "#{Dir.current}:/root/", "alpine-microtest", "/bin/sh", "-c", "exiftool -all= -overwrite_original /root/#{file}.png"])
+    # system("rm", ["#{file}.html"])
   end
 
   ECR.def_to_s "README.md.template"

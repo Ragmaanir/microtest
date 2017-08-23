@@ -19,18 +19,36 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 Add this to your application's `shard.yml`:
 
 ```yaml
-dependencies:
+development_dependencies:
   microtest:
     github: ragmaanir/microtest
+    version: ~> <%= Microtest::VERSION %>
+```
+
+And add this to your `spec_helper.rb`:
+
+```crystal
+require "../src/microtest"
+
+include Microtest::DSL
+
+Microtest.run!
 ```
 
 
 ## Usage
 
-
 ```crystal
 <%= File.read("spec/examples/waterpump.cr") %>
 ```
+
+Run the test with:
+
+`crystal spec`
+
+You can provide the seed to run the tests in the same order:
+
+`SEED=123 crystal spec`
 
 ## Power Assert Output
 
@@ -43,9 +61,21 @@ Generates:
 <%= image("Assertion Failure", "assets/assertion_failure") %>
 
 ### Microtest Test Output (default reporter)
+
 <%= image("Default", "assets/spec") %>
 
 ## Reporters
+
+Select the used reporters:
+
+```crystal
+Microtest.run!([
+  Microtest::DescriptionReporter.new,
+  Microtest::ErrorListReporter.new,
+  Microtest::SlowTestsReporter.new,
+  Microtest::SummaryReporter.new,
+] of Microtest::Reporter)
+```
 
 ```crystal
 <%= File.read("spec/examples/multiple_tests.cr") %>

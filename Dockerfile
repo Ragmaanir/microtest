@@ -26,4 +26,6 @@ chmod +x /usr/bin/wkhtmltoimage
 
 RUN chmod +x /usr/bin/wkhtmltoimage
 
+RUN apk add --no-cache exiftool
+
 WORKDIR /root

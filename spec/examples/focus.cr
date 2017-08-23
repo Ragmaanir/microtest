@@ -1,5 +1,5 @@
 describe Focus do
-  test "not focuesd" do
+  test "not focused" do
   end
 
   test! "focused" do
