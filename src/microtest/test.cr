@@ -127,7 +127,10 @@ module Microtest
               {% end %}
             ]
 
-            calls.shuffle(context.random).each(&.call)
+            calls.shuffle(context.random).each do |c|
+              break if context.abortion_forced?
+              c.call
+            end
           end
         {% end %}
       {% end %}
@@ -142,13 +145,15 @@ module Microtest
 
         duration = Time.now - time
 
-        case e = exc
-        when HookException
-          report_test_result(name, duration, e.test_exception)
-          context.abort!(e)
-          raise FatalException.new
-        else
-          report_test_result(name, duration, e)
+        if !context.abortion_forced?
+          case e = exc
+          when HookException
+            report_test_result(name, duration, e.test_exception)
+            context.abort!(e)
+            raise FatalException.new
+          else
+            report_test_result(name, duration, e)
+          end
         end
       end
 

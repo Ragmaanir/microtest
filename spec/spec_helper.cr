@@ -64,9 +64,7 @@ macro microtest_test(&block)
   begin
     MicrotestJsonResult.new(s, JSON.parse(output.to_s))
   rescue e
-    puts "Error parsing JSON:"
-    p output.to_s
-    raise e
+    raise "Error parsing JSON: #{output.to_s}"
   end
 end
 

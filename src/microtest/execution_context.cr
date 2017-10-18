@@ -6,6 +6,7 @@ module Microtest
     getter random_seed : UInt32
     getter random : Random
     getter aborting_exception : HookException? = nil
+    getter? abortion_forced : Bool = false
 
     def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
       @results = [] of TestResult
@@ -18,6 +19,10 @@ module Microtest
 
     def errors?
       errors.any?
+    end
+
+    def force_abortion!
+      @abortion_forced = true
     end
 
     def aborted?

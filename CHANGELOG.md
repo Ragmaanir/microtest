@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.0.1
+
+- abort tests
+
+### 1.0.0
+
 ### 0.10.0
 
 - Summary reporter: highlights whether focus is used or not

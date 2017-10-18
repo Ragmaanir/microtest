@@ -116,10 +116,10 @@ Run `build.cr` to run tests and generate `README.md` from `README.md.template` a
 - [x] focus
 - [x] generate README including examples from specs and terminal screenshots
 - [x] Print whether focus is active
+- [x] crtl+c to halt tests
 
 ## TODO
 
-- [ ] crtl+c to halt tests
 - [ ] fail fast
 - [ ] Number of assertions
 - [ ] Alternatives to nesting? (Use separate describe blocks)
