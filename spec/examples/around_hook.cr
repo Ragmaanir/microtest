@@ -1,15 +1,13 @@
-describe Hooks do
+describe AroundHook do
   class Ctx
     property value : Bool = true
   end
 
   C = Ctx.new
 
-  before do
+  around do |block|
     C.value = true
-  end
-
-  after do
+    block.call
     assert C.value == false
   end
 

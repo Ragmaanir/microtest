@@ -45,7 +45,7 @@ end
 macro microtest_test(&block)
   {%
     c = <<-CRYSTAL
-      require "../src/microtest"
+      require "./src/microtest"
 
       include Microtest::DSL
 
@@ -59,7 +59,7 @@ macro microtest_test(&block)
 
   output = IO::Memory.new
 
-  s = Process.run("crystal", ["eval", {{c}}], output: output)
+  s = Process.run("crystal", ["eval", {{c}}], output: output, error: STDERR)
 
   begin
     MicrotestJsonResult.new(s, JSON.parse(output.to_s))
@@ -71,7 +71,7 @@ end
 macro reporter_test(reporters, &block)
   {%
     c = <<-CRYSTAL
-      require "../src/microtest"
+      require "./src/microtest"
 
       include Microtest::DSL
 
@@ -89,4 +89,9 @@ macro reporter_test(reporters, &block)
   MicrotestStdoutResult.new(s, output.to_s, err.to_s)
 end
 
-Microtest.run!
+Microtest.run!([
+  Microtest::DescriptionReporter.new,
+  Microtest::ErrorListReporter.new,
+  Microtest::SlowTestsReporter.new,
+  Microtest::SummaryReporter.new,
+] of Microtest::Reporter)

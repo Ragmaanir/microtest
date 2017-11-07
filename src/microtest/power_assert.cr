@@ -184,16 +184,46 @@ module Microtest
       end
     end
 
+    macro reflect_terminal(expression)
+      {% if expression.is_a? Call %}
+        {% if expression.receiver.is_a?(Nop) %}
+          %receiver = Microtest::PowerAssert::EmptyNode.new
+        {% else %}
+          %receiver = Microtest::PowerAssert::EmptyNode.new
+        {% end %}
+        %args = [] of Microtest::PowerAssert::Node
+        {% for arg in expression.args %}
+          %args.push(Microtest::PowerAssert::EmptyNode.new)
+        {% end %}
+
+        %named_args = [] of Microtest::PowerAssert::NamedArg
+
+        %block = {{ expression.block.stringify }}
+
+        Microtest::PowerAssert::Call.new(
+          {{ expression.name.stringify }}, {{expression.stringify}},
+          {{ expression }},
+          %receiver, %args, %named_args, %block
+        )
+      {% elsif expression.is_a? StringLiteral %}
+        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}.inspect, {{expression}})
+      {% elsif %w(SymbolLiteral RangeLiteral).includes?(expression.class_name) %}
+        Microtest::PowerAssert::TerminalNode.build({{expression}}.inspect, {{expression}})
+      {% else %}
+        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}, {{expression}})
+      {% end %}
+    end
+
     macro reflect_ast(expression)
       {% if expression.is_a? Call %}
         {% if expression.receiver.is_a?(Nop) %}
           %receiver = Microtest::PowerAssert::EmptyNode.new
         {% else %}
-          %receiver = reflect_ast({{ expression.receiver }})
+          %receiver = reflect_terminal({{ expression.receiver }})
         {% end %}
         %args = [] of Microtest::PowerAssert::Node
         {% for arg in expression.args %}
-          %args.push(reflect_ast({{ arg }}))
+          %args.push(reflect_terminal({{ arg }}))
         {% end %}
 
         %named_args = [] of Microtest::PowerAssert::NamedArg
@@ -201,7 +231,7 @@ module Microtest
           {% for key, idx in expression.named_args %}
             %named_args.push Microtest::PowerAssert::NamedArg.new(
               :{{ key.name.id }},
-              reflect_ast({{ expression.named_args[idx].value }})
+              reflect_terminal({{ expression.named_args[idx].value }})
             )
           {% end %}
         {% end %}

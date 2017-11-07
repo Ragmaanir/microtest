@@ -1,7 +1,7 @@
 module Microtest
   module TestClassDSL
     macro around(&block)
-      def around_hooks
+      def around_hooks(&block)
         super do
           {{block.body}}
         end
@@ -65,22 +65,22 @@ module Microtest
     def initialize(@context)
     end
 
-    macro def self.test_classes : Array(Test.class)
-      {{ ("[" + Test.all_subclasses.join(", ") + "] of Test.class").id }}
+    def self.test_classes : Array(Test.class)
+      {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
     end
 
-    macro def self.using_focus? : Bool
+    def self.using_focus? : Bool
       {{
-        Test.all_subclasses.any? do |c|
+        @type.all_subclasses.any? do |c|
           c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
         end
       }}
     end
 
-    macro def self.test_methods : Array(String)
+    def self.test_methods : Array(String)
       {% begin %}
         {%
-          using_focus = Test.all_subclasses.any? do |c|
+          using_focus = @type.all_subclasses.any? do |c|
             c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
           end
 
@@ -100,7 +100,7 @@ module Microtest
     # a macro def cannot invoke another macro def. And a macro-level array of
     # method names is required in order to be able to iterate over test method
     # names to generate the "send(...)" like code.
-    macro def self.run_tests(context) : Nil
+    def self.run_tests(context) : Nil
       {% begin %}
         {%
           test_methods = @type.methods.map(&.name).select(&.starts_with?(GENERAL_TESTNAME_PREFIX)).map(&.stringify)

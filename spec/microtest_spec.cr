@@ -75,8 +75,6 @@ describe Microtest do
     assert (2 ** 4) == ((a * a) * a) # false
     ==================================================
     2 ** 4                   => 16
-    a                        => 2
-    a * a                    => 4
     (a * a) * a              => 8
     EXC
 
@@ -87,12 +85,6 @@ describe Microtest do
     ==================================================
     2 ** 4
     16
-    --------------------------------------------------
-    long_name
-    2
-    --------------------------------------------------
-    long_name + long_name
-    4
     --------------------------------------------------
     (long_name + long_name) + long_name
     6
@@ -189,27 +181,12 @@ describe Microtest do
   end
 
   test "around hook" do
-    skip "crashes in power assert formatter when specific combination of tests is run"
     result = microtest_test do
-      around do |block|
-        @@value = true
-        block.call
-        assert @@value == false
-      end
-
-      test "first" do
-        assert @@value == true
-        @@value = false
-      end
-
-      test "second" do
-        assert @@value == true
-        @@value = false
-      end
+      {{`cat spec/examples/around_hook.cr`}}
     end
 
-    assert result.json["results"]["MicrotestTest#first"]["type"] == "Microtest::TestSuccess"
-    assert result.json["results"]["MicrotestTest#second"]["type"] == "Microtest::TestSuccess"
+    assert result.json["results"]["AroundHookTest#first"]["type"] == "Microtest::TestSuccess"
+    assert result.json["results"]["AroundHookTest#second"]["type"] == "Microtest::TestSuccess"
   end
 end
 

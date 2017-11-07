@@ -1,8 +1,11 @@
 # Changelog
 
-### 1.0.1
+### 1.1.0
 
 - abort tests
+- limit power assert output depth
+- update crystal to 0.24.0 (pre-release)
+- fix around hooks
 
 ### 1.0.0
 
