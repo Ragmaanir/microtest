@@ -1,6 +1,6 @@
 # microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
-### Version 1.0.0
+### Version 1.1.0
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -22,7 +22,7 @@ Add this to your application's `shard.yml`:
 development_dependencies:
   microtest:
     github: ragmaanir/microtest
-    version: ~> 1.0.0
+    version: ~> 1.1.0
 ```
 
 And add this to your `spec_helper.rb`:
@@ -161,8 +161,8 @@ end
 
 ## Development
 
-I am using guardian to run the tests on each change. Also the guardian task uses the computer voice to report build/test failure/success. 
-Run `build.cr` to run tests and generate `README.md` from `README.md.template` and generate the images of the test outputs (using an alpine docker image).
+I am using guardian to run the tests on each change. Also the guardian task uses the computer voice to report build/test failure/success.
+Run `bin/build` to run tests and generate `README.md` from `README.md.template` and generate the images of the test outputs (using an alpine docker image).
 
 ## DONE
 

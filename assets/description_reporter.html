@@ -9,39 +9,27 @@
 <body style="color:white; background-color:black">
 <pre>
 
-<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
- <span style="color:yellow;">✓</span> <span style="color:yellow;">skip_this</span>
- <span style="color:lime;">✓</span> <span style="color:lime;">success</span>
-
 <span style="color:fuchsia;text-decoration:underline;">SecondTest</span>
  <span style="color:red;">✕</span> <span style="color:red;">error</span>
  <span style="color:red;">✕</span> <span style="color:red;">first_failure</span>
+
+<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
+ <span style="color:lime;">✓</span> <span style="color:lime;">success</span>
+ <span style="color:yellow;">✓</span> <span style="color:yellow;">skip_this</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
 <span style="color:red;"># 1  SecondTest#error : Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
-<span style="color:white;">  12</span> CRY: /src/main.cr <span style="color:yellow;">main</span>
-<span style="color:white;">   7</span>  <span style="color:yellow;">__crystal_main</span>
-<span style="color:white;">  88</span> APP: /src/microtest.cr <span style="color:yellow;">run!</span>
-<span style="color:white;">  84</span> APP: /src/microtest.cr <span style="color:yellow;">run</span>
-<span style="color:white;">  20</span> APP: /src/microtest/runner.cr <span style="color:yellow;">call</span>
-<span style="color:white;"> 255</span> APP: /src/microtest/test.cr <span style="color:yellow;">run_tests</span>
-<span style="color:white;"> 141</span> APP: /src/microtest/test.cr <span style="color:yellow;">call</span>
-<span style="color:white;"> 171</span> APP: /src/microtest/test.cr <span style="color:yellow;">execute_test</span>
-<span style="color:white;"> 195</span> APP: /src/microtest/test.cr <span style="color:yellow;">around_hooks</span>
-<span style="color:white;"> 255</span> APP: /src/microtest/test.cr <span style="color:yellow;">capture_exception</span>
-<span style="color:white;">   5</span>  <span style="color:yellow;">__test__error</span>
-<span style="color:white;">   5</span>  <span style="color:yellow;">raise_an_error</span>
+
 
 <span style="color:red;"># 2  SecondTest#first_failure</span>
 <span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
 ==================================================
 <span style="color:yellow;">a               </span> =&gt; 5
-<span style="color:yellow;">b               </span> =&gt; 7
 <span style="color:yellow;">b * 2           </span> =&gt; 14
 
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 44 milliseconds with seed 2046663402</span>
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 41 milliseconds with seed 3699610612</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 

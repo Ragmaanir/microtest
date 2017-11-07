@@ -1,7 +1,7 @@
 #!/usr/bin/env crystal
 
 require "ecr"
-require "./src/microtest/version"
+require "../src/microtest/version"
 
 def render_html(cmd, target, title = "", bg = "black")
   full_cmd = <<-BASH
