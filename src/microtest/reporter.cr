@@ -77,7 +77,9 @@ module Microtest
   end
 
   class DescriptionReporter < Reporter
-    def initialize(io = STDOUT)
+    getter threshold : Time::Span
+
+    def initialize(@threshold = 50.milliseconds, io = STDOUT)
       super(io)
     end
 
@@ -92,7 +94,8 @@ module Microtest
       symbol = style[:symbol].colorize(style[:color])
       name = result.test.colorize(style[:color])
 
-      puts " #{symbol} #{name}"
+      time_text = Formatter.colorize_duration(result.duration, threshold)
+      puts [" ", symbol, time_text.colorize(:dark_gray), " ", name].join
     end
 
     def finished(ctx : ExecutionContext)
@@ -155,11 +158,11 @@ module Microtest
     end
 
     def finished(ctx : ExecutionContext)
-      ms = (Time.now - @started_at).total_milliseconds
-      total = Formatter.format_large_number(ms.to_i)
+      duration = (Time.now - @started_at)
+      total, unit = Formatter.format_duration(duration)
 
       focus_hint = "USING FOCUS: " if Test.using_focus?
-      puts [focus_hint.colorize.back(:red), "Executed #{ctx.total_tests} tests in #{total} milliseconds with seed #{ctx.random_seed}".colorize(:blue)].join
+      puts [focus_hint.colorize.back(:red), "Executed #{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue)].join
       puts [
         ["Success: ", ctx.total_success].join.colorize(:green),
         ", ",
@@ -224,9 +227,7 @@ module Microtest
     getter count : Int32
     getter threshold : Time::Span
 
-    COLORS = [:yellow, :red, :light_red, :light_red]
-
-    def initialize(@count = 10, @threshold = Time::Span.new(0, 0, 0, 0, 50), io = STDOUT)
+    def initialize(@count = 10, @threshold = 50.milliseconds, io = STDOUT)
       super(io)
     end
 
@@ -240,7 +241,8 @@ module Microtest
                .first(count)
 
       if res.empty?
-        puts "No slow tests (threshold: #{threshold.total_milliseconds}ms)".colorize(:dark_gray)
+        num, unit = Formatter.format_duration(threshold)
+        puts "No slow tests (threshold: #{num}#{unit})".colorize(:dark_gray)
       else
         puts "Slowest #{res.size} tests".colorize(:blue)
         puts
@@ -248,21 +250,13 @@ module Microtest
         res.each do |r|
           style = Helper.result_style(r)
 
-          meth_color = Helper.result_style(r)[:color]
-          meth = [r.suite, "::", r.test].join.colorize(meth_color)
-
-          duration, unit = Formatter.format_duration(r.duration)
-
-          idx = 3.times.find { |i| threshold * (10**i) > r.duration } || 3
-          color = COLORS[idx]
+          meth = [r.suite, "::", r.test].join.colorize(style[:color])
 
           puts [
             " ",
             style[:symbol].colorize(style[:color]),
-            [
-              "%6s" % duration,
-              " %-2s " % unit,
-            ].join.colorize(color),
+            Formatter.colorize_duration(r.duration, threshold),
+            " ",
             meth,
           ].join
         end

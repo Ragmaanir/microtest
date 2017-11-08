@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.1.1
+
+- Added timing info to DescriptionReporter
+- Fixed timing-output in terminal
+
 ### 1.1.0
 
 - abort tests

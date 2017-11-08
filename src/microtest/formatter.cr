@@ -15,6 +15,10 @@ module Microtest
         @magnitude = magnitude.to_f64
       end
 
+      def integer_dividable?(seconds : Float64)
+        (seconds / magnitude).to_i > 0
+      end
+
       def ==(other : TimeUnit)
         name == other.name
       end
@@ -38,24 +42,33 @@ module Microtest
       nanosecond:  TimeUnit.new("ns", "nanosecond", 10.0 ** -9),
     }.to_h
 
+    # format_duration(15.milliseconds)) #=> {15, :millisecond}
+    # format_duration(1000.milliseconds)) #=> {1, :second}
     def self.format_duration(span : Time::Span)
       s = span.total_seconds
 
-      magnitudes = [
-        s / TIME_UNITS[:day].magnitude,
-        s / TIME_UNITS[:hour].magnitude,
-        s / TIME_UNITS[:minute].magnitude,
-        s,
-        s / TIME_UNITS[:millisecond].magnitude,
-        s / TIME_UNITS[:microsecond].magnitude,
-        s / TIME_UNITS[:nanosecond].magnitude,
-      ].map(&.to_i)
+      # find first time unit that has an integer part bigger than zero, or use nanosecond as unit
+      unit = TIME_UNITS.values.find { |unit| unit.integer_dividable?(s) } || TIME_UNITS[:nanosecond]
 
-      idx = magnitudes.index { |c| c > 0 } || (magnitudes.size - 1)
+      time = (s / unit.magnitude).to_i
 
-      unit = TIME_UNITS.values[idx]
+      {time, unit}
+    end
 
-      {Formatter.format_large_number(magnitudes[idx]), unit}
+    DEFAULT_DURATION_COLORING_SCALE = [:dark_gray, :yellow, :red, :light_red]
+
+    def self.colorize_duration(duration : Time::Span, threshold : Time::Span, colors = DEFAULT_DURATION_COLORING_SCALE)
+      time, unit = Formatter.format_duration(duration)
+      _, threshold_unit = Formatter.format_duration(threshold)
+
+      if duration > threshold
+        idx = 3.times.find { |i| threshold * (10**i) > duration } || 3
+        color = colors[idx]
+      else
+        color = colors.first
+      end
+
+      ("%4s %-2s" % [time, unit]).colorize(color)
     end
   end
 end
