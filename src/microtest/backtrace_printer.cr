@@ -1,44 +1,57 @@
 module Microtest
-  macro compile_time_command(cmd)
-    "{{system(cmd)}}".strip
-  end
+  CRYSTAL_EXECUTABLE = {{system("readlink -f `which crystal`").stringify}}
+  CRYSTAL_DIR        = CRYSTAL_EXECUTABLE.strip.sub("/embedded/bin/crystal", "")
 
-  CRYSTAL_DIR      = compile_time_command("readlink -f `which crystal`").sub("/embedded/bin/crystal", "")
-  APP_COMPILE_ROOT = compile_time_command("readlink -f `pwd`")
-  LIB_COMPILE_ROOT = compile_time_command("readlink -f `pwd`") + "/lib"
+  STRACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
 
   class BacktracePrinter
+    record Entry, file : String, line : Int32, func : String
+
     def call(backtrace : Array(String))
-      stack = Array(Array(String)).new
+      entries = simplify(backtrace)
+
+      strs = entries.map do |entry|
+        path = case name = entry.file
+               when Regex.new(CRYSTAL_DIR)
+                 name.sub(CRYSTAL_DIR, "CRY: ").colorize(:dark_gray)
+               when .starts_with?("lib/")
+                 "LIB: #{name}".colorize(:magenta)
+               when .starts_with?("src")
+                 "APP: #{name}".colorize(:light_magenta)
+               when .starts_with?("spec")
+                 "SPEC: #{name}".colorize(:light_magenta)
+               else
+                 puts "Could not handle backtrace for #{name.inspect}, please report".colorize(:cyan)
+                 name
+               end
+        [
+          [
+            path,
+            ":".colorize(:dark_gray),
+            entry.line.colorize(:dark_gray),
+          ].join,
+          entry.func.colorize(:yellow),
+        ].join(" ")
+      end
+
+      strs.join("\n")
+    end
+
+    def simplify(backtrace : Array(String)) : Array(Entry)
+      entries = Array(Entry).new
 
       backtrace.each do |line|
-        if m = /\A(\dx[a-z0-9]+): (.+) at (\S+) (\d+):(\d+)\z/.match(line)
-          addr = m[1]
-          func = m[2]
-          path = m[3]
-          line_no = m[4]
+        if m = STRACKTRACE_LINE_REGEX.match(line)
+          file = m[1]
+          line = m[2].to_i
+          column = m[3]
+          func = m[4]
 
-          stack << [line, "%4s" % line_no, path, func, addr]
+          entries << Entry.new(file, line, func)
         end
       end
 
-      strs = stack.map do |line|
-        line_2 = case l = line[2]
-                 when Regex.new(CRYSTAL_DIR)
-                   l.sub(CRYSTAL_DIR, "CRY: ").colorize(:dark_gray)
-                 when Regex.new(LIB_COMPILE_ROOT)
-                   l.sub(LIB_COMPILE_ROOT, "LIB: ").colorize(:magenta)
-                 when Regex.new(APP_COMPILE_ROOT)
-                   l.sub(APP_COMPILE_ROOT, "APP: ").colorize(:light_magenta)
-                 end
-        [
-          line[1].colorize(:light_gray),
-          line_2,
-          line[3].colorize(:yellow),
-        ].join(" ")
-      end.reverse
-
-      puts strs.join("\n")
+      entries.reverse
     end
   end
 end

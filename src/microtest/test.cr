@@ -162,9 +162,12 @@ module Microtest
 
     def report_test_result(name, duration, e)
       case e
-      when AssertionFailure then context.record_result(TestResult.failure(self.class.name, name, duration, e))
-      when UnexpectedError  then context.record_result(TestResult.failure(self.class.name, name, duration, e))
-      when SkipException    then context.record_result(TestResult.skip(self.class.name, name, duration, e))
+      when AssertionFailure
+        context.record_result(TestResult.failure(self.class.name, name, duration, e))
+      when UnexpectedError
+        context.record_result(TestResult.failure(self.class.name, name, duration, e))
+      when SkipException
+        context.record_result(TestResult.skip(self.class.name, name, duration, e))
       when nil # not :not_executed
         context.record_result(TestResult.success(self.class.name, name, duration))
       end
@@ -208,11 +211,19 @@ module Microtest
     def pass
     end
 
-    def fail(msg, file, line)
-      raise AssertionFailure.new(msg, file, line)
+    macro fail(msg)
+      raise Microtest::AssertionFailure.new({{msg}}, {{msg.filename}}, {{msg.line_number}})
     end
 
-    macro skip(msg, file = __FILE__, line = __LINE__)
+    macro fail(msg, file, line)
+      raise Microtest::AssertionFailure.new({{msg}}, {{file}}, {{line}})
+    end
+
+    macro skip(msg)
+      raise Microtest::SkipException.new({{msg}}, {{msg.filename}}, {{msg.line_number}})
+    end
+
+    macro skip(msg, file, line)
       raise Microtest::SkipException.new({{msg}}, {{file}}, {{line}})
     end
   end

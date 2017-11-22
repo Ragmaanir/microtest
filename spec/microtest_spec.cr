@@ -69,7 +69,9 @@ describe Microtest do
 
     assert !result.success?
 
-    exc = result.json["results"]["MicrotestTest#assertion_failure_message"]["exception"].as_s
+    results = result.json["results"]
+
+    exc = results["MicrotestTest#assertion_failure_message"]["exception"]["message"].as_s
 
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((a * a) * a) # false
@@ -78,7 +80,7 @@ describe Microtest do
     (a * a) * a              => 8
     EXC
 
-    exc = result.json["results"]["MicrotestTest#long_assertion_failure_message"]["exception"].as_s
+    exc = results["MicrotestTest#long_assertion_failure_message"]["exception"]["message"].as_s
 
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((long_name + long_name) + long_name) # false
@@ -91,38 +93,14 @@ describe Microtest do
     --------------------------------------------------
     EXC
 
-    exc = result.json["results"]["MicrotestTest#hide_literals_in_failure_message"]["exception"].as_s
+    exc = results["MicrotestTest#hide_literals_in_failure_message"]["exception"]["message"].as_s
 
     assert uncolor(exc) == %(assert "left" == "right" # false\n)
 
-    assert result.json["results"]["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
-    assert result.json["results"]["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
-    assert result.json["results"]["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
-    assert result.json["results"]["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
-  end
-
-  test "progress reporter" do
-    result = reporter_test([Microtest::ProgressReporter.new]) do
-      describe Microtest do
-        test "success" do
-          assert true == true
-        end
-
-        test "failure" do
-          assert 3 > 5
-        end
-
-        test "skip" do
-          skip "skip this one"
-        end
-      end
-    end
-
-    dot = Microtest::Helper::DOTS[:success]
-
-    assert result.stdout.includes?(dot.colorize(:red).to_s)
-    assert result.stdout.includes?(dot.colorize(:yellow).to_s)
-    assert result.stdout.includes?(dot.colorize(:green).to_s)
+    assert results["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
+    assert results["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
+    assert results["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
+    assert results["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
   end
 
   test "focusing" do
@@ -140,8 +118,10 @@ describe Microtest do
 
     assert result.success?
 
-    assert result.json["results"]["FocusTest#in_focus"]["type"] == "Microtest::TestSuccess"
-    assert !result.json["results"].as_h.has_key?("FocusTest#not_in_focus")
+    results = result.json["results"]
+
+    assert results["FocusTest#in_focus"]["type"] == "Microtest::TestSuccess"
+    assert !results.as_h.has_key?("FocusTest#not_in_focus")
   end
 
   test "before and after hook" do
@@ -151,8 +131,10 @@ describe Microtest do
 
     assert result.success?
 
-    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
-    assert result.json["results"]["HooksTest#second"]["type"] == "Microtest::TestSuccess"
+    results = result.json["results"]
+
+    assert results["HooksTest#first"]["type"] == "Microtest::TestSuccess"
+    assert results["HooksTest#second"]["type"] == "Microtest::TestSuccess"
   end
 
   test "error in before hook" do
@@ -162,6 +144,7 @@ describe Microtest do
 
     assert !result.success?
     assert !result.status.success?
+
     assert result.json["success"] == false
     assert result.json["aborted"] == true
     assert result.json["results"].as_h.empty?

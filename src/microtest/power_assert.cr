@@ -7,19 +7,10 @@ module Microtest
       def initialize(@expression, @value)
       end
 
-      def ==(other : Evaluation)
-        expression == other.expression
-      end
-
-      def hash
-        0
-      end
+      def_equals_and_hash expression
     end
 
     abstract class Value
-      def self.build(value : T)
-        ValueWrapper(T).new(value)
-      end
     end
 
     class ValueWrapper(T) < Value
@@ -59,7 +50,7 @@ module Microtest
       end
     end
 
-    class Call(T, B) < Node
+    class Call(B) < Node
       OPERATORS = %w(
         ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
       )
@@ -69,7 +60,7 @@ module Microtest
 
       def initialize(name : String, expression : String, value : T,
                      @receiver : Node, @arguments : Array(Node),
-                     @named_arguments : Array(NamedArg), @block : B)
+                     @named_arguments : Array(NamedArg), @block : B) forall T
         super(name, expression, value)
       end
 
@@ -262,8 +253,7 @@ module Microtest
 
         %message = Microtest.power_assert_formatter.call(%ast)
 
-        fail %message, {{ file }}, {{ line }}
-        #fail %message, {{ expression.filename }}, {{ expression.line_number }}
+        fail %message, {{ expression.filename }}, {{ expression.line_number }}
       end
     end
 
@@ -273,7 +263,7 @@ module Microtest
       case e
       when exception_type
         pass
-      else raise AssertionFailure.new("Expected block to raise #{exception_type} but it raised #{e}", file, line)
+      else raise AssertionFailure.new("Expected block to raise #{exception_type} but it raised #{e.class}: #{e.inspect}", file, line)
       end
     else
       raise AssertionFailure.new("Expected block to raise #{exception_type} but it didn't", file, line)

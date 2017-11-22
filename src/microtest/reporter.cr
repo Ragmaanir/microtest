@@ -27,7 +27,7 @@ module Microtest
   abstract class Reporter
     getter io : IO
 
-    def initialize(@io)
+    def initialize(@io = STDOUT)
     end
 
     abstract def report(result : TestResult)
@@ -104,10 +104,6 @@ module Microtest
   end
 
   class ErrorListReporter < Reporter
-    def initialize(io = STDOUT)
-      super(io)
-    end
-
     def report(result : TestResult)
     end
 
@@ -124,32 +120,36 @@ module Microtest
     end
 
     private def print_error(number, error)
-      # puts "|%03d| %s" % {number+1, "-"*25}
       case ex = error.exception
       when AssertionFailure
-        puts ["# %-3d" % (number + 1), error.test_method].join.colorize(:red)
-        puts ex.message
+        print_assertion_failure(number, error, ex)
       when UnexpectedError
-        puts ["# %-3d" % (number + 1), error.test_method, " : ", ex.message].join.colorize(:red)
-        if ex.exception.backtrace?
-          puts ("-" * 60).colorize(:red)
-          BacktracePrinter.new.call(ex.exception.backtrace)
-        end
+        print_unexpected_error(number, error, ex)
       else raise "Invalid Exception"
       end
 
       puts
     end
+
+    private def print_unexpected_error(number, error, ex : UnexpectedError)
+      puts ["# %-3d" % (number + 1), error.test_method].join.colorize(:red)
+      puts ex.message.colorize(:red)
+
+      if ex.exception.backtrace?
+        puts ("-" * 60).colorize(:red)
+        puts BacktracePrinter.new.call(ex.exception.backtrace)
+      else
+        puts "(no backtrace)"
+      end
+    end
+
+    private def print_assertion_failure(number, error, ex : AssertionFailure)
+      puts ["# %-3d" % (number + 1), error.test_method, " ", ex.file, ":", ex.line].join.colorize(:red)
+      puts ex.message
+    end
   end
 
   class SummaryReporter < Reporter
-    @started_at : Time
-
-    def initialize(io = STDOUT)
-      super(io)
-      @started_at = Time.now
-    end
-
     def report(result : TestResult)
     end
 
@@ -158,8 +158,7 @@ module Microtest
     end
 
     def finished(ctx : ExecutionContext)
-      duration = (Time.now - @started_at)
-      total, unit = Formatter.format_duration(duration)
+      total, unit = Formatter.format_duration(ctx.duration)
 
       focus_hint = "USING FOCUS: " if Test.using_focus?
       puts [focus_hint.colorize.back(:red), "Executed #{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue)].join
@@ -176,22 +175,31 @@ module Microtest
   end
 
   class JsonSummaryReporter < Reporter
-    @started_at : Time
-
-    def initialize(io = STDOUT)
-      super(io)
-      @started_at = Time.now
-    end
-
     def report(result : TestResult)
     end
 
-    def started(ctx : ExecutionContext)
-      @started_at = Time.now
+    def finished(ctx : ExecutionContext)
+      test_results = convert_test_results(ctx)
+
+      ms = ctx.duration.total_milliseconds
+
+      puts({
+        using_focus:        Test.using_focus?,
+        seed:               ctx.random_seed,
+        success:            !ctx.errors? && !ctx.aborted?,
+        aborted:            ctx.aborted?,
+        aborting_exception: ctx.aborting_exception.try(&.message),
+        total_count:        ctx.total_tests,
+        success_count:      ctx.total_success,
+        skip_count:         ctx.total_skip,
+        failure_count:      ctx.total_failure,
+        total_duration:     ms,
+        results:            test_results,
+      }.to_json)
     end
 
-    def finished(ctx : ExecutionContext)
-      test_results = ctx.results.reduce({} of String => Hash(String, String)) do |hash, res|
+    private def convert_test_results(ctx : ExecutionContext)
+      ctx.results.reduce({} of String => Hash(String, String)) do |hash, res|
         entry = {
           :suite    => res.suite,
           :test     => res.test,
@@ -199,29 +207,41 @@ module Microtest
           :duration => res.duration.total_milliseconds,
         }
 
-        case res
-        when TestFailure, TestSkip then entry = entry.merge({:exception => res.exception.to_s})
-        end
+        entry = entry.merge(test_failure_exception_to_hash(res))
 
         hash.merge({"#{res.suite}##{res.test}" => entry})
       end
-
-      ms = (Time.now - @started_at).total_milliseconds
-
-      puts({
-        using_focus:        Test.using_focus?,
-        success:            !ctx.errors? && !ctx.aborted?,
-        aborted:            ctx.aborted?,
-        aborting_exception: ctx.aborting_exception.try(&.message),
-        total_count:        ctx.total_tests,
-        success_count:      ctx.total_success,
-        skips_count:        ctx.total_skip,
-        failure_count:      ctx.total_failure,
-        total_duration:     ms,
-        results:            test_results,
-      }.to_json)
     end
-  end
+
+    def test_failure_exception_to_hash(result : TestResult)
+      hash = {} of String => String
+
+      case result
+      when TestFailure
+        case e = result.exception
+        when AssertionFailure
+          hash = hash.merge({
+            :exception => {
+              message:   e.to_s,
+              class:     e.class.name,
+              backtrace: e.backtrace? ? e.backtrace : nil,
+            },
+          })
+        when UnexpectedError
+          hash = hash.merge({
+            :exception => {
+              message:   e.exception.to_s,
+              class:     e.exception.class.name,
+              backtrace: e.exception.backtrace? ? e.exception.backtrace : nil,
+            },
+          })
+        else raise "BUG: unhandled exception"
+        end
+      end
+
+      hash
+    end
+  end # JsonSummaryReporter
 
   class SlowTestsReporter < Reporter
     getter count : Int32

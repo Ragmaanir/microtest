@@ -7,10 +7,16 @@ module Microtest
     getter random : Random
     getter aborting_exception : HookException? = nil
     getter? abortion_forced : Bool = false
+    getter started_at : Time = Time.now
+    getter! ended_at : Time
 
     def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
       @results = [] of TestResult
       @random = Random.new(@random_seed)
+    end
+
+    def duration
+      ended_at - started_at
     end
 
     def errors : Array(TestFailure)
@@ -38,6 +44,7 @@ module Microtest
     end
 
     def finished
+      @ended_at = Time.now
       reporters.each(&.finished(self))
     end
 
