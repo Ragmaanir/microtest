@@ -1,6 +1,6 @@
 # microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
-### Version 1.1.1
+### Version 1.2.0
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -22,7 +22,7 @@ Add this to your application's `shard.yml`:
 development_dependencies:
   microtest:
     github: ragmaanir/microtest
-    version: ~> 1.1.1
+    version: ~> 1.2.0
 ```
 
 And add this to your `spec_helper.rb`:

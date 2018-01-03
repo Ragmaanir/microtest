@@ -1,7 +1,7 @@
 #!/usr/bin/env crystal
 
 require "yaml"
-require "../src/kontrol/version"
+require "../src/microtest/version"
 
 def run(cmd, args = [] of String, msg = "Command failed: #{cmd} #{args.join(" ")}")
   puts "Running: #{cmd} #{args.join(" ")}"
@@ -19,14 +19,14 @@ end
 run("crystal", ["spec"])
 
 shard = YAML.parse(File.read("shard.yml"))
-versions_consistent = shard["version"] == Kontrol::VERSION
+versions_consistent = shard["version"] == Microtest::VERSION
 
 raise "Please update shard.yml or version.cr" unless versions_consistent
 
 run("./bin/build")
 run("git", ["add", "-A"])
 
-version_name = "v#{Kontrol::VERSION}"
+version_name = "v#{Microtest::VERSION}"
 run("git", ["commit", "-m", "Version #{version_name}"])
 run("git", ["tag", version_name])
 run("git", ["push"])

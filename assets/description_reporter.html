@@ -9,27 +9,37 @@
 <body style="color:white; background-color:black">
 <pre>
 
-<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
- <span style="color:yellow;">✓</span>  32 µs <span style="color:yellow;">skip_this</span>
- <span style="color:lime;">✓</span>   1 µs <span style="color:lime;">success</span>
-
 <span style="color:fuchsia;text-decoration:underline;">SecondTest</span>
- <span style="color:red;">✕</span>  17 µs <span style="color:red;">error</span>
- <span style="color:red;">✕</span>  35 µs <span style="color:red;">first_failure</span>
+ <span style="color:red;">✕</span>  63 µs <span style="color:red;">first_failure</span>
+ <span style="color:red;">✕</span>  15 µs <span style="color:red;">error</span>
+
+<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
+ <span style="color:yellow;">✓</span>  10 µs <span style="color:yellow;">skip_this</span>
+ <span style="color:lime;">✓</span>   1 µs <span style="color:lime;">success</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
-<span style="color:red;"># 1  SecondTest#error</span>
+<span style="color:red;"># 1  SecondTest#first_failure eval:5</span>
+<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
+==================================================
+<span style="color:yellow;">a               </span> =&gt; 5
+<span style="color:yellow;">(b * 2)         </span> =&gt; 14
+
+<span style="color:red;"># 2  SecondTest#error</span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
+<span style="color:aqua;">Could not handle backtrace for /home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr, please report</span>
+<span style="color:aqua;">Could not handle backtrace for /home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr, please report</span>
+<span style="color:aqua;">Could not handle backtrace for /home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr, please report</span>
+<span style="color:aqua;">Could not handle backtrace for /home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr, please report</span>
 <span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
 <span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
 <span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
-CRY: /src/crystal/main.cr:135 <span style="color:yellow;">main</span>
-CRY: /src/crystal/main.cr:101 <span style="color:yellow;">main</span>
-CRY: /src/crystal/main.cr:112 <span style="color:yellow;">main_user_code</span>
-CRY: /src/crystal/main.cr:11 <span style="color:yellow;">_crystal_main</span>
-/eval:7 <span style="color:yellow;">__crystal_main</span>
+/home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr:135 <span style="color:yellow;">main</span>
+/home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr:101 <span style="color:yellow;">main</span>
+/home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr:112 <span style="color:yellow;">main_user_code</span>
+/home/ragmaanir/applications/crystal-0.24.1/share/crystal/src/crystal/main.cr:11 <span style="color:yellow;">_crystal_main</span>
+/eval:0 <span style="color:yellow;">__crystal_main</span>
 APP: src/microtest.cr:51 <span style="color:yellow;">run!</span>
 APP: src/microtest.cr:47 <span style="color:yellow;">run</span>
 APP: src/microtest/runner.cr:23 <span style="color:yellow;">call</span>
@@ -41,13 +51,7 @@ APP: src/microtest/test.cr:255 <span style="color:yellow;">capture_exception</sp
 /eval:5 <span style="color:yellow;">__test__error</span>
 /eval:5 <span style="color:yellow;">raise_an_error</span>
 
-<span style="color:red;"># 2  SecondTest#first_failure eval:5</span>
-<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
-==================================================
-<span style="color:yellow;">a               </span> =&gt; 5
-<span style="color:yellow;">b * 2           </span> =&gt; 14
-
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 169µs with seed 4153635053</span>
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 177µs with seed 3600643575</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
