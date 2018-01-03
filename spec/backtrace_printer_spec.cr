@@ -1,3 +1,5 @@
+require "./spec_helper"
+
 describe Microtest::BacktracePrinter do
   def generate_exception(msg : String = "the message")
     begin
