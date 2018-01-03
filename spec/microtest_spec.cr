@@ -76,8 +76,8 @@ describe Microtest do
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((a * a) * a) # false
     ==================================================
-    2 ** 4                   => 16
-    (a * a) * a              => 8
+    (2 ** 4)                 => 16
+    ((a * a) * a)            => 8
     EXC
 
     exc = results["MicrotestTest#long_assertion_failure_message"]["exception"]["message"].as_s
@@ -85,10 +85,10 @@ describe Microtest do
     assert uncolor(exc) == <<-EXC
     assert (2 ** 4) == ((long_name + long_name) + long_name) # false
     ==================================================
-    2 ** 4
+    (2 ** 4)
     16
     --------------------------------------------------
-    (long_name + long_name) + long_name
+    ((long_name + long_name) + long_name)
     6
     --------------------------------------------------
     EXC
