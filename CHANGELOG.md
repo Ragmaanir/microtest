@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.2.1
+
+- Fix backtrace printing by using Crystal::PATH (crystal 0.26.0)
+
 ### 1.1.1
 
 - Added timing info to DescriptionReporter

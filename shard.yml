@@ -4,4 +4,6 @@ version: 1.2.0
 authors:
   - ragmaanir <ragmaanir@gmail.com>
 
+crystal: 0.26.0
+
 license: MIT

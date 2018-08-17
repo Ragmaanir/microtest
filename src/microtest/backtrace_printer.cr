@@ -1,11 +1,5 @@
 module Microtest
-  {% if flag?(:darwin) %}
-    CRYSTAL_EXECUTABLE = {{system("readlink `which crystal`").stringify}}
-  {% else %}
-    CRYSTAL_EXECUTABLE = {{system("readlink -f `which crystal`").stringify}}
-  {% end %}
-
-  CRYSTAL_DIR = CRYSTAL_EXECUTABLE.strip.sub("/embedded/bin/crystal", "")
+  CRYSTAL_DIR = File.expand_path({{Crystal::PATH.split(":").first}})
 
   STRACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
 
