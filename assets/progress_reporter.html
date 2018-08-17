@@ -8,17 +8,11 @@
 </head>
 <body style="color:white; background-color:black">
 <pre>
-<span style="color:red;">•</span><span style="color:red;">•</span><span style="color:yellow;">•</span><span style="color:lime;">•</span>
+<span style="color:red;">•</span><span style="color:red;">•</span><span style="color:lime;">•</span><span style="color:yellow;">•</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
-<span style="color:red;"># 1  SecondTest#first_failure eval:5</span>
-<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
-==================================================
-<span style="color:yellow;">a               </span> =&gt; 5
-<span style="color:yellow;">(b * 2)         </span> =&gt; 14
-
-<span style="color:red;"># 2  SecondTest#error</span>
+<span style="color:red;"># 1  SecondTest#error</span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
 <span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
@@ -42,7 +36,13 @@ APP: src/microtest/test.cr:104 <span style="color:yellow;">-&gt;</span>
 /eval:5 <span style="color:yellow;">__test__error</span>
 /eval:5 <span style="color:yellow;">raise_an_error</span>
 
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 113µs with seed 64163549</span>
+<span style="color:red;"># 2  SecondTest#first_failure eval:5</span>
+<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
+==================================================
+<span style="color:yellow;">a               </span> =&gt; 5
+<span style="color:yellow;">(b * 2)         </span> =&gt; 14
+
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 113µs with seed 2052281076</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
