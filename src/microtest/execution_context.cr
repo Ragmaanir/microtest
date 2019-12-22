@@ -7,7 +7,7 @@ module Microtest
     getter random : Random
     getter aborting_exception : HookException? = nil
     getter? abortion_forced : Bool = false
-    getter started_at : Time = Time.now
+    getter started_at : Time = Time.local
     getter! ended_at : Time
 
     def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
@@ -44,7 +44,7 @@ module Microtest
     end
 
     def finished
-      @ended_at = Time.now
+      @ended_at = Time.local
       reporters.each(&.finished(self))
     end
 

@@ -154,7 +154,7 @@ module Microtest
     end
 
     def started(ctx : ExecutionContext)
-      @started_at = Time.now
+      @started_at = Time.local
     end
 
     def finished(ctx : ExecutionContext)
@@ -256,9 +256,9 @@ module Microtest
 
     def finished(ctx : ExecutionContext)
       res = ctx.results
-               .select { |r| r.duration >= threshold }
-               .sort { |l, r| l.duration <=> r.duration }
-               .first(count)
+        .select { |r| r.duration >= threshold }
+        .sort { |l, r| l.duration <=> r.duration }
+        .first(count)
 
       if res.empty?
         num, unit = Formatter.format_duration(threshold)

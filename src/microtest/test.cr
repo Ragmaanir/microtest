@@ -140,10 +140,10 @@ module Microtest
 
     def call(name, &block)
       context.test_case(name) do
-        time = Time.now
+        time = Time.local
         exc = execute_test(name, &block)
 
-        duration = Time.now - time
+        duration = Time.local - time
 
         if !context.abortion_forced?
           case e = exc

@@ -34,7 +34,7 @@ module Microtest
       super(suite, test, duration)
     end
 
-    def kind
+    def kind : Symbol
       :failure
     end
 
@@ -50,7 +50,7 @@ module Microtest
       super(suite, test, duration)
     end
 
-    def kind
+    def kind : Symbol
       :skip
     end
 
@@ -60,7 +60,7 @@ module Microtest
   end
 
   class TestSuccess < TestResult
-    def kind
+    def kind : Symbol
       :success
     end
 

@@ -12,6 +12,7 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 - No nesting of describe blocks. IMO nesting of those blocks is an anti-pattern.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
 - Tests have to be started explicitly by `Microtest.run!`, no at-exit hook.
+- Colorized and abbreviated exception stacktraces
 
 ## Installation
 
@@ -28,7 +29,7 @@ development_dependencies:
 And add this to your `spec_helper.rb`:
 
 ```crystal
-require "../src/microtest"
+require "microtest"
 
 include Microtest::DSL
 
@@ -128,5 +129,4 @@ Run `bin/build` to run tests and generate `README.md` from `README.md.template` 
 
 ## Problems
 
-- [ ] Display correct line numbers. This is difficult since macros are used everywhere.
 - [ ] Some assertion failures cause segfaults

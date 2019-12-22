@@ -113,14 +113,14 @@ module Microtest
     end
 
     abstract class Formatter
-      abstract def call(node : Node)
+      abstract def call(node : Node) : String
     end
 
     class ListFormatter < Formatter
-      def call(node : Node)
+      def call(node : Node) : String
         # FIXME too much complex code, refactor into two methods, compact and complex or so
         expressions = node.nested_expressions.uniq
-        complete_expression = expressions.last
+        complete_expression = expressions.empty? ? node : expressions.last
 
         sizes = expressions.map do |ev|
           {left: ev.expression.size, right: ev.value.inspect.size}
