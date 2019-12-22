@@ -1,57 +1,6 @@
 require "./spec_helper"
 
-# require "../microtest"
-
-# include Microtest::DSL
-
-# Microtest.around do
-#   # DB.transaction do
-#   #   yield
-#   # end
-#   puts "before"
-#   yield
-#   puts "after"
-# end
-
-# Microtest.run!([
-#   Microtest::DescriptionReporter.new,
-# ] of Microtest::Reporter)
-
-# FIXME this does not work as intended since:
-# - github markdown does not support inline styles so `aha` styles are useless
-# - could not find a markdown-to-png program
-#
-# => resort to gif/pngs captured by console
-# def save_console_output(text, filename)
-#   escaped = text.gsub("\n", "\\n")
-
-#   cmd = "echo \"#{escaped}\" | aha  --black --no-header --title 'assertion failure' > #{filename}"
-
-#   `#{cmd}`
-# end
-
-# def render_command(cmd, target, title = "", bg = "black")
-#   full_cmd = <<-BASH
-#     #{cmd} | aha --#{bg} --title "#{title}" > #{target}.html
-#     wkhtmltoimage #{target}.html #{target}.png
-#   BASH
-
-#   puts system(full_cmd)
-# end
-
-# # convert text via "aha" to html, then convert html via wkhtmltoimage to png
-# def save_console_output(text, target, title = "", bg = "black")
-#   escaped = text.gsub("\n", "\\n")
-
-#   full_cmd = <<-BASH
-#     echo \"#{escaped}\" | aha --#{bg} --title "#{title}" > #{target}.html
-#     wkhtmltoimage -q #{target}.html #{target}.png
-#   BASH
-
-#   system(full_cmd)
-# end
-
-# convert text via "aha" to html, then convert html via wkhtmltoimage to png
+# convert text via "aha" to html
 def save_console_output(result : MicrotestStdoutResult, target, title = "", bg = "black")
   escaped = result.to_s.gsub("\n", "\\n")
 

@@ -19,6 +19,8 @@ module Microtest
                  "APP: #{name}".colorize(:light_magenta)
                when .starts_with?("spec")
                  "SPEC: #{name}".colorize(:light_magenta)
+               when "/eval"
+                 "EVAL: #{name}".colorize(:dark_gray)
                else
                  puts "Could not handle backtrace for #{name.inspect}, please report".colorize(:cyan)
                  name

@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.11
 
 RUN apk add --no-cache \
             xvfb \
@@ -7,7 +7,6 @@ RUN apk add --no-cache \
             fontconfig \
             dbus \
     && \
-
     # Install wkhtmltopdf from `testing` repository
     apk add qt5-qtbase-dev \
             wkhtmltopdf \

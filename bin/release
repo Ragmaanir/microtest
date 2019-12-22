@@ -18,11 +18,6 @@ end
 
 run("crystal", ["spec"])
 
-# shard = YAML.parse(File.read("shard.yml"))
-# versions_consistent = shard["version"] == Microtest::VERSION
-
-# raise "Please update shard.yml or version.cr" unless versions_consistent
-
 run("./bin/build")
 run("git", ["add", "-A"])
 

@@ -9,32 +9,23 @@
 <body style="color:white; background-color:black">
 <pre>
 
-<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
- <span style="color:yellow;">✓</span>  26 µs <span style="color:yellow;">skip_this</span>
- <span style="color:lime;">✓</span>   0 ns <span style="color:lime;">success</span>
-
 <span style="color:fuchsia;text-decoration:underline;">SecondTest</span>
- <span style="color:red;">✕</span>  36 µs <span style="color:red;">first_failure</span>
- <span style="color:red;">✕</span>  16 µs <span style="color:red;">error</span>
+ <span style="color:red;">✕</span>  32 µs <span style="color:red;">error</span>
+ <span style="color:red;">✕</span>  37 µs <span style="color:red;">first_failure</span>
+
+<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
+ <span style="color:lime;">✓</span>   1 µs <span style="color:lime;">success</span>
+ <span style="color:yellow;">✓</span>   8 µs <span style="color:yellow;">skip_this</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
-<span style="color:red;"># 1  SecondTest#first_failure eval:5</span>
-<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
-==================================================
-<span style="color:yellow;">a               </span> =&gt; 5
-<span style="color:yellow;">(b * 2)         </span> =&gt; 14
-
-<span style="color:red;"># 2  SecondTest#error</span>
+<span style="color:red;"># 1  SecondTest#error</span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
-<span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
-<span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
-<span style="color:aqua;">Could not handle backtrace for /eval, please report</span>
 CRY: /crystal/main.cr:106 <span style="color:yellow;">main</span>
 CRY: /crystal/main.cr:86 <span style="color:yellow;">main</span>
 CRY: /crystal/main.cr:97 <span style="color:yellow;">main_user_code</span>
-/eval:7 <span style="color:yellow;">__crystal_main</span>
+EVAL: /eval:7 <span style="color:yellow;">__crystal_main</span>
 APP: src/microtest.cr:51 <span style="color:yellow;">run!</span>
 APP: src/microtest.cr:47 <span style="color:yellow;">run</span>
 APP: src/microtest/runner.cr:23 <span style="color:yellow;">call</span>
@@ -46,10 +37,16 @@ APP: src/microtest/test.cr:255 <span style="color:yellow;">around_hooks</span>
 APP: src/microtest/test.cr:182 <span style="color:yellow;">-&gt;</span>
 APP: src/microtest/test.cr:255 <span style="color:yellow;">capture_exception</span>
 APP: src/microtest/test.cr:104 <span style="color:yellow;">-&gt;</span>
-/eval:5 <span style="color:yellow;">__test__error</span>
-/eval:5 <span style="color:yellow;">raise_an_error</span>
+EVAL: /eval:5 <span style="color:yellow;">__test__error</span>
+EVAL: /eval:5 <span style="color:yellow;">raise_an_error</span>
 
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 150µs with seed 2044807823</span>
+<span style="color:red;"># 2  SecondTest#first_failure eval:5</span>
+<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
+==================================================
+<span style="color:yellow;">a               </span> =&gt; 5
+<span style="color:yellow;">(b * 2)         </span> =&gt; 14
+
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 148µs with seed 2928757877</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
