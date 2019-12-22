@@ -1,6 +1,6 @@
 # microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)[![Dependency Status](https://shards.rocks/badge/github/ragmaanir/microtest/status.svg)](https://shards.rocks/github/ragmaanir/microtest)
 
-### Version 1.2.1
+### Version 1.2.2
 
 A very tiny testing framework inspired by minitest/minitest.cr.
 
@@ -12,6 +12,7 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 - No nesting of describe blocks. IMO nesting of those blocks is an anti-pattern.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
 - Tests have to be started explicitly by `Microtest.run!`, no at-exit hook.
+- Colorized and abbreviated exception stacktraces
 
 ## Installation
 
@@ -22,13 +23,13 @@ Add this to your application's `shard.yml`:
 development_dependencies:
   microtest:
     github: ragmaanir/microtest
-    version: ~> 1.2.1
+    version: ~> 1.2.2
 ```
 
 And add this to your `spec_helper.rb`:
 
 ```crystal
-require "../src/microtest"
+require "microtest"
 
 include Microtest::DSL
 
@@ -192,5 +193,4 @@ Run `bin/build` to run tests and generate `README.md` from `README.md.template` 
 
 ## Problems
 
-- [ ] Display correct line numbers. This is difficult since macros are used everywhere.
 - [ ] Some assertion failures cause segfaults

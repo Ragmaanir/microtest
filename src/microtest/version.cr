@@ -1,3 +1,3 @@
 module Microtest
-  VERSION = "1.2.1"
+  VERSION = {{ `shards version #{__DIR__}`.strip.stringify }}
 end

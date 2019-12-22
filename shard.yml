@@ -1,9 +1,9 @@
 name: microtest
-version: 1.2.1
+version: 1.2.2
 
 authors:
   - ragmaanir <ragmaanir@gmail.com>
 
-crystal: 0.26.0
+crystal: 0.32.1
 
 license: MIT
