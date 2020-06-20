@@ -8,7 +8,7 @@
 </head>
 <body style="color:white; background-color:black">
 <pre>
-<span style="color:red;">•</span><span style="color:red;">•</span><span style="color:lime;">•</span><span style="color:yellow;">•</span>
+<span style="color:yellow;">•</span><span style="color:lime;">•</span><span style="color:red;">•</span><span style="color:red;">•</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
@@ -21,25 +21,25 @@
 <span style="color:red;"># 2  SecondTest#error</span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
-CRY: /crystal/main.cr:106 <span style="color:yellow;">main</span>
-CRY: /crystal/main.cr:86 <span style="color:yellow;">main</span>
-CRY: /crystal/main.cr:97 <span style="color:yellow;">main_user_code</span>
+CRY: /crystal/main.cr:114 <span style="color:yellow;">main</span>
+CRY: /crystal/main.cr:91 <span style="color:yellow;">main</span>
+CRY: /crystal/main.cr:105 <span style="color:yellow;">main_user_code</span>
 EVAL: /eval:7 <span style="color:yellow;">__crystal_main</span>
 APP: src/microtest.cr:51 <span style="color:yellow;">run!</span>
 APP: src/microtest.cr:47 <span style="color:yellow;">run</span>
 APP: src/microtest/runner.cr:23 <span style="color:yellow;">call</span>
-APP: src/microtest/test.cr:255 <span style="color:yellow;">run_tests</span>
+CRY: /primitives.cr:255 <span style="color:yellow;">run_tests</span>
 APP: src/microtest/test.cr:104 <span style="color:yellow;">-&gt;</span>
 APP: src/microtest/test.cr:144 <span style="color:yellow;">call</span>
 APP: src/microtest/test.cr:179 <span style="color:yellow;">execute_test</span>
-APP: src/microtest/test.cr:255 <span style="color:yellow;">around_hooks</span>
+CRY: /primitives.cr:255 <span style="color:yellow;">around_hooks</span>
 APP: src/microtest/test.cr:182 <span style="color:yellow;">-&gt;</span>
-APP: src/microtest/test.cr:255 <span style="color:yellow;">capture_exception</span>
+CRY: /primitives.cr:255 <span style="color:yellow;">capture_exception</span>
 APP: src/microtest/test.cr:104 <span style="color:yellow;">-&gt;</span>
 EVAL: /eval:5 <span style="color:yellow;">__test__error</span>
 EVAL: /eval:5 <span style="color:yellow;">raise_an_error</span>
 
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 115µs with seed 1518081806</span>
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 129µs with seed 4274019702</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
