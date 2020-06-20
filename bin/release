@@ -18,6 +18,7 @@ end
 
 run("crystal", ["spec"])
 
+run("./bin/ameba")
 run("./bin/build")
 run("git", ["add", "-A"])
 

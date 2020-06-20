@@ -18,6 +18,8 @@ describe Microtest::Reporter do
       end
     end
 
+    assert !result.success?
+
     dot = Microtest::Helper::DOTS[:success]
 
     assert result.stdout.includes?(dot.colorize(:red).to_s)

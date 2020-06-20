@@ -48,7 +48,7 @@ module Microtest
       s = span.total_seconds
 
       # find first time unit that has an integer part bigger than zero, or use nanosecond as unit
-      unit = TIME_UNITS.values.find { |unit| unit.integer_dividable?(s) } || TIME_UNITS[:nanosecond]
+      unit = TIME_UNITS.values.find { |u| u.integer_dividable?(s) } || TIME_UNITS[:nanosecond]
 
       time = (s / unit.magnitude).to_i
 
@@ -59,7 +59,7 @@ module Microtest
 
     def self.colorize_duration(duration : Time::Span, threshold : Time::Span, colors = DEFAULT_DURATION_COLORING_SCALE)
       time, unit = Formatter.format_duration(duration)
-      _, threshold_unit = Formatter.format_duration(threshold)
+      # _, threshold_unit = Formatter.format_duration(threshold)
 
       if duration > threshold
         idx = 3.times.find { |i| threshold * (10**i) > duration } || 3

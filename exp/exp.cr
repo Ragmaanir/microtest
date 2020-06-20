@@ -21,11 +21,11 @@ class Test
     @@focused_tests ||= [] of String
   end
 
-  macro def self.test_classes : Array(Test.class)
+  def self.test_classes : Array(Test.class)
     {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
   end
 
-  macro def self.run_tests
+  def self.run_tests
     {% begin %}
       {% names = @type.methods.map(&.name).select(&.starts_with?("test__")) %}
       {% for n in names %}

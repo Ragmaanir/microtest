@@ -4,7 +4,7 @@ describe Microtest::Formatter do
   alias F = Microtest::Formatter
 
   test "days" do
-    span = Time::Span.new(1, 0, 0, 0)
+    span = Time::Span.new(days: 1)
     num, unit = F.format_duration(span)
 
     assert num == 1
@@ -12,7 +12,7 @@ describe Microtest::Formatter do
   end
 
   test "seconds" do
-    span = Time::Span.new(0, 0, 0, 1)
+    span = Time::Span.new(seconds: 1)
     num, unit = F.format_duration(span)
 
     assert num == 1
@@ -20,7 +20,7 @@ describe Microtest::Formatter do
   end
 
   test "second from nanoseconds" do
-    span = Time::Span.new(0, 0, 0, 0, 1_000_000_000)
+    span = Time::Span.new(nanoseconds: 1_000_000_000)
     num, unit = F.format_duration(span)
 
     assert num == 1
@@ -28,7 +28,7 @@ describe Microtest::Formatter do
   end
 
   test "milliseconds" do
-    span = Time::Span.new(0, 0, 0, 0, 1_000_000)
+    span = Time::Span.new(nanoseconds: 1_000_000)
     num, unit = F.format_duration(span)
 
     assert num == 1
@@ -36,7 +36,7 @@ describe Microtest::Formatter do
   end
 
   test "microseconds" do
-    span = Time::Span.new(0, 0, 0, 0, 1_000)
+    span = Time::Span.new(nanoseconds: 1_000)
     num, unit = F.format_duration(span)
 
     assert num == 1
@@ -44,7 +44,7 @@ describe Microtest::Formatter do
   end
 
   test "microseconds" do
-    span = Time::Span.new(0, 0, 0, 0, 1)
+    span = Time::Span.new(nanoseconds: 1)
     num, unit = F.format_duration(span)
 
     assert num == 1
