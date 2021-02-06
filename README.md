@@ -190,7 +190,6 @@ Run `bin/build` to run tests and generate `README.md` from `README.md.template` 
 - [ ] Alternatives to nesting? (Use separate describe blocks)
 - [ ] Group tests and specify hooks and helper methods for the group only
 - [ ] save results to file and compare current results to last results, including timings
-
-## Problems
-
-- [ ] Some assertion failures cause segfaults
+- [ ] release-script: check that changelog has an entry for the release
+- [ ] More robust test for backtrace printer
+- [ ] Check whether some assertion failures still cause segfaults
