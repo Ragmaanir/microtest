@@ -9,23 +9,17 @@
 <body style="color:white; background-color:black">
 <pre>
 
-<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
- <span style="color:lime;">✓</span> 210 ns <span style="color:lime;">success</span>
- <span style="color:yellow;">✓</span>  27 µs <span style="color:yellow;">skip_this</span>
-
 <span style="color:fuchsia;text-decoration:underline;">SecondTest</span>
+ <span style="color:red;">✕</span>  35 µs <span style="color:red;">error</span>
  <span style="color:red;">✕</span>  39 µs <span style="color:red;">first_failure</span>
- <span style="color:red;">✕</span>  14 µs <span style="color:red;">error</span>
+
+<span style="color:fuchsia;text-decoration:underline;">FirstTest</span>
+ <span style="color:lime;">✓</span> 215 ns <span style="color:lime;">success</span>
+ <span style="color:yellow;">✓</span>   7 µs <span style="color:yellow;">skip_this</span>
 
 <span style="color:yellow;">FirstTest#skip_this : not implemented</span>
 
-<span style="color:red;"># 1  SecondTest#first_failure eval:5</span>
-<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
-==================================================
-<span style="color:yellow;">a               </span> =&gt; 5
-<span style="color:yellow;">(b * 2)         </span> =&gt; 14
-
-<span style="color:red;"># 2  SecondTest#error</span>
+<span style="color:red;"># 1  SecondTest#error</span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="color:red;">------------------------------------------------------------</span>
 CRY: /crystal/main.cr:119 <span style="color:yellow;">main</span>
@@ -46,7 +40,13 @@ APP: src/microtest/test.cr:104 <span style="color:yellow;">-&gt;</span>
 EVAL: /eval:5 <span style="color:yellow;">__test__error</span>
 EVAL: /eval:5 <span style="color:yellow;">raise_an_error</span>
 
-<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 153µs with seed 1278151781</span>
+<span style="color:red;"># 2  SecondTest#first_failure eval:5</span>
+<span style="color:red;">assert </span><span style="color:yellow;">a == (b * 2)</span> # false
+==================================================
+<span style="color:yellow;">a               </span> =&gt; 5
+<span style="color:yellow;">(b * 2)         </span> =&gt; 14
+
+<span style="background-color:red;"></span><span style="color:#3333FF;">Executed 4 tests in 152µs with seed 2218443551</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
