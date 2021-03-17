@@ -257,16 +257,14 @@ module Microtest
       end
     end
 
-    def assert_raises(exception_type : Exception.class, file : String = __FILE__, line : String = __LINE__, &block)
+    def assert_raises(exception_type : E.class, file : String = __FILE__, line : String = __LINE__, &block) forall E
       yield
+    rescue e : E
+      pass
     rescue e
-      case e
-      when exception_type
-        pass
-      else raise AssertionFailure.new("Expected block to raise #{exception_type} but it raised #{e.class}: #{e.inspect}", file, line)
-      end
+      raise AssertionFailure.new("Expected block to raise #{E.name} but it raised #{e.class.name}: #{e.inspect}", file, line)
     else
-      raise AssertionFailure.new("Expected block to raise #{exception_type} but it didn't", file, line)
+      raise AssertionFailure.new("Expected block to raise #{E.name} but it didn't", file, line)
     end
   end
 end
