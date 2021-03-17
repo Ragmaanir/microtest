@@ -24,7 +24,7 @@ module Microtest
     end
 
     def errors?
-      errors.any?
+      !errors.empty?
     end
 
     def force_abortion!
@@ -70,7 +70,7 @@ module Microtest
     end
 
     def total_tests
-      suites.map(&.test_methods.size).sum
+      suites.sum(&.test_methods.size)
     end
 
     def total_success

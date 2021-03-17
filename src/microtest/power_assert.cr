@@ -73,7 +73,7 @@ module Microtest
 
         result += receiver.nested_expressions
 
-        result += arguments.map(&.nested_expressions).flatten
+        result += arguments.flat_map(&.nested_expressions)
 
         result << Evaluation.new(expression, value)
 
@@ -147,7 +147,7 @@ module Microtest
           complete_expression.value.inspect.colorize(:dark_gray),
         ].join
 
-        expression_values = expressions[0..-2].map do |ev|
+        expression_values = expressions[0..-2].join("\n") do |ev|
           val = ev.value.inspect
           exp_str = if is_compact
                       "%-#{exp_width}s" % ev.expression
@@ -161,7 +161,7 @@ module Microtest
             val,
             ("\n" + small_bar.colorize(:light_blue).to_s if !is_compact),
           ].join.colorize(:white)
-        end.join("\n")
+        end
 
         [
           assert_line,

@@ -5,7 +5,7 @@ def save_console_output(result : MicrotestStdoutResult, target, title = "", bg =
   escaped = result.to_s.gsub("\n", "\\n")
 
   full_cmd = <<-BASH
-    echo \"#{escaped}\" | aha --#{bg} --title "#{title}" > #{target}.html
+    echo "#{escaped}" | aha --#{bg} --title "#{title}" > #{target}.html
   BASH
 
   system(full_cmd)
@@ -17,7 +17,7 @@ describe WaterPumpExample do
       {{`cat spec/examples/waterpump.cr`}}
     end
 
-    assert res.json["results"].as_h.keys.sort == [
+    assert res.json["results"].as_h.keys.sort! == [
       "MyLib::WaterPumpTest#and_this_one_too_since_it_is_focused_also",
       "MyLib::WaterPumpTest#only_run_this_focused_test",
     ].sort

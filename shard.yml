@@ -4,11 +4,11 @@ version: 1.2.3
 authors:
   - ragmaanir <ragmaanir@gmail.com>
 
-crystal: 0.36.1
+crystal: '>= 0.35.1'
 
 license: MIT
 
 development_dependencies:
   ameba:
     github: veelenga/ameba
-    version: ~> 0.13
+    version: ~> 0.14

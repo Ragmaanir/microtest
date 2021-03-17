@@ -256,8 +256,9 @@ module Microtest
 
     def finished(ctx : ExecutionContext)
       res = ctx.results
+        # ameba:disable Style/VerboseBlock
         .select { |r| r.duration >= threshold }
-        .sort { |l, r| l.duration <=> r.duration }
+        .sort! { |l, r| l.duration <=> r.duration }
         .first(count)
 
       if res.empty?
