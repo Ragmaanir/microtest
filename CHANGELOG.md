@@ -1,5 +1,9 @@
 # Changelog
 
+- Crystal 0.36
+
+### 1.2.3
+
 ### 1.2.1
 
 - Fix backtrace printing by using Crystal::PATH (crystal 0.26.0)

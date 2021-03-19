@@ -1,16 +1,5 @@
 require "./spec_helper"
 
-# convert text via "aha" to html
-def save_console_output(result : MicrotestStdoutResult, target, title = "", bg = "black")
-  escaped = result.to_s.gsub("\n", "\\n")
-
-  full_cmd = <<-BASH
-    echo "#{escaped}" | aha --#{bg} --title "#{title}" > #{target}.html
-  BASH
-
-  system(full_cmd)
-end
-
 describe WaterPumpExample do
   test "waterpump example" do
     res = microtest_test do
@@ -34,7 +23,8 @@ describe AssertionFailureExample do
     end
 
     assert !res.success?
-    save_console_output(res, "assets/assertion_failure")
+
+    Helpers.save_console_output(res, "assertion_failure") if generate_assets?
   end
 end
 
@@ -45,7 +35,7 @@ describe SummaryAndProgressRepoterExample do
     end
 
     assert !res.success?
-    save_console_output(res, "assets/progress_reporter")
+    Helpers.save_console_output(res, "progress_reporter") if generate_assets?
   end
 end
 
@@ -56,7 +46,7 @@ describe SummaryAndDescriptionRepoterExample do
     end
 
     assert !res.success?
-    save_console_output(res, "assets/description_reporter")
+    Helpers.save_console_output(res, "description_reporter") if generate_assets?
   end
 end
 
@@ -67,6 +57,6 @@ describe FocusExample do
     end
 
     assert res.success?
-    save_console_output(res, "assets/focus")
+    Helpers.save_console_output(res, "focus") if generate_assets?
   end
 end

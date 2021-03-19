@@ -2,36 +2,35 @@
 
 require "ecr"
 require "../src/microtest/version"
+require "../spec/helpers"
 
-def render_html(cmd, target, title = "", bg = "black")
-  full_cmd = <<-BASH
-    #{cmd} | aha --#{bg} --title "#{title}" > #{target}.html
-  BASH
+puts "🔬 Build #{Helpers::DOCKER_IMAGE_NAME} docker image " \
+     "(aha, wkhtmltoimage, exiftool)" \
+     " to convert terminal output to html and then to jpg"
 
-  system(full_cmd)
-end
+Helpers.build_docker_image
 
-puts "Building"
-
-system("sudo", ["docker", "build", ".", "-t", "alpine-microtest"])
-
-render_html("crystal spec", "assets/spec")
+puts "🔬 Running tests"
+Helpers.run_and_record_specs
 
 class Readme
-  def image(title, file)
-    generate_image_from_html(file)
-    raise "Image does not exist: #{file}" unless File.exists?("#{file}.jpg")
-    "![#{title}](#{file}.jpg?raw=true)"
+  def image(asset_name : String)
+    generate_image_from_html(asset_name)
+    file = "assets/#{asset_name}.jpg"
+    raise "Image does not exist: #{file}" unless File.exists?(file)
+    "![missing](file?raw=true)"
   end
 
-  def generate_image_from_html(file)
-    system("sudo", ["docker", "run", "-v", "#{Dir.current}:/root/", "alpine-microtest", "/bin/sh", "-c", "wkhtmltoimage --width 800 /root/#{file}.html /root/#{file}.jpg"])
+  def generate_image_from_html(asset_name : String)
+    Helpers.run_in_docker(%[wkhtmltoimage --width 800 /root/#{asset_name}.html /root/#{asset_name}.jpg])
     # remove metadata
-    system("sudo", ["docker", "run", "-v", "#{Dir.current}:/root/", "alpine-microtest", "/bin/sh", "-c", "exiftool -all= -overwrite_original /root/#{file}.jpg"])
-    # system("rm", ["#{file}.html"])
+    Helpers.run_in_docker(%[exiftool -all= -overwrite_original /root/#{asset_name}.jpg])
+
+    Helpers.fix_asset_permissions("#{asset_name}.jpg")
   end
 
   ECR.def_to_s "README.md.template"
 end
 
+puts "🔬 Generating README.md from README.md.template"
 File.write("README.md", Readme.new.to_s)

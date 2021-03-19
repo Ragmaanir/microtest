@@ -1,45 +1,13 @@
 require "../src/microtest"
+require "./helpers"
 
 include Microtest::DSL
+include Helpers
 
 COLOR_REGEX = %r{\e\[\d\d?m}
 
 def uncolor(str)
   str.gsub(COLOR_REGEX, "")
-end
-
-class MicrotestJsonResult
-  getter status : Process::Status
-  getter json : JSON::Any
-
-  def initialize(@status, @json)
-  end
-
-  def success?
-    status.success? && json["success"] == true && json["aborted"] == false
-  end
-end
-
-class MicrotestStdoutResult
-  getter status : Process::Status
-  getter stdout : String
-  getter stderr : String
-
-  def initialize(@status, @stdout, @stderr)
-  end
-
-  def success?
-    status.success?
-  end
-
-  def to_s(io : IO)
-    if success?
-      io << stdout
-    else
-      io << stderr
-      io << stdout
-    end
-  end
 end
 
 macro microtest_test(&block)
@@ -89,9 +57,8 @@ macro reporter_test(reporters, &block)
   MicrotestStdoutResult.new(s, output.to_s, err.to_s)
 end
 
-Microtest.run!([
-  Microtest::DescriptionReporter.new,
-  Microtest::ErrorListReporter.new,
-  Microtest::SlowTestsReporter.new,
-  Microtest::SummaryReporter.new,
-] of Microtest::Reporter)
+def generate_assets?
+  ENV.has_key?("ASSETS")
+end
+
+Microtest.run!(:descriptions)

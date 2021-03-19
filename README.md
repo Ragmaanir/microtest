@@ -1,4 +1,4 @@
-# microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)
+# 🔬 microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)
 
 ### Version 1.2.3
 
@@ -13,6 +13,9 @@ A very tiny testing framework inspired by minitest/minitest.cr.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
 - Tests have to be started explicitly by `Microtest.run!`, no at-exit hook.
 - Colorized and abbreviated exception stacktraces
+- Randomized test order (SEED can be specified as environment variable)
+- Focus individual tests (`test! "my test" do ...`)
+- Different reportes (progress, descriptions, slow tests)
 
 ## Installation
 
@@ -91,15 +94,23 @@ end
 
 Generates:
 
-![Assertion Failure](assets/assertion_failure.jpg?raw=true)
+![missing](file?raw=true)
 
-### Microtest Test Output (default reporter)
+### Microtest Test Output (microtest tests using progress reporter)
 
-![Default](assets/spec.jpg?raw=true)
+![missing](file?raw=true)
 
 ## Reporters
 
-Select the used reporters:
+Use common reporter combinations:
+
+```crystal
+# both versions include error-list-, slow-tests- and summary-reporters:
+Microtest.run!(:progress)
+Microtest.run!(:descriptions)
+```
+
+Or select the used reporters explicitly:
 
 ```crystal
 Microtest.run!([
@@ -137,10 +148,10 @@ end
 ```
 
 ### Progress Reporter
-![Progress Reporter](assets/progress_reporter.jpg?raw=true)
+![missing](file?raw=true)
 
 ### Description Reporter
-![Description Reporter](assets/description_reporter.jpg?raw=true)
+![missing](file?raw=true)
 
 ### When focus active
 
@@ -158,38 +169,9 @@ end
 
 ```
 
-![Focus](assets/focus.jpg?raw=true)
+![missing](file?raw=true)
 
 ## Development
 
 I am using guardian to run the tests on each change. Also the guardian task uses the computer voice to report build/test failure/success.
 Run `bin/build` to run tests and generate `README.md` from `README.md.template` and generate the images of the test outputs (using an alpine docker image).
-
-## DONE
-
-- [x] hooks (before, after, around), and global ones for e.g. global transactional fixtures
-- [x] Customizable reporters
-- [x] Capture timing info
-- [x] Randomization + configurable seed
-- [x] Reporter: list N slowest tests
-- [x] assert_raises
-- [x] skip
-- [x] Write real tests for Microtest (uses JSON report to check for correct test output). Now tests are green.
-- [x] JSON reporter
-- [x] SummaryRepoter
-- [x] Continuous Integration with Travis
-- [x] focus
-- [x] generate README including examples from specs and terminal screenshots
-- [x] Print whether focus is active
-- [x] crtl+c to halt tests
-
-## TODO
-
-- [ ] fail fast
-- [ ] Number of assertions
-- [ ] Alternatives to nesting? (Use separate describe blocks)
-- [ ] Group tests and specify hooks and helper methods for the group only
-- [ ] save results to file and compare current results to last results, including timings
-- [ ] release-script: check that changelog has an entry for the release
-- [ ] More robust test for backtrace printer
-- [ ] Check whether some assertion failures still cause segfaults
