@@ -13,27 +13,29 @@ module Microtest
     abstract class Value
     end
 
+    # There is no "Object" class in crystal, so we have to use this wrapper
     class ValueWrapper(T) < Value
       getter value : T
 
       def initialize(@value)
       end
 
-      def to_s(io)
-        io << value.to_s
-      end
+      # def to_s(io)
+      #   value.to_s(io)
+      # end
 
-      def inspect(io)
-        io << value.inspect
-      end
+      # def inspect(io)
+      #   value.inspect(io)
+      # end
+
+      def_equals_and_hash value
     end
 
     abstract class Node
-      getter name : String
       getter expression : String
       getter value : Value
 
-      def initialize(@name, @expression, value : T) forall T
+      def initialize(@expression, value : T) forall T
         @value = ValueWrapper(T).new(value)
       end
 
@@ -42,30 +44,78 @@ module Microtest
 
     class EmptyNode < Node
       def initialize
-        super("", "", nil)
+        super("", nil)
       end
 
       def nested_expressions : Array(Evaluation)
         [] of Evaluation
       end
+
+      def_equals_and_hash
     end
 
-    class Call(B) < Node
+    class Call < Node
       OPERATORS = %w(
         ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
       )
 
+      macro build(expression, nest)
+        {%
+          if expression.is_a?(Crystal::Macros::Call)
+            raise "Expression is not a Call: #{expression}"
+          end
+        %}
+
+        {% if !nest || expression.receiver.is_a?(Nop) %}
+          %receiver = Microtest::PowerAssert::EmptyNode.new
+        {% else %}
+          %receiver = Microtest::PowerAssert.reflect(
+            {{ expression.receiver }},
+            nest
+          )
+        {% end %}
+
+        %args = [] of Microtest::PowerAssert::Node
+
+        {% for arg in expression.args %}
+          %args.push(Microtest::PowerAssert.reflect({{ arg }}, nest))
+        {% end %}
+
+        %named_args = [] of Microtest::PowerAssert::NamedArg
+
+        {% if expression.named_args.is_a?(ArrayLiteral) %}
+          {% for arg in expression.named_args %}
+            %named_args.push Microtest::PowerAssert::NamedArg.new(
+              {{ arg.name }},
+              reflect({{ arg.value }}, nest)
+            )
+          {% end %}
+        {% end %}
+
+        Microtest::PowerAssert::Call.new(
+          {{ expression.name.stringify }},
+          {{expression.stringify}},
+          {{ expression }},
+          %receiver, %args, %named_args
+        )
+      end
+
+      getter method_name : String
       getter receiver : Node
       getter arguments : Array(Node)
 
-      def initialize(name : String, expression : String, value : T,
+      def initialize(@method_name : String, expression : String, value : T,
                      @receiver : Node, @arguments : Array(Node),
-                     @named_arguments : Array(NamedArg), @block : B) forall T
-        super(name, expression, value)
+                     @named_arguments : Array(NamedArg)) forall T
+        super(expression, value)
       end
 
       def operator?
-        name.in?(OPERATORS)
+        method_name.in?(OPERATORS)
+      end
+
+      def comparator?
+        method_name.in?(%w(!= < <= <=> == === > >=))
       end
 
       def nested_expressions : Array(Evaluation)
@@ -75,15 +125,19 @@ module Microtest
 
         result += arguments.flat_map(&.nested_expressions)
 
-        result << Evaluation.new(expression, value)
+        # result << Evaluation.new(expression, value)
 
         result
       end
+
+      def_equals_and_hash method_name, expression, value, receiver, arguments, @named_arguments # , @block
     end
 
     class NamedArg < Node
+      getter name : String
+
       # FIXME implement
-      def initialize(name, value)
+      def initialize(@name, value)
         super("", value)
       end
 
@@ -93,14 +147,8 @@ module Microtest
     end
 
     class TerminalNode < Node
-      def self.build(expression, value : T) forall T
-        TerminalNode.new(expression, value)
-      end
-
-      @expression : String
-
-      def initialize(expression, value)
-        super(expression, expression, value)
+      def initialize(expression : String, value : T) forall T
+        super(expression, value)
       end
 
       def nested_expressions : Array(Evaluation)
@@ -110,136 +158,19 @@ module Microtest
           [Evaluation.new(expression, value)] of Evaluation
         end
       end
+
+      def_equals_and_hash expression, value
     end
 
-    abstract class Formatter
-      abstract def call(node : Node) : String
-    end
-
-    class ListFormatter < Formatter
-      def call(node : Node) : String
-        # FIXME too much complex code, refactor into two methods, compact and complex or so
-        expressions = node.nested_expressions.uniq
-        complete_expression = expressions.empty? ? node : expressions.last
-
-        sizes = expressions.map do |ev|
-          {left: ev.expression.size, right: ev.value.inspect.size}
-        end
-
-        max_sizes = sizes.reduce({left: 0, right: 0}) do |max, s|
-          {
-            left:  [max[:left], s[:left]].max,
-            right: [max[:right], s[:right]].max,
-          }
-        end
-
-        big_bar = "=" * 50
-        small_bar = "-" * 50
-
-        is_compact = max_sizes[:left] < 32 && max_sizes[:right] < 50
-
-        exp_width = [8, 12, 16, 20, 24].find { |limit| max_sizes[:left] < limit } || 24
-
-        assert_line = [
-          "assert ".colorize(:red),
-          complete_expression.expression.to_s.colorize(:yellow),
-          " # ".colorize(:dark_gray),
-          complete_expression.value.inspect.colorize(:dark_gray),
-        ].join
-
-        expression_values = expressions[0..-2].join("\n") do |ev|
-          val = ev.value.inspect
-          exp_str = if is_compact
-                      "%-#{exp_width}s" % ev.expression
-                    else
-                      ev.expression.to_s
-                    end
-
-          [
-            exp_str.colorize.fore(:yellow),
-            (is_compact ? " => " : "\n").colorize(:light_blue),
-            val,
-            ("\n" + small_bar.colorize(:light_blue).to_s if !is_compact),
-          ].join.colorize(:white)
-        end
-
-        [
-          assert_line,
-          if expressions.size > 1
-            [
-              big_bar.colorize(:light_blue),
-              expression_values,
-            ].join("\n")
-          end,
-        ].join("\n")
-      end
-    end
-
-    macro reflect_terminal(expression)
-      {% if expression.is_a? Call %}
-        {% if expression.receiver.is_a?(Nop) %}
-          %receiver = Microtest::PowerAssert::EmptyNode.new
+    macro reflect(expression, nest = true)
+      {% if expression.is_a?(Call) %}
+        {% if Call::OPERATORS.includes?(expression.name) %}
+          Microtest::PowerAssert::Call.build({{ expression.id }}, true)
         {% else %}
-          %receiver = Microtest::PowerAssert::EmptyNode.new
+          Microtest::PowerAssert::Call.build({{ expression.id }}, true)
         {% end %}
-        %args = [] of Microtest::PowerAssert::Node
-        {% for arg in expression.args %}
-          %args.push(Microtest::PowerAssert::EmptyNode.new)
-        {% end %}
-
-        %named_args = [] of Microtest::PowerAssert::NamedArg
-
-        %block = {{ expression.block.stringify }}
-
-        Microtest::PowerAssert::Call.new(
-          {{ expression.name.stringify }}, {{expression.stringify}},
-          {{ expression }},
-          %receiver, %args, %named_args, %block
-        )
-      {% elsif expression.is_a? StringLiteral %}
-        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}.inspect, {{expression}})
-      {% elsif %w(SymbolLiteral RangeLiteral).includes?(expression.class_name) %}
-        Microtest::PowerAssert::TerminalNode.build({{expression}}.inspect, {{expression}})
       {% else %}
-        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}, {{expression}})
-      {% end %}
-    end
-
-    macro reflect_ast(expression)
-      {% if expression.is_a? Call %}
-        {% if expression.receiver.is_a?(Nop) %}
-          %receiver = Microtest::PowerAssert::EmptyNode.new
-        {% else %}
-          %receiver = reflect_terminal({{ expression.receiver }})
-        {% end %}
-        %args = [] of Microtest::PowerAssert::Node
-        {% for arg in expression.args %}
-          %args.push(reflect_terminal({{ arg }}))
-        {% end %}
-
-        %named_args = [] of Microtest::PowerAssert::NamedArg
-        {% if expression.named_args.is_a?(ArrayLiteral) %}
-          {% for key, idx in expression.named_args %}
-            %named_args.push Microtest::PowerAssert::NamedArg.new(
-              :{{ key.name.id }},
-              reflect_terminal({{ expression.named_args[idx].value }})
-            )
-          {% end %}
-        {% end %}
-
-        %block = {{ expression.block.stringify }}
-
-        Microtest::PowerAssert::Call.new(
-          {{ expression.name.stringify }}, {{expression.stringify}},
-          {{ expression }},
-          %receiver, %args, %named_args, %block
-        )
-      {% elsif expression.is_a? StringLiteral %}
-        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}.inspect, {{expression}})
-      {% elsif %w(SymbolLiteral RangeLiteral).includes?(expression.class_name) %}
-        Microtest::PowerAssert::TerminalNode.build({{expression}}.inspect, {{expression}})
-      {% else %}
-        Microtest::PowerAssert::TerminalNode.build({{expression.id.stringify}}, {{expression}})
+        Microtest::PowerAssert::TerminalNode.new({{expression.stringify}}, {{expression}})
       {% end %}
     end
 
@@ -249,11 +180,11 @@ module Microtest
       if %result
         pass
       else
-        %ast = reflect_ast({{ expression }})
+        %ast = reflect({{ expression }})
 
         %message = Microtest.power_assert_formatter.call(%ast)
 
-        fail %message, {{ expression.filename }}, {{ expression.line_number }}
+        fail(%message, {{ expression.filename }}, {{ expression.line_number }})
       end
     end
 

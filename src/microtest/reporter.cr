@@ -10,8 +10,8 @@ module Microtest
     DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow}
 
     DOT   = "\u2022"
-    TICK  = "\u2713"
-    CROSS = "\u2715"
+    TICK  = "✓" # Check Mark "\u2713"
+    CROSS = "✕" # Multiplication "\u2715"
 
     DOTS  = {success: DOT, failure: DOT, skip: DOT}
     TICKS = {success: TICK, failure: CROSS, skip: TICK}
@@ -119,20 +119,25 @@ module Microtest
       end
     end
 
-    private def print_error(number, error)
+    private def print_error(number : Int32, error)
       case ex = error.exception
       when AssertionFailure
-        print_assertion_failure(number, error, ex)
+        print_assertion_failure(number, error.test_method, ex)
       when UnexpectedError
-        print_unexpected_error(number, error, ex)
+        print_unexpected_error(number, error.test_method, ex)
       else raise "Invalid Exception"
       end
 
       puts
     end
 
-    private def print_unexpected_error(number, error, ex : UnexpectedError)
-      puts ["# %-3d" % (number + 1), error.test_method].join.colorize(:red)
+    private def print_unexpected_error(number : Int32, meth : String, ex : UnexpectedError)
+      # puts [
+      #   "# %-3d" % (number + 1),
+      #   error.test_method,
+      # ].join.colorize(:red)
+
+      puts test_locator_line(number, meth, ex)
       puts ex.message.colorize(:red)
 
       if ex.exception.backtrace?
@@ -143,9 +148,30 @@ module Microtest
       end
     end
 
-    private def print_assertion_failure(number, error, ex : AssertionFailure)
-      puts ["# %-3d" % (number + 1), error.test_method, " ", ex.file, ":", ex.line].join.colorize(:red)
+    private def print_assertion_failure(number : Int32, meth : String, ex : AssertionFailure)
+      # puts [
+      #   ("❌ %-3d" % (number + 1)).colorize(:red),
+      #   error.test_method.colorize(:red),
+      #   " ",
+      #   [ex.file, ":", ex.line].join.colorize(:dark_gray),
+      # ].join
+      puts test_locator_line(number, meth, ex)
       puts ex.message
+    end
+
+    private def test_locator_line(number : Int32, meth : String, ex : AssertionFailure | UnexpectedError) : String
+      String.build { |io|
+        Colorize.with.red.surround(io) do
+          io << ("# %-3d" % (number + 1))
+          io << meth
+          io << " "
+        end
+        Colorize.with.dark_gray.surround(io) do
+          io << ex.file
+          io << ":"
+          io << ex.line
+        end
+      }
     end
   end
 

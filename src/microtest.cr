@@ -5,6 +5,7 @@ require "./microtest/exceptions"
 require "./microtest/test_result"
 require "./microtest/execution_context"
 require "./microtest/power_assert"
+require "./microtest/power_assert_formatter"
 require "./microtest/test"
 require "./microtest/runner"
 require "./microtest/reporter"
@@ -72,7 +73,7 @@ module Microtest
   end
 
   module DSL
-    macro describe(cls, focus = :nofocus, &block)
+    macro describe(cls, &block)
       class {{cls.id}}Test < Microtest::Test
         {{block.body}}
       end
