@@ -65,7 +65,7 @@ module Microtest
       end
 
       private def literal(node : TerminalNode)
-        v = node.value.value
+        v = node.value
         simpler_exp = simplify_value(v)
 
         simplified = simpler_exp != node.expression
@@ -82,7 +82,7 @@ module Microtest
       end
 
       private def call_only(node : Call)
-        rv = node.receiver.value.value
+        rv = node.receiver.value
         rstr = simplify_value(rv)
 
         simpler_exp = String.build do |s|
@@ -101,7 +101,7 @@ module Microtest
 
           if !node.arguments.empty?
             s << "(" if !node.operator?
-            s << node.arguments.join(", ") { |a| a.value.value.inspect }
+            s << node.arguments.join(", ") { |a| a.value.inspect }
             s << ")" if !node.operator?
           end
         end
@@ -112,7 +112,7 @@ module Microtest
 
         lines << simpler_exp if simpler_exp != node.expression
 
-        lines << node.value.value.inspect if node.value.value != false
+        lines << node.value.inspect if node.value != false
 
         grouped_lines(lines)
       end
@@ -122,8 +122,8 @@ module Microtest
       private def call_compare(node : Call)
         left, right = node.receiver, node.arguments[0]
 
-        lval = left.value.value.inspect
-        rval = right.value.value.inspect
+        lval = left.value.inspect
+        rval = right.value.inspect
 
         simpler_exp = String.build do |s|
           s << lval

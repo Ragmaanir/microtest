@@ -33,13 +33,14 @@ module Microtest
 
     abstract class Node
       getter expression : String
-      getter value : Value
+      getter wrapper : Value
+      delegate value, to: wrapper
 
       def initialize(@expression, value : T) forall T
-        @value = ValueWrapper(T).new(value)
+        @wrapper = ValueWrapper(T).new(value)
       end
 
-      abstract def nested_expressions : Array(Evaluation)
+      # abstract def nested_expressions : Array(Evaluation)
     end
 
     class EmptyNode < Node
@@ -47,9 +48,9 @@ module Microtest
         super("", nil)
       end
 
-      def nested_expressions : Array(Evaluation)
-        [] of Evaluation
-      end
+      # def nested_expressions : Array(Evaluation)
+      #   [] of Evaluation
+      # end
 
       def_equals_and_hash
     end
@@ -118,17 +119,17 @@ module Microtest
         method_name.in?(%w(!= < <= <=> == === > >=))
       end
 
-      def nested_expressions : Array(Evaluation)
-        result = [] of Evaluation
+      # def nested_expressions : Array(Evaluation)
+      #   result = [] of Evaluation
 
-        result += receiver.nested_expressions
+      #   result += receiver.nested_expressions
 
-        result += arguments.flat_map(&.nested_expressions)
+      #   result += arguments.flat_map(&.nested_expressions)
 
-        # result << Evaluation.new(expression, value)
+      #   # result << Evaluation.new(expression, value)
 
-        result
-      end
+      #   result
+      # end
 
       def_equals_and_hash method_name, expression, value, receiver, arguments, @named_arguments # , @block
     end
@@ -141,9 +142,9 @@ module Microtest
         super("", value)
       end
 
-      def nested_expressions : Array(Evaluation)
-        [] of Evaluation
-      end
+      # def nested_expressions : Array(Evaluation)
+      #   [] of Evaluation
+      # end
     end
 
     class TerminalNode < Node
@@ -151,24 +152,20 @@ module Microtest
         super(expression, value)
       end
 
-      def nested_expressions : Array(Evaluation)
-        if expression == value.inspect
-          [] of Evaluation
-        else
-          [Evaluation.new(expression, value)] of Evaluation
-        end
-      end
+      # def nested_expressions : Array(Evaluation)
+      #   if expression == value.inspect
+      #     [] of Evaluation
+      #   else
+      #     [Evaluation.new(expression, value)] of Evaluation
+      #   end
+      # end
 
       def_equals_and_hash expression, value
     end
 
     macro reflect(expression, nest = true)
       {% if expression.is_a?(Call) %}
-        {% if Call::OPERATORS.includes?(expression.name) %}
-          Microtest::PowerAssert::Call.build({{ expression.id }}, true)
-        {% else %}
-          Microtest::PowerAssert::Call.build({{ expression.id }}, true)
-        {% end %}
+        Microtest::PowerAssert::Call.build({{ expression.id }}, true)
       {% else %}
         Microtest::PowerAssert::TerminalNode.new({{expression.stringify}}, {{expression}})
       {% end %}

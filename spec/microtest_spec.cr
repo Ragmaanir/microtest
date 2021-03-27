@@ -74,28 +74,20 @@ describe Microtest do
     exc = results["MicrotestTest#assertion_failure_message"]["exception"]["message"].as_s
 
     assert uncolor(exc) == <<-EXC
-    assert (2 ** 4) == ((a * a) * a) # false
-    ==================================================
-    (2 ** 4)                 => 16
-    ((a * a) * a)            => 8
+    ┏ assert (2 ** 4) == ((a * a) * a)
+    ┗ 16 == 8\n
     EXC
 
     exc = results["MicrotestTest#long_assertion_failure_message"]["exception"]["message"].as_s
 
     assert uncolor(exc) == <<-EXC
-    assert (2 ** 4) == ((long_name + long_name) + long_name) # false
-    ==================================================
-    (2 ** 4)
-    16
-    --------------------------------------------------
-    ((long_name + long_name) + long_name)
-    6
-    --------------------------------------------------
+    ┏ assert (2 ** 4) == ((long_name + long_name) + long_name)
+    ┗ 16 == 6\n
     EXC
 
     exc = results["MicrotestTest#hide_literals_in_failure_message"]["exception"]["message"].as_s
 
-    assert uncolor(exc) == %(assert "left" == "right" # false\n)
+    assert uncolor(exc) == %[◆ assert "left" == "right"\n]
 
     assert results["MicrotestTest#skip_this"]["type"] == "Microtest::TestSkip"
     assert results["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
