@@ -24,6 +24,30 @@ module Microtest
         end
       end
 
+      private def grouped_lines(lines : Array(String))
+        String.build do |io|
+          if lines.size == 1
+            io << color("◆ ", BAR_COLOR)
+            io << lines.shift
+            io << "\n"
+          else
+            io << color("┏ ", BAR_COLOR)
+            io << lines.shift
+            io << "\n"
+
+            while lines.size > 1
+              io << color("┃ ", BAR_COLOR)
+              io << lines.shift
+              io << "\n"
+            end
+
+            io << color("┗ ", BAR_COLOR)
+            io << lines.shift
+            io << "\n"
+          end
+        end
+      end
+
       private def literal(node : TerminalNode)
         v = node.value.value
         simpler_exp = if v.is_a?(Array) && v.size > 1
@@ -32,28 +56,17 @@ module Microtest
                         v.inspect
                       end
 
-        String.build do |io|
-          simplified = simpler_exp != node.expression
-          is_complex_result = ![true, false].includes?(v)
-          nest = simplified && is_complex_result
+        simplified = simpler_exp != node.expression
+        is_complex_result = ![true, false].includes?(v)
+        nest = simplified && is_complex_result
 
-          if nest
-            io << color("┏ ", BAR_COLOR)
-          else
-            io << color("◆ ", BAR_COLOR)
-          end
+        lines = [
+          "#{color("assert", :red)} #{color(node.expression, :red, :bold)}",
+        ]
 
-          io << color("assert ", :red)
-          io << color(node.expression, :red, :bold)
+        lines << simpler_exp if nest
 
-          if nest
-            io << "\n"
-            io << color("┗ ", BAR_COLOR)
-            io << simpler_exp
-          end
-
-          io << "\n"
-        end
+        grouped_lines(lines)
       end
 
       #
@@ -75,56 +88,39 @@ module Microtest
                  rv.inspect
                end
 
-        String.build do |io|
-          simpler_exp = String.build do |s|
-            if rv
-              s << rstr
-            end
-
-            if node.operator?
-              s << " "
-              s << node.method_name
-              s << " "
-            else
-              s << "." if rv
-              s << node.method_name
-            end
-
-            if !node.arguments.empty?
-              s << "(" if !node.operator?
-              s << node.arguments.join(", ") { |a| a.value.value.inspect }
-              s << ")" if !node.operator?
-            end
+        simpler_exp = String.build do |s|
+          if rv
+            s << rstr
           end
 
-          simplified = simpler_exp != node.expression
-          is_complex_result = node.value.value != false
-
-          if simplified || is_complex_result
-            io << color("┏ ", BAR_COLOR)
+          if node.operator?
+            s << " "
+            s << node.method_name
+            s << " "
           else
-            io << color("◆ ", BAR_COLOR)
+            s << "." if rv
+            s << node.method_name
           end
 
-          io << color("assert ", :red)
-          io << color(node.expression, :red, :bold)
-
-          if simplified
-            io << "\n"
-
-            io << color(is_complex_result ? "┃ " : "┗ ", BAR_COLOR)
-
-            io << simpler_exp
+          if !node.arguments.empty?
+            s << "(" if !node.operator?
+            s << node.arguments.join(", ") { |a| a.value.value.inspect }
+            s << ")" if !node.operator?
           end
-
-          if is_complex_result
-            io << "\n"
-            io << color("┗ ", BAR_COLOR)
-            io << node.value.value.inspect
-          end
-
-          io << "\n"
         end
+
+        simplified = simpler_exp != node.expression
+        is_complex_result = node.value.value != false
+
+        lines = [] of String
+
+        lines << "#{color("assert", :red)} #{color(node.expression, :red, :bold)}"
+
+        lines << simpler_exp if simplified
+
+        lines << node.value.value.inspect if is_complex_result
+
+        grouped_lines(lines)
       end
 
       # e.g.: a == b, c > d
@@ -134,74 +130,42 @@ module Microtest
       private def call_compare(node : Call)
         left, right = node.receiver, node.arguments[0]
 
-        String.build do |io|
-          lval = left.value.value.inspect
-          rval = right.value.value.inspect
+        lval = left.value.value.inspect
+        rval = right.value.value.inspect
 
-          simpler_exp = String.build do |s|
-            s << lval
+        simpler_exp = String.build do |s|
+          s << lval
 
-            s << " "
-            s << node.method_name
-            s << " "
+          s << " "
+          s << node.method_name
+          s << " "
 
-            s << rval
-          end
-
-          simplified = simpler_exp != node.expression
-
-          io << color(simplified ? "┏ " : "◆ ", BAR_COLOR)
-          io << color("assert ", :red)
-          io << color(node.expression, :red, :bold)
-
-          if simplified
-            # if the inspects of left and right dont fit in one line,
-            # display the in two lines.
-            multi_line = lval.size + rval.size > 20
-
-            io << "\n"
-
-            if multi_line
-              io << color("┃ ", BAR_COLOR)
-              io << lval
-              io << "\n"
-              io << color("┗ ", BAR_COLOR)
-              io << rval
-            else
-              io << color("┗ ", BAR_COLOR)
-              io << lval
-              io << " "
-              io << color(node.method_name, :dark_gray)
-              io << " "
-              io << rval
-            end
-          end
-
-          io << "\n"
+          s << rval
         end
+
+        simplified = simpler_exp != node.expression
+
+        lines = [] of String
+
+        lines << "#{color("assert", :red)} #{color(node.expression, :red, :bold)}"
+
+        if simplified
+          # if the inspects of left and right dont fit in one line,
+          # display the in two lines.
+          multi_line = lval.size + rval.size > 20
+
+          if multi_line
+            # FIXME: indicate that these two lines are not simplifications, but different values
+            # e.g. by highlighting the first character difference
+            lines << lval
+            lines << rval
+          else
+            lines << "#{lval} #{color(node.method_name, :dark_gray)} #{rval}"
+          end
+        end
+
+        grouped_lines(lines)
       end
-
-      # def call(node : Node) : String
-      #   expressions = node.nested_expressions.uniq
-
-      #   String.build do |io|
-      #     io << color("┏ ", BAR_COLOR) if expressions.size > 1
-      #     io << color("assert ", :red)
-      #     io << color(node.expression, :red) # TODO bold!!
-
-      #     if expressions.size > 1
-      #       io << "\n"
-
-      #       expressions.each do |ev|
-      #         io << color("┃ ", BAR_COLOR)
-      #         io << ev.expression
-      #         io << color("\t => ", :dark_gray)
-      #         io << ev.value
-      #         io << "\n"
-      #       end
-      #     end
-      #   end
-      # end
 
       private def color(s : String, c : Symbol, m : Symbol? = nil)
         return s if !colorize?
