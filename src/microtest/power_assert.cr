@@ -1,15 +1,5 @@
 module Microtest
   module PowerAssert
-    class Evaluation
-      getter expression : String
-      getter value : Value
-
-      def initialize(@expression, @value)
-      end
-
-      def_equals_and_hash expression
-    end
-
     abstract class Value
     end
 
@@ -19,14 +9,6 @@ module Microtest
 
       def initialize(@value)
       end
-
-      # def to_s(io)
-      #   value.to_s(io)
-      # end
-
-      # def inspect(io)
-      #   value.inspect(io)
-      # end
 
       def_equals_and_hash value
     end
@@ -40,22 +22,16 @@ module Microtest
         @wrapper = ValueWrapper(T).new(value)
       end
 
-      # abstract def nested_expressions : Array(Evaluation)
+      def_equals_and_hash expression, wrapper
     end
 
     class EmptyNode < Node
       def initialize
         super("", nil)
       end
-
-      # def nested_expressions : Array(Evaluation)
-      #   [] of Evaluation
-      # end
-
-      def_equals_and_hash
     end
 
-    class Call < Node
+    class CallNode < Node
       OPERATORS = %w(
         ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
       )
@@ -82,18 +58,18 @@ module Microtest
           %args.push(Microtest::PowerAssert.reflect({{ arg }}, nest))
         {% end %}
 
-        %named_args = [] of Microtest::PowerAssert::NamedArg
+        %named_args = [] of Microtest::PowerAssert::NamedArgNode
 
         {% if expression.named_args.is_a?(ArrayLiteral) %}
           {% for arg in expression.named_args %}
-            %named_args.push Microtest::PowerAssert::NamedArg.new(
+            %named_args.push Microtest::PowerAssert::NamedArgNode.new(
               {{ arg.name }},
               reflect({{ arg.value }}, nest)
             )
           {% end %}
         {% end %}
 
-        Microtest::PowerAssert::Call.new(
+        Microtest::PowerAssert::CallNode.new(
           {{ expression.name.stringify }},
           {{expression.stringify}},
           {{ expression }},
@@ -107,7 +83,7 @@ module Microtest
 
       def initialize(@method_name : String, expression : String, value : T,
                      @receiver : Node, @arguments : Array(Node),
-                     @named_arguments : Array(NamedArg)) forall T
+                     @named_arguments : Array(NamedArgNode)) forall T
         super(expression, value)
       end
 
@@ -119,32 +95,16 @@ module Microtest
         method_name.in?(%w(!= < <= <=> == === > >=))
       end
 
-      # def nested_expressions : Array(Evaluation)
-      #   result = [] of Evaluation
-
-      #   result += receiver.nested_expressions
-
-      #   result += arguments.flat_map(&.nested_expressions)
-
-      #   # result << Evaluation.new(expression, value)
-
-      #   result
-      # end
-
       def_equals_and_hash method_name, expression, value, receiver, arguments, @named_arguments # , @block
     end
 
-    class NamedArg < Node
+    class NamedArgNode < Node
       getter name : String
 
       # FIXME implement
       def initialize(@name, value)
         super("", value)
       end
-
-      # def nested_expressions : Array(Evaluation)
-      #   [] of Evaluation
-      # end
     end
 
     class TerminalNode < Node
@@ -152,20 +112,12 @@ module Microtest
         super(expression, value)
       end
 
-      # def nested_expressions : Array(Evaluation)
-      #   if expression == value.inspect
-      #     [] of Evaluation
-      #   else
-      #     [Evaluation.new(expression, value)] of Evaluation
-      #   end
-      # end
-
       def_equals_and_hash expression, value
     end
 
     macro reflect(expression, nest = true)
       {% if expression.is_a?(Call) %}
-        Microtest::PowerAssert::Call.build({{ expression.id }}, true)
+        Microtest::PowerAssert::CallNode.build({{ expression.id }}, true)
       {% else %}
         Microtest::PowerAssert::TerminalNode.new({{expression.stringify}}, {{expression}})
       {% end %}

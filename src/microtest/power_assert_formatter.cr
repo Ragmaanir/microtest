@@ -13,7 +13,7 @@ module Microtest
       end
 
       def call(node : Node) : String
-        if node.is_a?(Call)
+        if node.is_a?(CallNode)
           if node.comparator?
             call_compare(node)
           else
@@ -81,7 +81,7 @@ module Microtest
         grouped_lines(lines)
       end
 
-      private def call_only(node : Call)
+      private def call_only(node : CallNode)
         rv = node.receiver.value
         rstr = simplify_value(rv)
 
@@ -119,7 +119,7 @@ module Microtest
 
       # When inspect-strings longer than N characters, then display compared values
       # in two lines. Otherwise display them in the same line.
-      private def call_compare(node : Call)
+      private def call_compare(node : CallNode)
         left, right = node.receiver, node.arguments[0]
 
         lval = left.value.inspect

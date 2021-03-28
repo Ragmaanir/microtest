@@ -28,31 +28,31 @@ describe Microtest::PowerAssert do
     a = 1
     assert reflect(a) == TerminalNode.new("a", 1)
 
-    assert reflect(constant) == Call.new(
+    assert reflect(constant) == CallNode.new(
       %[constant],
       %[constant],
       1337,
       EmptyNode.new,
       [] of Node,
-      [] of NamedArg
+      [] of NamedArgNode
     )
 
-    assert reflect(function(1)) == Call.new(
+    assert reflect(function(1)) == CallNode.new(
       %[function],
       %[function(1)],
       1001,
       EmptyNode.new,
       [TerminalNode.new("1", 1)] of Node,
-      [] of NamedArg
+      [] of NamedArgNode
     )
 
-    assert reflect(yielding(1) { |x| x }) == Call.new(
+    assert reflect(yielding(1) { |x| x }) == CallNode.new(
       %[yielding],
       %[yielding(1) do |x|\n  x\nend],
       2001,
       EmptyNode.new,
       [TerminalNode.new("1", 1)] of Node,
-      [] of NamedArg
+      [] of NamedArgNode
     )
   end
 end
