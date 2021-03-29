@@ -1,16 +1,17 @@
 require "./spec_helper"
 
 describe Microtest do
-  test "power asserts" do
+  test "power asserts succeed" do
     assert true == !false
     assert 1 > 0
-  end
+    assert "a" + "b" == "ab"
+    assert [1] == [2 - 1]
+    assert [] of Int32 == [] of Int32
 
-  test "succeeds" do
     a = 1
-    bob = 5
+    b = 5
 
-    assert bob == 4 + a
+    assert b == 4 + a
   end
 
   test "valid test-name" do
@@ -19,7 +20,7 @@ describe Microtest do
 
   test "assert_raises" do
     assert_raises(ArgumentError) do
-      raise ArgumentError.new("bob")
+      raise ArgumentError.new("expected exception")
     end
 
     assert_raises(Microtest::AssertionFailure) do
