@@ -1,5 +1,5 @@
 module Microtest
-  class StandardException < Exception
+  abstract class StandardException < Exception
     getter file : String
     getter line : Int32
 
