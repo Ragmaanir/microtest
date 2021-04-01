@@ -36,47 +36,6 @@ module Microtest
         ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
       )
 
-      macro build(expression, nest)
-        {%
-          if expression.is_a?(Crystal::Macros::Call)
-            raise "Expression is not a Call: #{expression}"
-          end
-        %}
-
-        {% if !nest || expression.receiver.is_a?(Nop) %}
-          %receiver = Microtest::PowerAssert::EmptyNode.new
-        {% else %}
-          %receiver = Microtest::PowerAssert.reflect(
-            {{ expression.receiver }},
-            nest
-          )
-        {% end %}
-
-        %args = [] of Microtest::PowerAssert::Node
-
-        {% for arg in expression.args %}
-          %args.push(Microtest::PowerAssert.reflect({{ arg }}, nest))
-        {% end %}
-
-        %named_args = [] of Microtest::PowerAssert::NamedArgNode
-
-        {% if expression.named_args.is_a?(ArrayLiteral) %}
-          {% for arg in expression.named_args %}
-            %named_args.push Microtest::PowerAssert::NamedArgNode.new(
-              {{ arg.name }},
-              reflect({{ arg.value }}, nest)
-            )
-          {% end %}
-        {% end %}
-
-        Microtest::PowerAssert::CallNode.new(
-          {{ expression.name.stringify }},
-          {{expression.stringify}},
-          {{ expression }},
-          %receiver, %args, %named_args
-        )
-      end
-
       getter method_name : String
       getter receiver : Node
       getter arguments : Array(Node)
@@ -115,12 +74,77 @@ module Microtest
       def_equals_and_hash expression, value
     end
 
-    macro reflect(expression, nest = true)
+    # In order to evaluate the expression only once, and not multiple times,
+    # we have to return a tuple of node and value, so that the returned values
+    # can be used in calls without having to re-evaluate them.
+    macro reflect_tuple(expression)
       {% if expression.is_a?(Call) %}
-        Microtest::PowerAssert::CallNode.build({{ expression.id }}, true)
+
+        {% if expression.receiver.is_a?(Nop) %}
+          %receiver = {
+            node: Microtest::PowerAssert::EmptyNode.new,
+            value: nil
+          }
+        {% else %}
+          %receiver = Microtest::PowerAssert.reflect_tuple({{ expression.receiver }})
+        {% end %}
+
+        %args = Tuple.new(
+          {% for arg in expression.args %}
+            Microtest::PowerAssert.reflect_tuple({{ arg }}),
+          {% end %}
+        )
+
+        %arg_vals = %args.map(&.[:value])
+        %arg_nodes = {% if expression.args.size > 0 %}
+            %args.map(&.[:node].as(Microtest::PowerAssert::Node)).to_a
+          {% else %}
+            [] of Microtest::PowerAssert::Node
+          {% end %}
+
+
+        %named_args = [] of Microtest::PowerAssert::NamedArgNode
+
+        {% if expression.named_args.is_a?(ArrayLiteral) %}
+          {% for arg in expression.named_args %}
+            %named_args.push Microtest::PowerAssert::NamedArgNode.new(
+              {{ arg.name }},
+              Microtest::PowerAssert.reflect_tuple({{ arg.value }})
+            )
+          {% end %}
+        {% end %}
+
+        %value = {% if expression.receiver.is_a?(Nop) %}
+            {{expression.name}}(*%arg_vals) {{expression.block}}
+          {% else %}
+            %receiver[:value].{{expression.name}}(*%arg_vals) {{expression.block}}
+          {% end %}
+
+        {
+          node: Microtest::PowerAssert::CallNode.new(
+            {{ expression.name.stringify }},
+            {{expression.stringify}},
+            %value,
+            %receiver[:node],
+            %arg_nodes,
+            %named_args
+          ),
+          value: %value
+        }
       {% else %}
-        Microtest::PowerAssert::TerminalNode.new({{expression.stringify}}, {{expression}})
+        %value = {{expression}}
+        {
+          node: Microtest::PowerAssert::TerminalNode.new(
+            {{expression.stringify}},
+            %value
+          ),
+          value: %value
+        }
       {% end %}
+    end
+
+    macro reflect(expression)
+      (Microtest::PowerAssert.reflect_tuple({{expression}}))[:node]
     end
 
     macro assert(expression, file = __FILE__, line = __LINE__)

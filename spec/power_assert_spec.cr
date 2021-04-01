@@ -55,4 +55,17 @@ describe Microtest::PowerAssert do
       [] of NamedArgNode
     )
   end
+
+  def append(a : Array(Int32))
+    a << 1
+    a
+  end
+
+  test "reflect evaluates expressions only once" do
+    arr = [] of Int32
+
+    reflect(append(append(append(arr))))
+
+    assert arr.size == 3
+  end
 end
