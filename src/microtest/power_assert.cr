@@ -32,10 +32,6 @@ module Microtest
     end
 
     class CallNode < Node
-      OPERATORS = %w(
-        ! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~
-      )
-
       getter method_name : String
       getter receiver : Node
       getter arguments : Array(Node)
@@ -47,14 +43,14 @@ module Microtest
       end
 
       def operator?
-        method_name.in?(OPERATORS)
+        method_name.in?(%w(! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~))
       end
 
       def comparator?
         method_name.in?(%w(!= < <= <=> == === > >=))
       end
 
-      def_equals_and_hash method_name, expression, value, receiver, arguments, @named_arguments # , @block
+      def_equals_and_hash method_name, expression, wrapper, receiver, arguments, @named_arguments # , @block
     end
 
     class NamedArgNode < Node
@@ -64,6 +60,8 @@ module Microtest
       def initialize(@name, value)
         super("", value)
       end
+
+      def_equals_and_hash name, expression, wrapper
     end
 
     class TerminalNode < Node
@@ -71,7 +69,7 @@ module Microtest
         super(expression, value)
       end
 
-      def_equals_and_hash expression, value
+      def_equals_and_hash expression, wrapper
     end
 
     # In order to evaluate the expression only once, and not multiple times,
@@ -147,7 +145,7 @@ module Microtest
       (Microtest::PowerAssert.reflect_tuple({{expression}}))[:node]
     end
 
-    macro assert(expression, file = __FILE__, line = __LINE__)
+    macro assert(expression)
       %result = {{ expression }}
 
       if %result
