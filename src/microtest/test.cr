@@ -49,7 +49,11 @@ module Microtest
                 test = new(ctx)
                 test.run_test({{name}}) {
                   {% if a[:skip] %}
-                    Test.skip({{a[:skip].is_a?(String) ? a[:skip] : "pending"}})
+                    Test.skip(
+                      {{"pending" if a[:skip]}},
+                      {{a[:__filename] || a.filename}},
+                      {{a[:__line_number] || a.line_number}}
+                    )
                   {% else %}
                     test.{{ meth.name.id }}
                   {% end %}

@@ -27,12 +27,12 @@ macro microtest_test(&block)
 
   output = IO::Memory.new
 
-  s = Process.run("crystal", ["eval", {{c}}], output: output, error: STDERR)
+  s = Process.run("crystal", ["eval", {{c}}, "--error-trace"], output: output, error: STDERR)
 
   begin
     MicrotestJsonResult.new(s, JSON.parse(output.to_s))
   rescue e
-    raise "Error parsing JSON: #{output.to_s}"
+    raise "Error parsing JSON: #{output.to_s.inspect}"
   end
 end
 
@@ -52,7 +52,7 @@ macro reporter_test(reporters, &block)
   output = IO::Memory.new
   err = IO::Memory.new
 
-  s = Process.run("crystal", ["eval", {{c}}], output: output, error: err)
+  s = Process.run("crystal", ["eval", {{c}}, "--error-trace"], output: output, error: err)
 
   MicrotestStdoutResult.new(s, output.to_s, err.to_s)
 end
