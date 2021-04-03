@@ -39,10 +39,32 @@ module Microtest
 
   include GlobalHookDSL
 
-  annotation TestClass
-  end
+  class TestMethod
+    getter name : String, focus : Bool | String, skip : Bool
+    getter block : (TestMethod, ExecutionContext) ->
 
-  annotation TestMethod
+    def initialize(@name, @focus, @skip, &@block : (TestMethod, ExecutionContext) ->)
+    end
+
+    def focus?
+      focus
+    end
+
+    def skip?
+      skip
+    end
+
+    def sanitized_name
+      name.gsub(/[^a-zA-Z0-9_]/, "_")
+    end
+
+    def method_name
+      method_name = "test__#{sanitized_name}"
+    end
+
+    def call(ctx : ExecutionContext)
+      block.call(self, ctx)
+    end
   end
 
   def self.power_assert_formatter
@@ -81,6 +103,10 @@ module Microtest
   module DSL
     macro describe(cls, &block)
       class {{cls.id}}Test < Microtest::Test
+        def self.test_methods
+          [] of Microtest::TestMethod
+        end
+
         {{block.body}}
       end
     end

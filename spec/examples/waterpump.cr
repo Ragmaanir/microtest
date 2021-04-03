@@ -25,11 +25,6 @@ describe WaterPump do
     assert(p.speed > 50)
   end
 
-  @[Microtest::TestMethod(name: "A test defined using annotations", skip: true)]
-  def test_using_annotations
-    assert true
-  end
-
   test "this one is pending since it got no body"
 
   pending "this one is pending even though it has a body" do

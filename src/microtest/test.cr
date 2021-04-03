@@ -14,56 +14,8 @@ module Microtest
       {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
     end
 
-    record(TestMethodReflection, name : String, focus : Bool, skip : Bool | String, block : ExecutionContext ->) do
-      def focus?
-        focus
-      end
-
-      def skip?
-        skip
-      end
-
-      def call(ctx : ExecutionContext)
-        block.call(ctx)
-      end
-    end
-
-    def self.test_methods : Array(TestMethodReflection)
-      {% begin %}
-        {% ms = @type.methods.select { |m| m.annotation(TestMethod) } %}
-
-        [
-          {% for meth in ms %}
-            {%
-              a = meth.annotation(TestMethod)
-              name = meth.name.stringify
-                .gsub(/\Atest__/, "")
-                .gsub(/[^a-zA-Z0-9_]/, "")
-            %}
-
-            TestMethodReflection.new(
-              {{a[:name]}},
-              {{!!a[:focus]}},
-              {{!!a[:skip]}},
-              -> (ctx : ExecutionContext) {
-                test = new(ctx)
-                test.run_test({{name}}) {
-                  {% if a[:skip] %}
-                    Test.skip(
-                      {{"pending" if a[:skip]}},
-                      {{a[:__filename] || a.filename}},
-                      {{a[:__line_number] || a.line_number}}
-                    )
-                  {% else %}
-                    test.{{ meth.name.id }}
-                  {% end %}
-                }
-
-              }
-            ),
-          {% end %}
-        ] of TestMethodReflection
-      {% end %}
+    def self.test_methods
+      [] of Microtest::TestMethod
     end
 
     def self.selected_test_methods(ctx : ExecutionContext)
@@ -89,10 +41,17 @@ module Microtest
       nil
     end
 
-    def run_test(name : String, &block)
+    def run_test(meth : TestMethod, &block)
+      name = meth.sanitized_name
+
       context.test_case(name) do
         time = Time.local
-        exc = execute_test(name, &block)
+
+        if meth.skip?
+          exc = SkipException.new("pending", "", 0)
+        else
+          exc = execute_test(name, &block)
+        end
 
         duration = Time.local - time
 
