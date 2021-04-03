@@ -5,10 +5,6 @@ module Microtest
     include TestClassDSL
     include Microtest::PowerAssert
 
-    GENERAL_TESTNAME_PREFIX = "__test"
-    FOCUSED_TESTNAME_PREFIX = "__testf"
-    GENERAL_TESTNAME_REGEX  = /__test(f)?__/
-
     getter context : ExecutionContext
 
     def initialize(@context)
@@ -18,76 +14,78 @@ module Microtest
       {{ ("[" + @type.all_subclasses.join(", ") + "] of Test.class").id }}
     end
 
-    def self.using_focus? : Bool
-      {{
-        @type.all_subclasses.any? do |c|
-          c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
+    record(TestMethodReflection, name : String, focus : Bool, skip : Bool | String, block : ExecutionContext ->) do
+      def focus?
+        focus
+      end
+
+      def skip?
+        skip
+      end
+
+      def call(ctx : ExecutionContext)
+        block.call(ctx)
+      end
+    end
+
+    def self.test_methods : Array(TestMethodReflection)
+      {% begin %}
+        {% ms = @type.methods.select { |m| m.annotation(TestMethod) } %}
+
+        [
+          {% for meth in ms %}
+            {%
+              a = meth.annotation(TestMethod)
+              name = meth.name.stringify
+                .gsub(/\Atest__/, "")
+                .gsub(/[^a-zA-Z0-9_]/, "")
+            %}
+
+            TestMethodReflection.new(
+              {{a[:name]}},
+              {{!!a[:focus]}},
+              {{!!a[:skip]}},
+              -> (ctx : ExecutionContext) {
+                test = new(ctx)
+                test.run_test({{name}}) {
+                  {% if a[:skip] %}
+                    Test.skip({{a[:skip].is_a?(String) ? a[:skip] : "pending"}})
+                  {% else %}
+                    test.{{ meth.name.id }}
+                  {% end %}
+                }
+
+              }
+            ),
+          {% end %}
+        ] of TestMethodReflection
+      {% end %}
+    end
+
+    def self.selected_test_methods(ctx : ExecutionContext)
+      test_methods.select { |m| !ctx.focus? || m.focus? }
+    end
+
+    def self.using_focus?
+      test_methods.any?(&.focus?)
+    end
+
+    def self.run_tests(ctx : ExecutionContext) : Nil
+      tests = selected_test_methods(ctx)
+
+      if !tests.empty?
+        ctx.test_suite(self.name) do
+          tests.shuffle(ctx.random).each do |c|
+            break if ctx.abortion_forced?
+            c.call(ctx)
+          end
         end
-      }}
-    end
-
-    def self.test_methods : Array(String)
-      {% begin %}
-        {%
-          using_focus = @type.all_subclasses.any? do |c|
-            c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
-          end
-
-          methods = if using_focus
-                      @type.methods.map(&.name).select(&.starts_with?(FOCUSED_TESTNAME_PREFIX)).map(&.stringify)
-                    else
-                      @type.methods.map(&.name).select(&.starts_with?(GENERAL_TESTNAME_PREFIX)).map(&.stringify)
-                    end
-        %}
-        [ {{ *methods }} ] of String
-      {% end %}
-    end
-
-    # NOTE:
-    # These macro methods are ugly. They contain a lot of duplication,
-    # but i don't know how to get rid of it. The duplication seems necessary, since
-    # a macro def cannot invoke another macro def. And a macro-level array of
-    # method names is required in order to be able to iterate over test method
-    # names to generate the "send(...)" like code.
-    def self.run_tests(context) : Nil
-      {% begin %}
-        {%
-          test_methods = @type.methods.map(&.name).select(&.starts_with?(GENERAL_TESTNAME_PREFIX)).map(&.stringify)
-
-          focus = Test.all_subclasses.any? do |c|
-            c.methods.map(&.name).any?(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
-          end
-
-          names = if focus
-                    test_methods.select(&.starts_with?(FOCUSED_TESTNAME_PREFIX))
-                  else
-                    test_methods.select(&.starts_with?(GENERAL_TESTNAME_PREFIX))
-                  end
-        %}
-
-        {% if !names.empty? %}
-          context.test_suite(self) do
-            calls = [
-              {% for name in names %}
-                -> {
-                  test = new(context)
-                  test.call("{{name.id}}".sub(GENERAL_TESTNAME_REGEX, "")) { test.{{ name.id }} }
-                },
-              {% end %}
-            ]
-
-            calls.shuffle(context.random).each do |c|
-              break if context.abortion_forced?
-              c.call
-            end
-          end
-        {% end %}
-      {% end %}
+      end
 
       nil
     end
 
-    def call(name, &block)
+    def run_test(name : String, &block)
       context.test_case(name) do
         time = Time.local
         exc = execute_test(name, &block)

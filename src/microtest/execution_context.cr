@@ -9,10 +9,16 @@ module Microtest
     getter? abortion_forced : Bool = false
     getter started_at : Time = Time.local
     getter! ended_at : Time
+    @focus : Bool
 
     def initialize(@reporters : Array(Reporter), @suites, @random_seed : UInt32 = Random.new_seed)
       @results = [] of TestResult
       @random = Random.new(@random_seed)
+      @focus = @suites.any?(&.using_focus?)
+    end
+
+    def focus?
+      @focus
     end
 
     def duration
@@ -48,10 +54,10 @@ module Microtest
       reporters.each(&.finished(self))
     end
 
-    def test_suite(cls)
-      reporters.each(&.suite_started(self, cls.name))
+    def test_suite(name : String)
+      reporters.each(&.suite_started(self, name))
       yield # FIXME
-      reporters.each(&.suite_finished(self, cls.name))
+      reporters.each(&.suite_finished(self, name))
     end
 
     def test_case(name)

@@ -39,6 +39,12 @@ module Microtest
 
   include GlobalHookDSL
 
+  annotation TestClass
+  end
+
+  annotation TestMethod
+  end
+
   def self.power_assert_formatter
     @@formatter ||= PowerAssert::ListFormatter.new
   end

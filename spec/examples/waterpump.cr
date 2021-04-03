@@ -1,25 +1,38 @@
-describe MyLib::WaterPump do
-  test "that it pumps water" do
-    p = MyLib::WaterPump.new("main")
-    p.enable
-    p.start
+class WaterPump
+  getter name : String
+  getter speed : Int32
+  getter? enabled : Bool = false
 
-    assert(p.pumps_water?)
+  def initialize(@name, @speed = 10)
   end
 
-  test "that it pumps with a certain speed" do
-    p = MyLib::WaterPump.new("main", speed: 100)
-    p.enable
-    p.start
+  def enable
+    @enabled = true
+  end
+end
 
-    assert(p.pump_speed > 50)
+describe WaterPump do
+  test "enabling" do
+    p = WaterPump.new("main")
+    p.enable
+
+    assert(p.enabled?)
+  end
+
+  test "pump speed" do
+    p = WaterPump.new("main", speed: 100)
+
+    assert(p.speed > 50)
+  end
+
+  @[Microtest::TestMethod(name: "A test defined using annotations", skip: true)]
+  def test_using_annotations
+    assert true
   end
 
   test "this one is pending since it got no body"
 
-  test "only run this focused test", :focus do
-  end
-
-  test! "and this one too since it is focused also" do
+  pending "this one is pending even though it has a body" do
+    raise "should not raise"
   end
 end

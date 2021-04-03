@@ -22,31 +22,30 @@ module Microtest
       end
     end
 
-    macro pending(name = "anonymous", &block)
-      {%
-        testname = name.gsub(/\s+|-/, "_").id
-      %}
-
-      def __test__{{testname}}
-        skip "pending"
-      end
+    macro pending(name = "anonymous", *args, **options, &block)
+      test({{name}}, {{*(args + [:skip])}}, {{**options}}) {{block}}
     end
 
-    macro test!(name = "anonymous", &block)
-      test({{name}}, :focus) {{block}}
+    macro test!(name = "anonymous", *args, **options, &block)
+      test({{name}}, {{*(args + [:focus])}}, {{**options}}) {{block}}
     end
 
-    macro test(name = "anonymous", focus = :nofocus, &block)
+    macro test(name = "anonymous", *args, __line = __LINE__, **options, &block)
       {%
-        testname = name.gsub(/\s+|-/, "_").id
-        focus_str = focus == :focus ? "f" : ""
+        sanitized_name = name.gsub(/[^a-zA-Z0-9_]/, "_")
+        focus = args.includes?(:focus)
+        skip = args.includes?(:skip)
       %}
 
-      def __test{{focus_str.id}}__{{testname}}
+      @[Microtest::TestMethod(
+        name: {{name}},
+        focus: {{focus}},
+        skip: {{skip || !block}},
+        line: {{__line}}
+      )]
+      def test__{{sanitized_name.id}}
         {% if block %}
           {{block.body}}
-        {% else %}
-          skip "not implemented"
         {% end %}
       end
     end

@@ -7,12 +7,18 @@ describe WaterPumpExample do
     end
 
     assert res.json["results"].as_h.keys.sort! == [
-      "MyLib::WaterPumpTest#and_this_one_too_since_it_is_focused_also",
-      "MyLib::WaterPumpTest#only_run_this_focused_test",
+      "WaterPumpTest#enabling",
+      "WaterPumpTest#pump_speed",
+      "WaterPumpTest#test_using_annotations",
+      "WaterPumpTest#this_one_is_pending_even_though_it_has_a_body",
+      "WaterPumpTest#this_one_is_pending_since_it_got_no_body",
     ].sort
 
-    assert res.json["results"]["MyLib::WaterPumpTest#and_this_one_too_since_it_is_focused_also"]["type"] == "Microtest::TestSuccess"
-    assert res.json["results"]["MyLib::WaterPumpTest#only_run_this_focused_test"]["type"] == "Microtest::TestSuccess"
+    assert res.json["results"]["WaterPumpTest#enabling"]["type"] == "Microtest::TestSuccess"
+    assert res.json["results"]["WaterPumpTest#pump_speed"]["type"] == "Microtest::TestSuccess"
+    assert res.json["results"]["WaterPumpTest#test_using_annotations"]["type"] == "Microtest::TestSkip"
+    assert res.json["results"]["WaterPumpTest#this_one_is_pending_even_though_it_has_a_body"]["type"] == "Microtest::TestSkip"
+    assert res.json["results"]["WaterPumpTest#this_one_is_pending_since_it_got_no_body"]["type"] == "Microtest::TestSkip"
   end
 end
 
