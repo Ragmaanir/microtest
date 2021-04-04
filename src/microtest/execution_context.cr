@@ -79,6 +79,10 @@ module Microtest
       suites.sum(&.test_methods.size)
     end
 
+    def executed_tests
+      results.size
+    end
+
     def total_success
       results.count(&.as?(TestSuccess))
     end

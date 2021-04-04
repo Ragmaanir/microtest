@@ -187,7 +187,10 @@ module Microtest
       total, unit = Formatter.format_duration(ctx.duration)
 
       focus_hint = "USING FOCUS: " if Test.using_focus?
-      puts [focus_hint.colorize.back(:red), "Executed #{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue)].join
+      puts [
+        focus_hint.colorize.back(:red),
+        "Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue),
+      ].join
       puts [
         ["Success: ", ctx.total_success].join.colorize(:green),
         ", ",
@@ -216,6 +219,7 @@ module Microtest
         aborted:            ctx.aborted?,
         aborting_exception: ctx.aborting_exception.try(&.message),
         total_count:        ctx.total_tests,
+        executed_count:     ctx.executed_tests,
         success_count:      ctx.total_success,
         skip_count:         ctx.total_skip,
         failure_count:      ctx.total_failure,

@@ -47,6 +47,7 @@ describe Microtest::JsonSummaryReporter do
     assert json["aborting_exception"] == nil
 
     assert json["total_count"] == 1
+    assert json["executed_count"] == 1
     assert json["success_count"] == 1
     assert json["skip_count"] == 0
     assert json["failure_count"] == 0
@@ -90,6 +91,7 @@ describe Microtest::JsonSummaryReporter do
     assert json["aborting_exception"] == nil
 
     assert json["total_count"] == 4
+    assert json["executed_count"] == 4
     assert json["success_count"] == 1
     assert json["skip_count"] == 1
     assert json["failure_count"] == 2
