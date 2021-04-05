@@ -1,5 +1,4 @@
-require "colorize"
-
+require "./microtest/termart"
 require "./microtest/backtrace_printer"
 require "./microtest/exceptions"
 require "./microtest/test_result"
