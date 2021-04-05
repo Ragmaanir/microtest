@@ -32,7 +32,7 @@ module Microtest
       if !tests.empty?
         ctx.test_suite(self.name) do
           tests.shuffle(ctx.random).each do |c|
-            break if ctx.abortion_forced?
+            break if ctx.halted?
             c.call(ctx)
           end
         end
@@ -43,69 +43,43 @@ module Microtest
 
     def run_test(meth : TestMethod, &block)
       name = meth.sanitized_name
+      time = Time.local
 
-      context.test_case(name) do
-        time = Time.local
+      test_exc = SkipException.new("before-hook failed", "", 0)
+      hook_exc = nil
 
-        if meth.skip?
-          exc = SkipException.new("pending", "", 0)
-        else
-          exc = execute_test(name, &block)
-        end
+      begin
+        around_hooks do
+          before_hooks
 
-        duration = Time.local - time
-
-        if !context.abortion_forced?
-          case e = exc
-          when HookException
-            report_test_result(name, duration, e.test_exception)
-            context.abort!(e)
-            raise FatalException.new
+          begin
+            if meth.skip?
+              # test_exc = SkipException.new("pending", "", 0)
+              skip("pending")
+            else
+              block.call
+            end
+          rescue ex : AssertionFailure | SkipException
+            test_exc = ex
+          rescue ex : Exception
+            test_exc = UnexpectedError.new(self.class.name, name, ex)
           else
-            report_test_result(name, duration, e)
+            test_exc = nil # passed
           end
+
+          after_hooks
         end
+      rescue e
+        hook_exc = HookException.new(self.class.name, name, e)
+
+        context.abort!(hook_exc)
       end
+
+      duration = Time.local - time
+
+      context.record_result(self.class.name, meth, duration, test_exc, hook_exc)
 
       nil
-    end
-
-    def report_test_result(name : String, duration : Time::Span, e : StandardException | Symbol | Nil)
-      case e
-      when AssertionFailure
-        context.record_result(TestResult.failure(self.class.name, name, duration, e))
-      when UnexpectedError
-        context.record_result(TestResult.failure(self.class.name, name, duration, e))
-      when SkipException
-        context.record_result(TestResult.skip(self.class.name, name, duration, e))
-      when nil # not :not_executed
-        context.record_result(TestResult.success(self.class.name, name, duration))
-      end
-    end
-
-    def execute_test(name, &block) : StandardException | Symbol | Nil
-      exc = :not_executed
-
-      around_hooks do
-        before_hooks
-
-        exc = capture_exception(name, &block)
-
-        after_hooks
-      end
-    rescue e
-      HookException.new(self.class.name, "Hook before/after/around raised in #{name}", e, exc)
-    else
-      exc
-    end
-
-    def capture_exception(name, &block)
-      block.call
-      nil
-    rescue ex : AssertionFailure | SkipException
-      ex
-    rescue ex : Exception
-      UnexpectedError.new(self.class.name, name, ex)
     end
 
     def around_hooks(&block)

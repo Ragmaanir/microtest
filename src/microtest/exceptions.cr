@@ -1,5 +1,5 @@
 module Microtest
-  abstract class StandardException < Exception
+  abstract class TestException < Exception
     getter file : String
     getter line : Int32
 
@@ -8,13 +8,13 @@ module Microtest
     end
   end
 
-  class AssertionFailure < StandardException
+  class AssertionFailure < TestException
   end
 
-  class SkipException < StandardException
+  class SkipException < TestException
   end
 
-  class UnexpectedError < StandardException
+  class UnexpectedError < TestException
     getter exception : Exception
     getter suite : String
     getter test : String
@@ -22,15 +22,18 @@ module Microtest
     def initialize(@suite, @test, @exception)
       # super("Unexpected error in #{suite}##{test}: #{exception.message}")
       # super("Unexpected error: #{exception.message}", exception.file, exception.line)
+      # XXX: suite, test, line
       super("Unexpected error: #{exception}", "unknown", 0)
     end
   end
 
-  class HookException < UnexpectedError
-    getter test_exception : StandardException | Symbol | Nil
+  class HookException < Exception
+    getter exception : Exception
+    getter suite : String
+    getter test : String
 
-    def initialize(suite, test, exception, @test_exception)
-      super(suite, test, exception)
+    def initialize(@suite, @test, @exception)
+      super("Error in hook: #{exception}")
     end
   end
 

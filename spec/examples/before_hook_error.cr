@@ -1,6 +1,6 @@
 describe Hooks do
   before do
-    raise "error"
+    raise "Before hook error"
   end
 
   test "first" do

@@ -186,11 +186,13 @@ module Microtest
     def finished(ctx : ExecutionContext)
       total, unit = Formatter.format_duration(ctx.duration)
 
-      focus_hint = "USING FOCUS: " if Test.using_focus?
+      focus_hint = ["USING FOCUS:".colorize.back(:red), " "].join if Test.using_focus?
+
       puts [
-        focus_hint.colorize.back(:red),
+        focus_hint,
         "Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue),
       ].join
+
       puts [
         ["Success: ", ctx.total_success].join.colorize(:green),
         ", ",
@@ -199,7 +201,44 @@ module Microtest
         ["Failures: ", ctx.total_failure].join.colorize(:red).toggle(ctx.total_failure > 0),
       ].join.colorize(:white)
 
+      if ctx.manually_aborted?
+        puts
+        puts "Test run was aborted manually".colorize(:white).back(:red)
+      elsif ctx.aborted?
+        puts
+        puts "Test run was aborted by exception:".colorize(:white).back(:red)
+        print_unexpected_error(ctx.aborting_exception.not_nil!)
+      end
+
       puts
+    end
+
+    private def print_unexpected_error(ex : HookException)
+      puts test_locator_line(ex)
+      puts ex.message.colorize(:red)
+
+      if ex.exception.backtrace?
+        puts ("-" * 60).colorize(:red)
+        puts BacktracePrinter.new.call(ex.exception.backtrace)
+      else
+        puts "(no backtrace)"
+      end
+    end
+
+    private def test_locator_line(ex : HookException) : String
+      String.build { |io|
+        Colorize.with.red.surround(io) do
+          io << ex.suite
+          io << "#"
+          io << ex.test
+          io << " "
+        end
+      # Colorize.with.dark_gray.surround(io) do
+      #   io << ex.file
+      #   io << ":"
+      #   io << ex.line
+      # end
+      }
     end
   end
 
@@ -217,6 +256,7 @@ module Microtest
         seed:               ctx.random_seed,
         success:            !ctx.errors? && !ctx.aborted?,
         aborted:            ctx.aborted?,
+        manually_aborted:   ctx.manually_aborted?,
         aborting_exception: ctx.aborting_exception.try(&.message),
         total_count:        ctx.total_tests,
         executed_count:     ctx.executed_tests,

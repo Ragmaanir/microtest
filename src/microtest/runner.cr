@@ -15,14 +15,14 @@ module Microtest
       ctx = ExecutionContext.new(reporters, suites, random_seed)
       ctx.started
 
-      Signal::INT.trap { ctx.force_abortion! }
+      Signal::INT.trap {
+        ctx.manually_abort!
+        Signal::INT.reset
+      }
 
-      begin
-        suites.shuffle(ctx.random).each do |suite|
-          break if ctx.abortion_forced?
-          suite.run_tests(ctx)
-        end
-      rescue e : FatalException
+      suites.shuffle(ctx.random).each do |suite|
+        break if ctx.halted?
+        suite.run_tests(ctx)
       end
 
       ctx.finished

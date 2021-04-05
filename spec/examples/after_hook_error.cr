@@ -4,7 +4,7 @@ describe Hooks do
   end
 
   after do
-    assert @value == true
+    raise "After hook error"
   end
 
   test "first" do

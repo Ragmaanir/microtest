@@ -1,15 +1,22 @@
 module Microtest
   abstract class TestResult
-    def self.failure(suite, test, duration, error)
-      TestFailure.new(suite, test, duration, error)
-    end
-
-    def self.success(suite, test, duration)
-      TestSuccess.new(suite, test, duration)
-    end
-
-    def self.skip(suite, test, duration, error)
-      TestSkip.new(suite, test, duration, error)
+    def self.from(
+      suite_name : String,
+      meth : TestMethod,
+      duration : Time::Span,
+      test_exc : TestException?,
+      hook_exc : HookException?
+    )
+      case test_exc
+      when AssertionFailure, UnexpectedError
+        TestFailure.new(suite_name, meth.sanitized_name, duration, test_exc)
+      when SkipException
+        TestSkip.new(suite_name, meth.sanitized_name, duration, test_exc)
+      when nil
+        TestSuccess.new(suite_name, meth.sanitized_name, duration)
+      else
+        raise "BUG: Unhandled internal exception: #{test_exc}"
+      end
     end
 
     # getter suite : Test.class

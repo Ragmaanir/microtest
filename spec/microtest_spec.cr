@@ -140,7 +140,9 @@ describe Microtest do
 
     assert result.json["success"] == false
     assert result.json["aborted"] == true
-    assert result.json["results"].as_h.empty?
+    assert result.json["aborting_exception"] == "Error in hook: Before hook error"
+    assert result.json["results"].as_h.size == 1
+    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSkip"
   end
 
   test "error in after hook" do
@@ -152,7 +154,7 @@ describe Microtest do
     assert !result.status.success?
     assert result.json["success"] == false
     assert result.json["aborted"] == true
-    assert /Unexpected error/ === result.json["aborting_exception"]
+    assert result.json["aborting_exception"] == "Error in hook: After hook error"
     assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
   end
 

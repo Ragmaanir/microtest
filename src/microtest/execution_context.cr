@@ -6,7 +6,7 @@ module Microtest
     getter random_seed : UInt32
     getter random : Random
     getter aborting_exception : HookException? = nil
-    getter? abortion_forced : Bool = false
+    getter? manually_aborted : Bool = false
     getter started_at : Time = Time.local
     getter! ended_at : Time
     @focus : Bool
@@ -33,12 +33,16 @@ module Microtest
       !errors.empty?
     end
 
-    def force_abortion!
-      @abortion_forced = true
+    def manually_abort!
+      @manually_aborted = true
     end
 
     def aborted?
       !!aborting_exception
+    end
+
+    def halted?
+      manually_aborted? || aborted?
     end
 
     def skips
@@ -56,18 +60,25 @@ module Microtest
 
     def test_suite(name : String)
       reporters.each(&.suite_started(self, name))
-      yield # FIXME
+      yield
       reporters.each(&.suite_finished(self, name))
     end
 
-    def test_case(name)
-      yield # FIXME
+    def record_result(
+      suite_name : String,
+      meth : TestMethod,
+      duration : Time::Span,
+      exc : TestException?,
+      hook_exc : HookException?
+    )
+      result = TestResult.from(suite_name, meth, duration, exc, hook_exc)
+      @results << result
+      @reporters.each(&.report(result))
     end
 
     def record_result(result : TestResult)
       @results << result
       @reporters.each(&.report(result))
-      # FIXME
     end
 
     def abort!(exception : HookException)
