@@ -277,7 +277,7 @@ module Microtest
     getter count : Int32
     getter threshold : Time::Span
 
-    def initialize(@count = 10, @threshold = 50.milliseconds, io = STDOUT)
+    def initialize(@count = 3, @threshold = 50.milliseconds, io = STDOUT)
       super(io)
     end
 
@@ -288,7 +288,7 @@ module Microtest
       res = ctx.results
         # ameba:disable Style/VerboseBlock
         .select { |r| r.duration >= threshold }
-        .sort! { |l, r| l.duration <=> r.duration }
+        .sort! { |l, r| r.duration <=> l.duration }
         .first(count)
 
       if res.empty?
