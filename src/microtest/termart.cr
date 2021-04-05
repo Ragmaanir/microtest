@@ -2,6 +2,13 @@ require "colorize"
 
 module Microtest
   class Termart
+    def self.string(colorize : Bool)
+      String.build do |io|
+        t = new(io, colorize)
+        yield t
+      end
+    end
+
     getter io : IO
     getter? colorize
 

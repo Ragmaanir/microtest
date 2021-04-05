@@ -24,28 +24,8 @@ module Microtest
         end
       end
 
-      private def grouped_lines(lines : Array(String), bar_color = BAR_COLOR)
-        String.build do |io|
-          if lines.size == 1
-            io << color("◆ ", bar_color)
-            io << lines.shift
-            io << "\n"
-          else
-            io << color("┏ ", bar_color)
-            io << lines.shift
-            io << "\n"
-
-            while lines.size > 1
-              io << color("┃ ", bar_color)
-              io << lines.shift
-              io << "\n"
-            end
-
-            io << color("┗ ", bar_color)
-            io << lines.shift
-            io << "\n"
-          end
-        end
+      private def grouped_lines(lines : Array(String), bar_color = BAR_COLOR) : String
+        Termart.string(colorize?) { |t| t.grouped_lines(lines) }
       end
 
       private def simplify_value(v : V, max_length = 64) forall V
