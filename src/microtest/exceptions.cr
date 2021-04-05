@@ -36,7 +36,4 @@ module Microtest
       super("Error in hook: #{exception}")
     end
   end
-
-  class FatalException < Exception
-  end
 end
