@@ -1,3 +1,5 @@
+require "./string_utils"
+
 module Microtest
   module PowerAssert
     abstract class Formatter
@@ -135,10 +137,10 @@ module Microtest
             # FIXME: indicate that these two lines are not simplifications,
             # but different values.
 
-            diff_idx = string_diff_index(lval, rval) || raise "BUG: Strings are not different"
+            diff_idx = StringUtils.diff_index(lval, rval) || raise "BUG: Strings are not different"
 
-            lines << highlight_split_char(split_string_at(lval, diff_idx))
-            lines << highlight_split_char(split_string_at(rval, diff_idx))
+            lines << highlight_split_char(StringUtils.split_at(lval, diff_idx))
+            lines << highlight_split_char(StringUtils.split_at(rval, diff_idx))
           else
             lines << Termart.string(colorize?) { |t|
               t.w(lval)
@@ -149,18 +151,6 @@ module Microtest
         end
 
         grouped_lines(lines)
-      end
-
-      private def string_diff_index(left : String, right : String) : Int32?
-        left.chars.zip?(right.chars).index { |(l, r)| l != r }
-      end
-
-      private def split_string_at(str : String, i : Int32) : Tuple(String, String, String)
-        {
-          str[0..(i - 1)],
-          str[i, 1],
-          str[(i + 1)..-1],
-        }
       end
 
       private def highlight_split_char(t : Tuple(String, String, String)) : String
