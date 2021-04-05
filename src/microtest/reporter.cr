@@ -9,7 +9,7 @@ module Microtest
 
     DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow}
 
-    DOT   = "\u2022"
+    DOT   = "•" # Bullet "\u2022"
     TICK  = "✓" # Check Mark "\u2713"
     CROSS = "✕" # Multiplication "\u2715"
 
@@ -20,6 +20,21 @@ module Microtest
       {
         symbol: symbols[result.kind],
         color:  colors[result.kind],
+      }
+    end
+
+    def self.inspect_unexpected_error(ex : UnexpectedError | HookException) : String
+      String.build { |io|
+        io << ex.message.colorize(:red)
+        io << "\n"
+
+        if ex.exception.backtrace?
+          io << ("-" * 60).colorize(:red)
+          io << "\n"
+          io << BacktracePrinter.new.call(ex.exception.backtrace)
+        else
+          io << "(no backtrace)"
+        end
       }
     end
   end
@@ -119,47 +134,23 @@ module Microtest
       end
     end
 
-    private def print_error(number : Int32, error)
-      case ex = error.exception
+    private def print_error(number : Int32, error : TestFailure)
+      ex = error.exception
+
+      puts test_locator_line(number, error.test_method, ex.file, ex.line)
+
+      case ex
       when AssertionFailure
-        print_assertion_failure(number, error.test_method, ex)
+        puts ex.message
       when UnexpectedError
-        print_unexpected_error(number, error.test_method, ex)
-      else raise "Invalid Exception"
+        puts Helper.inspect_unexpected_error(ex)
+      else raise "BUG: Invalid Exception"
       end
 
       puts
     end
 
-    private def print_unexpected_error(number : Int32, meth : String, ex : UnexpectedError)
-      # puts [
-      #   "# %-3d" % (number + 1),
-      #   error.test_method,
-      # ].join.colorize(:red)
-
-      puts test_locator_line(number, meth, ex)
-      puts ex.message.colorize(:red)
-
-      if ex.exception.backtrace?
-        puts ("-" * 60).colorize(:red)
-        puts BacktracePrinter.new.call(ex.exception.backtrace)
-      else
-        puts "(no backtrace)"
-      end
-    end
-
-    private def print_assertion_failure(number : Int32, meth : String, ex : AssertionFailure)
-      # puts [
-      #   ("❌ %-3d" % (number + 1)).colorize(:red),
-      #   error.test_method.colorize(:red),
-      #   " ",
-      #   [ex.file, ":", ex.line].join.colorize(:dark_gray),
-      # ].join
-      puts test_locator_line(number, meth, ex)
-      puts ex.message
-    end
-
-    private def test_locator_line(number : Int32, meth : String, ex : AssertionFailure | UnexpectedError) : String
+    private def test_locator_line(number : Int32, meth : String, file : String, line : Int32) : String
       String.build { |io|
         Colorize.with.red.surround(io) do
           io << ("# %-3d" % (number + 1))
@@ -167,9 +158,9 @@ module Microtest
           io << " "
         end
         Colorize.with.dark_gray.surround(io) do
-          io << ex.file
+          io << file
           io << ":"
-          io << ex.line
+          io << line
         end
       }
     end
@@ -204,33 +195,21 @@ module Microtest
       if ctx.manually_aborted?
         puts
         puts "Test run was aborted manually".colorize(:white).back(:red)
-      elsif ctx.aborted?
+      elsif ex = ctx.aborting_exception
         puts
         puts "Test run was aborted by exception:".colorize(:white).back(:red)
-        print_unexpected_error(ctx.aborting_exception.not_nil!)
+
+        puts test_locator_line(ex)
+        puts Helper.inspect_unexpected_error(ex)
       end
 
       puts
     end
 
-    private def print_unexpected_error(ex : HookException)
-      puts test_locator_line(ex)
-      puts ex.message.colorize(:red)
-
-      if ex.exception.backtrace?
-        puts ("-" * 60).colorize(:red)
-        puts BacktracePrinter.new.call(ex.exception.backtrace)
-      else
-        puts "(no backtrace)"
-      end
-    end
-
     private def test_locator_line(ex : HookException) : String
       String.build { |io|
         Colorize.with.red.surround(io) do
-          io << ex.suite
-          io << "#"
-          io << ex.test
+          io << ex.test_method
           io << " "
         end
       # Colorize.with.dark_gray.surround(io) do

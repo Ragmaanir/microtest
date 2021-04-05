@@ -35,5 +35,9 @@ module Microtest
     def initialize(@suite, @test, @exception)
       super("Error in hook: #{exception}")
     end
+
+    def test_method
+      [suite, test].join("#")
+    end
   end
 end

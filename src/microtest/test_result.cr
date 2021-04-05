@@ -35,7 +35,7 @@ module Microtest
   end
 
   class TestFailure < TestResult
-    getter exception : Exception
+    getter exception : AssertionFailure | UnexpectedError
 
     def initialize(suite, test, duration : Time::Span, @exception)
       super(suite, test, duration)
@@ -43,10 +43,6 @@ module Microtest
 
     def kind : Symbol
       :failure
-    end
-
-    def inspect(io)
-      io << "#{suite}.#{test}: #{exception}"
     end
   end
 
@@ -60,19 +56,11 @@ module Microtest
     def kind : Symbol
       :skip
     end
-
-    def inspect(io)
-      io << "TestSkip"
-    end
   end
 
   class TestSuccess < TestResult
     def kind : Symbol
       :success
-    end
-
-    def inspect(io)
-      io << "TestSuccess"
     end
   end
 end
