@@ -1,49 +1,61 @@
 module Microtest
-  CRYSTAL_DIR = File.expand_path({{Crystal::PATH.split(":").last}})
+  def self.find_crystal_root_path
+    # find the backtrace entry for crystals main method
+    first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || raise("Could not determine crystal path from caller stacktrace")
 
+    path = first_entry.split(":").first
+
+    # move up from:
+    #   "?/crystal-1.0.0/share/crystal/src/crystal/main.cr"
+    # to:
+    #   "?/crystal-1.0.0/share/crystal/src"
+    File.expand_path(File.join(path, "..", ".."))
+  end
+
+  CRYSTAL_DIR = find_crystal_root_path
+
+  # e.g.: "spec/spec_helper.cr:64:1 in '__crystal_main'"
   STRACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
 
   class BacktracePrinter
-    record Entry, original : String, file : String, line : Int32, func : String
+    record(Entry, original : String, file : String, line : Int32, func : String) do
+      def pretty_path(colorize : Bool, raise_on_unmatched_file : Bool)
+        Termart.string(colorize) { |t|
+          case file
+          when %r{\Alib/}  then t.w("LIB: #{file}", fg: :magenta)
+          when %r{\Asrc/}  then t.w("APP: #{file}", fg: :light_magenta)
+          when %r{\Aspec/} then t.w("SPEC: #{file}", fg: :light_magenta)
+          else
+            case exp = File.expand_path(file)
+            when %r{\A/eval}                then t.w("EVAL: #{exp}", fg: :dark_gray)
+            when .starts_with?(CRYSTAL_DIR) then t.w(exp.sub(CRYSTAL_DIR, "CRY: "), fg: :dark_gray)
+            else
+              if raise_on_unmatched_file
+                raise "Path in backtrace could not be classified: #{file}"
+              else
+                t.w("???: #{original}", fg: :cyan)
+              end
+            end
+          end
+        }
+      end
+    end
 
-    def call(backtrace : Array(String), raise_on_unmatched_file = false)
+    def call(backtrace : Array(String), colorize = true, raise_on_unmatched_file = false)
       entries = simplify(backtrace)
 
-      strs = entries.map do |entry|
-        path = case name = entry.file
-               when .starts_with?("lib/")
-                 "LIB: #{name}".colorize(:magenta)
-               when .starts_with?("src")
-                 "APP: #{name}".colorize(:light_magenta)
-               when .starts_with?("spec")
-                 "SPEC: #{name}".colorize(:light_magenta)
-               else
-                 expanded = File.expand_path(name)
-                 case expanded
-                 when .starts_with?("/eval")
-                   "EVAL: #{expanded}".colorize(:dark_gray)
-                 when .starts_with?(CRYSTAL_DIR)
-                   expanded.sub(CRYSTAL_DIR, "CRY: ").colorize(:dark_gray)
-                 else
-                   raise "Path in backtrace could not be classified: #{name}" if raise_on_unmatched_file
-                   "???: #{entry.original}".colorize(:cyan)
-                 end
-               end
-        [
-          [
-            path,
-            ":".colorize(:dark_gray),
-            entry.line.colorize(:dark_gray),
-          ].join,
-          entry.func.colorize(:yellow),
-        ].join(" ")
-      end
-
-      strs.join("\n")
+      Termart.string(colorize) { |t|
+        entries.each do |entry|
+          t.w(entry.pretty_path(colorize, raise_on_unmatched_file))
+          t.w(":", entry.line.to_s, " ", fg: :dark_gray)
+          t.w(entry.func, fg: :yellow)
+          t.br
+        end
+      }
     end
 
     def simplify(backtrace : Array(String)) : Array(Entry)
-      entries = Array(Entry).new
+      entries = [] of Entry
 
       backtrace.each do |l|
         if m = STRACKTRACE_LINE_REGEX.match(l)
