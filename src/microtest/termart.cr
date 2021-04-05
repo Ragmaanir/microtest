@@ -2,7 +2,7 @@ require "colorize"
 
 module Microtest
   class Termart
-    def self.string(colorize : Bool)
+    def self.string(colorize : Bool) : String
       String.build do |io|
         t = new(io, colorize)
         yield t

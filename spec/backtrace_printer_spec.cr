@@ -45,24 +45,24 @@ describe Microtest::BacktracePrinter do
     pretty_trace = printer.call(raw_trace, false)
 
     assert pretty_trace == <<-BACKTRACE
-    CRY: /crystal/main.cr:119 main
-    CRY: /crystal/main.cr:96 main
-    CRY: /crystal/main.cr:110 main_user_code
-    SPEC: spec/spec_helper.cr:64 __crystal_main
-    APP: src/microtest.cr:67 run!
-    APP: src/microtest.cr:71 run!
-    APP: src/microtest.cr:53 run
-    APP: src/microtest.cr:55 run
-    APP: src/microtest/runner.cr:25 call
-    APP: src/microtest/test.cr:36 run_tests
-    CRY: /primitives.cr:255 call
-    SPEC: spec/backtrace_printer_spec.cr:17 ->
-    APP: src/microtest/test.cr:52 run_test
-    CRY: /primitives.cr:255 around_hooks
-    CRY: /primitives.cr:255 ->
-    SPEC: spec/backtrace_printer_spec.cr:17 ->
-    SPEC: spec/backtrace_printer_spec.cr:19 test__prettify_path
-    SPEC: spec/backtrace_printer_spec.cr:5 generate_exception\n
+    ┏ CRY: /crystal/main.cr:119 main
+    ┃ CRY: /crystal/main.cr:96 main
+    ┃ CRY: /crystal/main.cr:110 main_user_code
+    ┃ SPEC: spec/spec_helper.cr:64 __crystal_main
+    ┃ APP: src/microtest.cr:67 run!
+    ┃ APP: src/microtest.cr:71 run!
+    ┃ APP: src/microtest.cr:53 run
+    ┃ APP: src/microtest.cr:55 run
+    ┃ APP: src/microtest/runner.cr:25 call
+    ┃ APP: src/microtest/test.cr:36 run_tests
+    ┃ CRY: /primitives.cr:255 call
+    ┃ SPEC: spec/backtrace_printer_spec.cr:17 ->
+    ┃ APP: src/microtest/test.cr:52 run_test
+    ┃ CRY: /primitives.cr:255 around_hooks
+    ┃ CRY: /primitives.cr:255 ->
+    ┃ SPEC: spec/backtrace_printer_spec.cr:17 ->
+    ┃ SPEC: spec/backtrace_printer_spec.cr:19 test__prettify_path
+    ┗ SPEC: spec/backtrace_printer_spec.cr:5 generate_exception\n
     BACKTRACE
   end
 
