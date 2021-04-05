@@ -3,6 +3,7 @@ require "colorize"
 require "./microtest/backtrace_printer"
 require "./microtest/exceptions"
 require "./microtest/test_result"
+require "./microtest/test_method"
 require "./microtest/execution_context"
 require "./microtest/power_assert"
 require "./microtest/power_assert_formatter"
@@ -38,34 +39,6 @@ module Microtest
   end
 
   include GlobalHookDSL
-
-  class TestMethod
-    getter name : String, focus : Bool | String, skip : Bool
-    getter block : (TestMethod, ExecutionContext) ->
-
-    def initialize(@name, @focus, @skip, &@block : (TestMethod, ExecutionContext) ->)
-    end
-
-    def focus?
-      focus
-    end
-
-    def skip?
-      skip
-    end
-
-    def sanitized_name
-      name.gsub(/[^a-zA-Z0-9_]/, "_")
-    end
-
-    def method_name
-      method_name = "test__#{sanitized_name}"
-    end
-
-    def call(ctx : ExecutionContext)
-      block.call(self, ctx)
-    end
-  end
 
   def self.power_assert_formatter
     @@formatter ||= PowerAssert::ListFormatter.new
