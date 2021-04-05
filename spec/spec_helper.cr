@@ -61,4 +61,4 @@ def generate_assets?
   ENV.has_key?("ASSETS")
 end
 
-Microtest.run!(:descriptions)
+Microtest.run!
