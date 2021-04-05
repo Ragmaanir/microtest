@@ -28,6 +28,15 @@ module Microtest
         Termart.string(colorize?) { |t| t.grouped_lines(lines) }
       end
 
+      # Returns colorized "assert x == y"
+      private def formatted_assert_statement(node : CallNode | TerminalNode) : String
+        Termart.string(colorize?) { |t|
+          t.w("assert", fg: :red)
+          t.w(" ")
+          t.w(node.expression, fg: :red, m: :bold)
+        }
+      end
+
       private def simplify_value(v : V, max_length = 64) forall V
         if v.is_a?(Array) && v.size > 1
           String.build do |io|
@@ -52,9 +61,9 @@ module Microtest
         is_complex_result = ![true, false].includes?(v)
         nest = simplified && is_complex_result
 
-        lines = [
-          "#{color("assert", :red)} #{color(node.expression, :red, :bold)}",
-        ]
+        lines = [] of String
+
+        lines << formatted_assert_statement(node)
 
         lines << simpler_exp if nest
 
@@ -88,7 +97,7 @@ module Microtest
 
         lines = [] of String
 
-        lines << "#{color("assert", :red)} #{color(node.expression, :red, :bold)}"
+        lines << formatted_assert_statement(node)
 
         lines << simpler_exp if simpler_exp != node.expression
 
@@ -117,7 +126,7 @@ module Microtest
 
         lines = [] of String
 
-        lines << "#{color("assert", :red)} #{color(node.expression, :red, :bold)}"
+        lines << formatted_assert_statement(node)
 
         if simpler_exp != node.expression
           # if the inspects of left and right dont fit in one line,
@@ -131,7 +140,11 @@ module Microtest
             lines << highlight_split_char(split_string_at(lval, diff_idx))
             lines << highlight_split_char(split_string_at(rval, diff_idx))
           else
-            lines << "#{lval} #{color(node.method_name, :dark_gray)} #{rval}"
+            lines << Termart.string(colorize?) { |t|
+              t.w(lval)
+              t.w(" ", node.method_name, " ", fg: :dark_gray)
+              t.w(rval)
+            }
           end
         end
 
@@ -151,15 +164,11 @@ module Microtest
       end
 
       private def highlight_split_char(t : Tuple(String, String, String)) : String
-        "#{t[0]}#{color(t[1], :white, bg: :red)}#{t[2]}"
-      end
-
-      private def color(s : String, fg : Symbol, m : Symbol? = nil, bg : Symbol? = nil)
-        return s if !colorize?
-        s = s.colorize(fg)
-        s = s.mode(m) if m
-        s = s.back(bg) if bg
-        s
+        Termart.string(colorize?) { |a|
+          a.w(t[0])
+          a.w(t[1], fg: :white, bg: :red)
+          a.w(t[2])
+        }
       end
     end
   end

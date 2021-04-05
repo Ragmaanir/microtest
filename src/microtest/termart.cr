@@ -15,33 +15,6 @@ module Microtest
     def initialize(@io, @colorize : Bool = true)
     end
 
-    # def w(str : String, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
-    #   if colorize?
-    #     s = str.colorize
-    #     s = s.fore(fg) if fg
-    #     s = s.mode(m) if m
-    #     s = s.back(bg) if bg
-    #     io << s
-    #   else
-    #     io << str
-    #   end
-    # end
-
-    # def w(*strs : String, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
-    #   if colorize?
-    #     c = Colorize.with
-    #     c = c.fore(fg) if fg
-    #     c = c.mode(m) if m
-    #     c = c.back(bg) if bg
-
-    #     c.surround(io) do |c|
-    #       strs.each { |s| c << s }
-    #     end
-    #   else
-    #     strs.each { |s| io << s }
-    #   end
-    # end
-
     private def colorized_io(fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
       if colorize?
         c = Colorize.with
