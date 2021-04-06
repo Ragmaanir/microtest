@@ -31,7 +31,7 @@ module Microtest
       end
 
       private def grouped_lines(lines : Array(String)) : String
-        build_string { |t| t.grouped_lines(lines, BAR_COLOR) }
+        build_string(&.grouped_lines(lines, BAR_COLOR))
       end
 
       # Returns colorized "assert x == y"
@@ -96,7 +96,7 @@ module Microtest
 
           if !node.arguments.empty?
             s << "(" if !node.operator?
-            s << node.arguments.join(", ") { |a| a.value.inspect }
+            s << node.arguments.join(", ", &.value.inspect)
             s << ")" if !node.operator?
           end
         end

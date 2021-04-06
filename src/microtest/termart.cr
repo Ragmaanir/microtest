@@ -28,8 +28,8 @@ module Microtest
         c = c.mode(m) if m
         c = c.back(bg) if bg
 
-        c.surround(io) do |c|
-          yield c
+        c.surround(io) do |cio|
+          yield cio
         end
       else
         yield io

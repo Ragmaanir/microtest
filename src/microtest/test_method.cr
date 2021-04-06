@@ -19,7 +19,7 @@ module Microtest
     end
 
     def method_name
-      method_name = "test__#{sanitized_name}"
+      "test__#{sanitized_name}"
     end
 
     def call(ctx : ExecutionContext)

@@ -23,6 +23,7 @@ describe Microtest::PowerAssert do
     assert reflect(1..5) == TerminalNode.new(%[1..5], 1..5)
     assert reflect("1".."5") == TerminalNode.new(%["1".."5"], "1".."5")
 
+    # ameba:disable Lint/UselessAssign
     assert reflect(b = 0) == TerminalNode.new(%[b = 0], 0)
 
     a = 1
