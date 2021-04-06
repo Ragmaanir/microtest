@@ -54,7 +54,7 @@ module Microtest
         io << "\n"
 
         if ex.exception.backtrace?
-          io << BacktracePrinter.new.call(ex.exception.backtrace)
+          io << BacktracePrinter.new.call(ex.exception.backtrace, true, false)
         else
           io << "(no backtrace)"
         end
