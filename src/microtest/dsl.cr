@@ -22,18 +22,27 @@ module Microtest
       end
     end
 
-    macro pending(name = "anonymous", *args, **options, &block)
+    macro pending(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
       test({{name}}, {{*(args + [:skip])}}, {{**options}}) {{block}}
     end
 
-    macro test!(name = "anonymous", *args, **options, &block)
+    macro test!(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
       test({{name}}, {{*(args + [:focus])}}, {{**options}}) {{block}}
     end
 
-    macro test(name = "anonymous", *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
+    macro test(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
       {%
+        raise "Test name cant be empty" if name == ""
+
+        name = "unnamed_in_line_#{__line_number}" if name == nil
+
         sanitized_name = name.gsub(/[^a-zA-Z0-9_]/, "_")
         method_name = "test__#{sanitized_name.id}"
+
+        if @type.has_method?(method_name)
+          raise "Test method with same name already defined: #{method_name.id} (#{name})"
+        end
+
         focus = args.includes?(:focus)
         # TODO pass custom skip message
         skip = args.includes?(:skip) || !block

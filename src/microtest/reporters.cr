@@ -162,7 +162,7 @@ module Microtest
     def finished(ctx : ExecutionContext)
       total, unit = Formatter.format_duration(ctx.duration)
 
-      if Test.using_focus?
+      if ctx.focus?
         write("USING FOCUS:", bg: :red)
         write(" ")
       end

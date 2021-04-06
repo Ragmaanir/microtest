@@ -90,19 +90,11 @@ module Microtest
     def pass
     end
 
-    macro fail(msg)
-      raise Microtest::AssertionFailure.new({{msg}}, {{msg.filename}}, {{msg.line_number}})
-    end
-
-    macro fail(msg, file, line)
+    macro fail(msg = "failed", file = __FILE__, line = __LINE__)
       raise Microtest::AssertionFailure.new({{msg}}, {{file}}, {{line}})
     end
 
-    macro skip(msg)
-      raise Microtest::SkipException.new({{msg}}, {{msg.filename}}, {{msg.line_number}})
-    end
-
-    macro skip(msg, file, line)
+    macro skip(msg = "skipped", file = __FILE__, line = __LINE__)
       raise Microtest::SkipException.new({{msg}}, {{file}}, {{line}})
     end
   end

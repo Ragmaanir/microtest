@@ -43,7 +43,7 @@ describe Microtest::Formatter do
     assert unit == F::TIME_UNITS[:microsecond]
   end
 
-  test "microseconds" do
+  test "nanoseconds" do
     span = Time::Span.new(nanoseconds: 1)
     num, unit = F.format_duration(span)
 
