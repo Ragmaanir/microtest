@@ -1,7 +1,7 @@
 module Microtest
   def self.find_crystal_root_path
     # find the backtrace entry for crystals main method
-    first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || raise("Could not determine crystal path from caller stacktrace")
+    first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || Microtest.bug("Could not determine crystal path from caller stacktrace")
 
     path = first_entry.split(":").first
 
@@ -12,7 +12,11 @@ module Microtest
     File.expand_path(File.join(path, "..", ".."))
   end
 
-  CRYSTAL_DIR = find_crystal_root_path
+  CRYSTAL_DIR      = find_crystal_root_path
+  PROJECT_DIR      = Dir.current
+  PROJECT_LIB_DIR  = File.join(PROJECT_DIR, "lib")
+  PROJECT_SRC_DIR  = File.join(PROJECT_DIR, "src")
+  PROJECT_SPEC_DIR = File.join(PROJECT_DIR, "spec")
 
   # e.g.: "spec/spec_helper.cr:64:1 in '__crystal_main'"
   STRACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
@@ -21,33 +25,28 @@ module Microtest
     record(Entry, kind : Symbol, path : String, line : Int32, func : String)
 
     def self.simplify_path(path : String, raise_on_unmatched_file = false)
-      exp = File.expand_path(path)
-
       kind = case path
-             when %r{\Alib/}  then :lib
-             when %r{\Asrc/}  then :app
-             when %r{\Aspec/} then :spec
-             else
-               case exp
-               when %r{\A/eval}                then :eval
-               when .starts_with?(CRYSTAL_DIR) then :crystal
-               else                                 :unknown
-               end
+             when .starts_with?(PROJECT_LIB_DIR)  then :lib
+             when .starts_with?(PROJECT_SRC_DIR)  then :app
+             when .starts_with?(PROJECT_SPEC_DIR) then :spec
+             when .starts_with?("/eval")          then :eval
+             when .starts_with?(CRYSTAL_DIR)      then :crystal
+             else                                      :unknown
              end
 
       simple_path = case kind
-                    when :lib     then "LIB: #{path}"
-                    when :app     then "APP: #{path}"
-                    when :spec    then "SPEC: #{path}"
-                    when :eval    then "EVAL: #{exp}"
-                    when :crystal then exp.sub(CRYSTAL_DIR, "CRY: ")
+                    when :lib     then path.sub(PROJECT_LIB_DIR, "LIB: lib")
+                    when :app     then path.sub(PROJECT_SRC_DIR, "APP: src")
+                    when :spec    then path.sub(PROJECT_SPEC_DIR, "SPEC: spec")
+                    when :eval    then "EVAL: #{path}"
+                    when :crystal then path.sub(CRYSTAL_DIR, "CRY: ")
                     when :unknown
                       if raise_on_unmatched_file
-                        raise "Path in backtrace could not be classified: #{path}"
+                        Microtest.bug("Path in backtrace could not be classified: #{path}")
                       else
                         "???: #{path}"
                       end
-                    else Microtest.bug("Case not implemented: #{kind}")
+                    else Microtest.bug("Case not implemented: #{kind} for #{path}")
                     end
 
       {kind, simple_path}
@@ -91,7 +90,14 @@ module Microtest
           # column = m[3]
           func = m[4]
 
-          entries << Entry.new(*self.class.simplify_path(file, raise_on_unmatched_file), line, func)
+          entries << Entry.new(
+            *self.class.simplify_path(
+              File.expand_path(file),
+              raise_on_unmatched_file
+            ),
+            line,
+            func
+          )
         end
       end
 

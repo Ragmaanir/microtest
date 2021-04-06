@@ -132,7 +132,7 @@ module Microtest
       ex = error.exception
 
       write("# %-3d" % (number + 1), error.test_method, " ", fg: :red)
-      write(ex.file, ":", ex.line, fg: :dark_gray)
+      write(BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
       br
 
       case ex
