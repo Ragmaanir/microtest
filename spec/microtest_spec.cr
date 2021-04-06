@@ -38,6 +38,9 @@ describe Microtest do
   test "test results" do
     result = microtest_test do
       describe Microtest do
+        test do # unnamed
+        end
+
         test "assertion failure message" do
           a = 2
           assert 2**4 == a * a * a
@@ -94,6 +97,7 @@ describe Microtest do
     assert results["MicrotestTest#pending"]["type"] == "Microtest::TestSkip"
     assert results["MicrotestTest#pending_too"]["type"] == "Microtest::TestSkip"
     assert results["MicrotestTest#raise"]["type"] == "Microtest::TestFailure"
+    assert results["MicrotestTest#unnamed_in_line_6"]["type"] == "Microtest::TestSuccess"
   end
 
   test "focusing" do
