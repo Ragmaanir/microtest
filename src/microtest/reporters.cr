@@ -225,7 +225,7 @@ module Microtest
           write(symbol, fg: color)
           write(Formatter.colorize_duration(r.duration, threshold).to_s)
           write(" ")
-          write(r.suite, "::", r.test, fg: color)
+          write(r.suite, MEHTOD_SEPARATOR, r.test, fg: color)
           br
         end
       end

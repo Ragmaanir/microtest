@@ -41,6 +41,8 @@ module Microtest
 
   include GlobalHookDSL
 
+  MEHTOD_SEPARATOR = "#"
+
   def self.bug(msg : String)
     raise("MICROTEST BUG: #{msg}")
   end

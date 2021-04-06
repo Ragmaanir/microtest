@@ -40,7 +40,7 @@ module Microtest
 
         entry = entry.merge(test_failure_exception_to_hash(res))
 
-        hash.merge({"#{res.suite}##{res.test}" => entry})
+        hash.merge({"#{res.suite}#{MEHTOD_SEPARATOR}#{res.test}" => entry})
       end
     end
 

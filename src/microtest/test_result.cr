@@ -28,7 +28,7 @@ module Microtest
     end
 
     def test_method
-      [suite, test].join("#")
+      [suite, test].join(MEHTOD_SEPARATOR)
     end
 
     abstract def kind : Symbol
