@@ -9,6 +9,8 @@ require "./microtest/power_assert_formatter"
 require "./microtest/test"
 require "./microtest/runner"
 require "./microtest/reporter"
+require "./microtest/reporters"
+require "./microtest/json_reporter"
 
 module Microtest
   module GlobalHookDSL
