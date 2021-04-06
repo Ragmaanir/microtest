@@ -140,7 +140,7 @@ module Microtest
         writeln(ex.message)
       when UnexpectedError
         writeln(inspect_unexpected_error(ex))
-      else raise "BUG: Invalid Exception"
+      else Microtest.bug("Invalid Exception")
       end
 
       br

@@ -141,7 +141,7 @@ module Microtest
             # FIXME: indicate that these two lines are not simplifications,
             # but different values.
 
-            diff_idx = StringUtils.diff_index(lval, rval) || raise "BUG: Strings are not different"
+            diff_idx = StringUtils.diff_index(lval, rval) || Microtest.bug("Strings are not different")
 
             lines << highlight_split_char(lval, diff_idx)
             lines << highlight_split_char(rval, diff_idx)

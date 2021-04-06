@@ -41,6 +41,10 @@ module Microtest
 
   include GlobalHookDSL
 
+  def self.bug(msg : String)
+    raise("MICROTEST BUG: #{msg}")
+  end
+
   def self.power_assert_formatter
     @@formatter ||= PowerAssert::ListFormatter.new
   end

@@ -66,7 +66,7 @@ module Microtest
               backtrace: e.exception.backtrace? ? e.exception.backtrace : nil,
             },
           })
-        else raise "BUG: unhandled exception"
+        else Microtest.bug("unhandled exception")
         end
       end
 

@@ -15,7 +15,7 @@ module Microtest
       when nil
         TestSuccess.new(suite_name, meth.sanitized_name, duration)
       else
-        raise "BUG: Unhandled internal exception: #{test_exc}"
+        Microtest.bug("Unhandled internal exception: #{test_exc}")
       end
     end
 
