@@ -20,7 +20,7 @@ describe Microtest::Reporter do
 
     assert !result.success?
 
-    dot = Microtest::Helper::DOTS[:success]
+    dot = Microtest::TerminalReporter::DOTS[:success]
 
     assert result.stdout.includes?(dot.colorize(:red).to_s)
     assert result.stdout.includes?(dot.colorize(:yellow).to_s)

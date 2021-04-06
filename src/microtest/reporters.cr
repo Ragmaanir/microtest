@@ -1,7 +1,7 @@
 require "./formatter"
 
 module Microtest
-  module Helper
+  abstract class TerminalReporter < Reporter
     alias ResultSymbols = {success: String, failure: String, skip: String}
     alias ResultColors = {success: Symbol, failure: Symbol, skip: Symbol}
 
@@ -14,28 +14,6 @@ module Microtest
     DOTS  = {success: DOT, failure: DOT, skip: DOT}
     TICKS = {success: TICK, failure: CROSS, skip: TICK}
 
-    def self.result_style(result : TestResult, symbols : ResultSymbols = TICKS, colors : ResultColors = DEFAULT_COLORS) : Tuple(String, Symbol)
-      {
-        symbols[result.kind],
-        colors[result.kind],
-      }
-    end
-
-    def self.inspect_unexpected_error(ex : UnexpectedError | HookException) : String
-      String.build { |io|
-        io << ex.message.colorize(:red)
-        io << "\n"
-
-        if ex.exception.backtrace?
-          io << BacktracePrinter.new.call(ex.exception.backtrace)
-        else
-          io << "(no backtrace)"
-        end
-      }
-    end
-  end
-
-  abstract class TerminalReporter < Reporter
     private getter t : Termart
 
     def initialize(io : IO = STDOUT)
@@ -58,17 +36,41 @@ module Microtest
     private def flush
       t.flush
     end
+
+    private def result_style(
+      result : TestResult,
+      symbols : ResultSymbols = TICKS,
+      colors : ResultColors = DEFAULT_COLORS
+    ) : Tuple(String, Symbol)
+      {
+        symbols[result.kind],
+        colors[result.kind],
+      }
+    end
+
+    private def inspect_unexpected_error(ex : UnexpectedError | HookException) : String
+      String.build { |io|
+        io << ex.message.colorize(:red)
+        io << "\n"
+
+        if ex.exception.backtrace?
+          io << BacktracePrinter.new.call(ex.exception.backtrace)
+        else
+          io << "(no backtrace)"
+        end
+      }
+    end
   end
 
   class ProgressReporter < TerminalReporter
-    @chars : Helper::ResultSymbols
+    @chars : ResultSymbols
 
-    def initialize(@chars = Helper::DOTS, io = STDOUT)
+    def initialize(@chars = DOTS, io = STDOUT)
       super(io)
     end
 
     def report(result)
-      symbol, color = Helper.result_style(result, @chars)
+      symbol, color = result_style(result, @chars)
       write(symbol, fg: color)
       flush
     end
@@ -92,7 +94,7 @@ module Microtest
     end
 
     def report(result)
-      symbol, color = Helper.result_style(result, Helper::TICKS)
+      symbol, color = result_style(result, TICKS)
 
       time_text = Formatter.colorize_duration(result.duration, threshold)
 
@@ -137,7 +139,7 @@ module Microtest
       when AssertionFailure
         writeln(ex.message)
       when UnexpectedError
-        writeln(Helper.inspect_unexpected_error(ex))
+        writeln(inspect_unexpected_error(ex))
       else raise "BUG: Invalid Exception"
       end
 
@@ -180,7 +182,7 @@ module Microtest
         br
         writeln("Test run was aborted by exception in hooks for ", ex.test_method, fg: :white, bg: :red)
 
-        writeln(Helper.inspect_unexpected_error(ex))
+        writeln(inspect_unexpected_error(ex))
       end
 
       br
@@ -213,7 +215,7 @@ module Microtest
         br
 
         res.each do |r|
-          symbol, color = Helper.result_style(r)
+          symbol, color = result_style(r)
 
           write(" ")
           write(symbol, fg: color)
