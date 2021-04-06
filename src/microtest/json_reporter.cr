@@ -15,7 +15,7 @@ module Microtest
       io << {
         using_focus:        Test.using_focus?,
         seed:               ctx.random_seed,
-        success:            !ctx.errors? && !ctx.aborted?,
+        success:            ctx.success?,
         aborted:            ctx.aborted?,
         manually_aborted:   ctx.manually_aborted?,
         aborting_exception: ctx.aborting_exception.try(&.message),

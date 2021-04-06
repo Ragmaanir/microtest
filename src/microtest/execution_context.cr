@@ -33,6 +33,10 @@ module Microtest
       !errors.empty?
     end
 
+    def success?
+      !(errors? || aborted?)
+    end
+
     def manually_abort!
       @manually_aborted = true
     end

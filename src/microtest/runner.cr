@@ -27,7 +27,7 @@ module Microtest
 
       ctx.finished
 
-      !ctx.errors? && !ctx.aborted?
+      ctx.success?
     end
   end
 end
