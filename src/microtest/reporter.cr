@@ -175,46 +175,35 @@ module Microtest
     def finished(ctx : ExecutionContext)
       total, unit = Formatter.format_duration(ctx.duration)
 
-      focus_hint = ["USING FOCUS:".colorize.back(:red), " "].join if Test.using_focus?
-
-      puts [
-        focus_hint,
-        "Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}".colorize(:blue),
-      ].join
-
-      puts [
-        ["Success: ", ctx.total_success].join.colorize(:green),
-        ", ",
-        ["Skips: ", ctx.total_skip].join.colorize(:yellow).toggle(ctx.total_skip > 0),
-        ", ",
-        ["Failures: ", ctx.total_failure].join.colorize(:red).toggle(ctx.total_failure > 0),
-      ].join.colorize(:white)
-
-      if ctx.manually_aborted?
-        puts
-        puts "Test run was aborted manually".colorize(:white).back(:red)
-      elsif ex = ctx.aborting_exception
-        puts
-        puts "Test run was aborted by exception:".colorize(:white).back(:red)
-
-        puts test_locator_line(ex)
-        puts Helper.inspect_unexpected_error(ex)
-      end
-
-      puts
-    end
-
-    private def test_locator_line(ex : HookException) : String
-      String.build { |io|
-        Colorize.with.red.surround(io) do
-          io << ex.test_method
-          io << " "
+      Termart.io(io, true) { |t|
+        if Test.using_focus?
+          t.w("USING FOCUS:", bg: :red)
+          t.w(" ")
         end
-      # Colorize.with.dark_gray.surround(io) do
-      #   io << ex.file
-      #   io << ":"
-      #   io << ex.line
-      # end
+
+        t.w("Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
+        t.br
+
+        t.w("Success: ", ctx.total_success, fg: (:green if ctx.total_success > 0))
+        t.w(", ")
+
+        t.w("Skips: ", ctx.total_skip, fg: (:yellow if ctx.total_skip > 0))
+        t.w(", ")
+
+        t.w("Failures: ", ctx.total_failure, fg: (:red if ctx.total_failure > 0))
+        t.br
+
+        if ctx.manually_aborted?
+          t.br
+          t.l("Test run was aborted manually", fg: :white, bg: :red)
+        elsif ex = ctx.aborting_exception
+          t.br
+          t.l("Test run was aborted by exception in hooks for ", ex.test_method, fg: :white, bg: :red)
+
+          t.l(Helper.inspect_unexpected_error(ex))
+        end
+
+        t.br
       }
     end
   end

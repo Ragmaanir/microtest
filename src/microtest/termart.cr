@@ -9,6 +9,12 @@ module Microtest
       end
     end
 
+    def self.io(io : IO, colorize : Bool)
+      t = new(io, colorize)
+      yield t
+      nil
+    end
+
     getter io : IO
     getter? colorize
 
@@ -30,10 +36,15 @@ module Microtest
       end
     end
 
-    def w(*strs : String, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
+    def w(*strs : String | Int32, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
       colorized_io(fg, bg, m) do |cio|
         strs.each { |s| cio << s }
       end
+    end
+
+    def l(*args, **opts)
+      w(*args, **opts)
+      br
     end
 
     def br
