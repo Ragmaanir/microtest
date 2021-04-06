@@ -13,6 +13,26 @@ require "./microtest/reporters"
 require "./microtest/json_reporter"
 
 module Microtest
+  module DSL
+    macro describe(cls, &block)
+      class {{cls.id}}Test < Microtest::Test
+
+        \{% if @type.has_method?("__microtest_already_defined") %}
+          \{% raise "Duplicate describe for: {{cls.id}}" %}
+        \{% end %}
+
+        private def __microtest_already_defined
+        end
+
+        def self.test_methods
+          [] of Microtest::TestMethod
+        end
+
+        {{block.body}}
+      end
+    end
+  end
+
   module GlobalHookDSL
     macro around(&block)
       class Microtest::Test
@@ -78,17 +98,5 @@ module Microtest
   def self.run!(*args)
     success = run(*args)
     exit(success ? 0 : -1)
-  end
-
-  module DSL
-    macro describe(cls, &block)
-      class {{cls.id}}Test < Microtest::Test
-        def self.test_methods
-          [] of Microtest::TestMethod
-        end
-
-        {{block.body}}
-      end
-    end
   end
 end
