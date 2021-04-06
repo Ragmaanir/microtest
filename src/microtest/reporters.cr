@@ -14,10 +14,10 @@ module Microtest
     DOTS  = {success: DOT, failure: DOT, skip: DOT}
     TICKS = {success: TICK, failure: CROSS, skip: TICK}
 
-    def self.result_style(result : TestResult, symbols : ResultSymbols = TICKS, colors : ResultColors = DEFAULT_COLORS)
+    def self.result_style(result : TestResult, symbols : ResultSymbols = TICKS, colors : ResultColors = DEFAULT_COLORS) : Tuple(String, Symbol)
       {
-        symbol: symbols[result.kind],
-        color:  colors[result.kind],
+        symbols[result.kind],
+        colors[result.kind],
       }
     end
 
@@ -43,8 +43,8 @@ module Microtest
     end
 
     def report(result)
-      style = Helper.result_style(result, @chars)
-      print style[:symbol].colorize(style[:color])
+      symbol, color = Helper.result_style(result, @chars)
+      print symbol.colorize(color)
     end
 
     def finished(ctx : ExecutionContext)
@@ -66,10 +66,10 @@ module Microtest
     end
 
     def report(result)
-      style = Helper.result_style(result, Helper::TICKS)
+      sym, color = Helper.result_style(result, Helper::TICKS)
 
-      symbol = style[:symbol].colorize(style[:color])
-      name = result.test.colorize(style[:color])
+      symbol = sym.colorize(color)
+      name = result.test.colorize(color)
 
       time_text = Formatter.colorize_duration(result.duration, threshold)
       puts [" ", symbol, time_text.colorize(:dark_gray), " ", name].join
@@ -198,13 +198,13 @@ module Microtest
         puts
 
         res.each do |r|
-          style = Helper.result_style(r)
+          symbol, color = Helper.result_style(r)
 
-          meth = [r.suite, "::", r.test].join.colorize(style[:color])
+          meth = [r.suite, "::", r.test].join.colorize(color)
 
           puts [
             " ",
-            style[:symbol].colorize(style[:color]),
+            symbol.colorize(color),
             Formatter.colorize_duration(r.duration, threshold),
             " ",
             meth,
