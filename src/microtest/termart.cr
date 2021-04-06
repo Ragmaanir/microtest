@@ -36,7 +36,7 @@ module Microtest
       end
     end
 
-    def w(*strs : String | Int32, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
+    def w(*strs : String | Int32 | Nil, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
       colorized_io(fg, bg, m) do |cio|
         strs.each { |s| cio << s }
       end
@@ -49,6 +49,10 @@ module Microtest
 
     def br
       w("\n")
+    end
+
+    def flush
+      io.flush
     end
 
     def grouped_lines(lines : Array(String), bar_color : Symbol? = nil)

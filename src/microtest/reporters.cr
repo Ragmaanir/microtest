@@ -36,14 +36,27 @@ module Microtest
   end
 
   abstract class TerminalReporter < Reporter
-    private def print(*args)
-      io.print(*args)
-      io.flush
+    private getter t : Termart
+
+    def initialize(io : IO = STDOUT)
+      super
+      @t = Termart.new(io, true)
     end
 
-    private def puts(*args)
-      io.puts(*args)
-      io.flush
+    private def write(*args, **opts)
+      t.w(*args, **opts)
+    end
+
+    private def writeln(*args, **opts)
+      t.l(*args, **opts)
+    end
+
+    private def br
+      t.br
+    end
+
+    private def flush
+      t.flush
     end
   end
 
@@ -56,12 +69,13 @@ module Microtest
 
     def report(result)
       symbol, color = Helper.result_style(result, @chars)
-      print symbol.colorize(color)
+      write(symbol, fg: color)
+      flush
     end
 
     def finished(ctx : ExecutionContext)
-      puts
-      puts
+      br
+      br
     end
   end
 
@@ -73,22 +87,25 @@ module Microtest
     end
 
     def suite_started(ctx : ExecutionContext, cls : String)
-      puts
-      puts cls.colorize(:magenta).underline
+      br
+      writeln(cls, fg: :magenta, m: :underline)
     end
 
     def report(result)
-      sym, color = Helper.result_style(result, Helper::TICKS)
-
-      symbol = sym.colorize(color)
-      name = result.test.colorize(color)
+      symbol, color = Helper.result_style(result, Helper::TICKS)
 
       time_text = Formatter.colorize_duration(result.duration, threshold)
-      puts [" ", symbol, time_text.colorize(:dark_gray), " ", name].join
+
+      write(" ")
+      write(symbol, fg: color)
+      write(time_text.to_s)
+      write(" ")
+      write(result.test, fg: color)
+      br
     end
 
     def finished(ctx : ExecutionContext)
-      puts
+      br
     end
   end
 
@@ -99,8 +116,9 @@ module Microtest
     def finished(ctx : ExecutionContext)
       ctx.skips.each do |skip|
         ex = skip.exception
-        puts [skip.test_method, " : ", ex.message].join.colorize(:yellow)
-        puts
+
+        writeln(skip.test_method, " : ", ex.message, fg: :yellow)
+        br
       end
 
       ctx.errors.each_with_index do |error, i|
@@ -111,32 +129,19 @@ module Microtest
     private def print_error(number : Int32, error : TestFailure)
       ex = error.exception
 
-      puts test_locator_line(number, error.test_method, ex.file, ex.line)
+      write("# %-3d" % (number + 1), error.test_method, " ", fg: :red)
+      write(ex.file, ":", ex.line, fg: :dark_gray)
+      br
 
       case ex
       when AssertionFailure
-        puts ex.message
+        writeln(ex.message)
       when UnexpectedError
-        puts Helper.inspect_unexpected_error(ex)
+        writeln(Helper.inspect_unexpected_error(ex))
       else raise "BUG: Invalid Exception"
       end
 
-      puts
-    end
-
-    private def test_locator_line(number : Int32, meth : String, file : String, line : Int32) : String
-      String.build { |io|
-        Colorize.with.red.surround(io) do
-          io << ("# %-3d" % (number + 1))
-          io << meth
-          io << " "
-        end
-        Colorize.with.dark_gray.surround(io) do
-          io << file
-          io << ":"
-          io << line
-        end
-      }
+      br
     end
   end
 
@@ -151,36 +156,34 @@ module Microtest
     def finished(ctx : ExecutionContext)
       total, unit = Formatter.format_duration(ctx.duration)
 
-      Termart.io(io, true) { |t|
-        if Test.using_focus?
-          t.w("USING FOCUS:", bg: :red)
-          t.w(" ")
-        end
+      if Test.using_focus?
+        write("USING FOCUS:", bg: :red)
+        write(" ")
+      end
 
-        t.w("Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
-        t.br
+      write("Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
+      br
 
-        t.w("Success: ", ctx.total_success, fg: (:green if ctx.total_success > 0))
-        t.w(", ")
+      write("Success: ", ctx.total_success, fg: (:green if ctx.total_success > 0))
+      write(", ")
 
-        t.w("Skips: ", ctx.total_skip, fg: (:yellow if ctx.total_skip > 0))
-        t.w(", ")
+      write("Skips: ", ctx.total_skip, fg: (:yellow if ctx.total_skip > 0))
+      write(", ")
 
-        t.w("Failures: ", ctx.total_failure, fg: (:red if ctx.total_failure > 0))
-        t.br
+      write("Failures: ", ctx.total_failure, fg: (:red if ctx.total_failure > 0))
+      br
 
-        if ctx.manually_aborted?
-          t.br
-          t.l("Test run was aborted manually", fg: :white, bg: :red)
-        elsif ex = ctx.aborting_exception
-          t.br
-          t.l("Test run was aborted by exception in hooks for ", ex.test_method, fg: :white, bg: :red)
+      if ctx.manually_aborted?
+        br
+        writeln("Test run was aborted manually", fg: :white, bg: :red)
+      elsif ex = ctx.aborting_exception
+        br
+        writeln("Test run was aborted by exception in hooks for ", ex.test_method, fg: :white, bg: :red)
 
-          t.l(Helper.inspect_unexpected_error(ex))
-        end
+        writeln(Helper.inspect_unexpected_error(ex))
+      end
 
-        t.br
-      }
+      br
     end
   end
 
@@ -204,27 +207,24 @@ module Microtest
 
       if res.empty?
         num, unit = Formatter.format_duration(threshold)
-        puts "No slow tests (threshold: #{num}#{unit})".colorize(:dark_gray)
+        writeln("No slow tests (threshold: #{num}#{unit})", fg: :dark_gray)
       else
-        puts "Slowest #{res.size} tests".colorize(:blue)
-        puts
+        writeln("Slowest #{res.size} tests", fg: :blue)
+        br
 
         res.each do |r|
           symbol, color = Helper.result_style(r)
 
-          meth = [r.suite, "::", r.test].join.colorize(color)
-
-          puts [
-            " ",
-            symbol.colorize(color),
-            Formatter.colorize_duration(r.duration, threshold),
-            " ",
-            meth,
-          ].join
+          write(" ")
+          write(symbol, fg: color)
+          write(Formatter.colorize_duration(r.duration, threshold).to_s)
+          write(" ")
+          write(r.suite, "::", r.test, fg: color)
+          br
         end
       end
 
-      puts
+      br
     end
   end
 end
