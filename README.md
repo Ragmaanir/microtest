@@ -102,11 +102,11 @@ end
 
 Generates:
 
-![missing](file?raw=true)
+![missing](assets/assertion_failure.jpg?raw=true)
 
 ### Microtest Test Output (microtest tests using progress reporter)
 
-![missing](file?raw=true)
+![missing](assets/spec.jpg?raw=true)
 
 ## Reporters
 
@@ -156,10 +156,10 @@ end
 ```
 
 ### Progress Reporter
-![missing](file?raw=true)
+![missing](assets/progress_reporter.jpg?raw=true)
 
 ### Description Reporter
-![missing](file?raw=true)
+![missing](assets/description_reporter.jpg?raw=true)
 
 ### When focus active
 
@@ -177,7 +177,7 @@ end
 
 ```
 
-![missing](file?raw=true)
+![missing](assets/focus.jpg?raw=true)
 
 ## Development
 

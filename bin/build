@@ -18,7 +18,7 @@ class Readme
     generate_image_from_html(asset_name)
     file = "assets/#{asset_name}.jpg"
     raise "Image does not exist: #{file}" unless File.exists?(file)
-    "![missing](file?raw=true)"
+    "![missing](#{file}?raw=true)"
   end
 
   def generate_image_from_html(asset_name : String)
