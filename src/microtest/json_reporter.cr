@@ -12,7 +12,7 @@ module Microtest
 
       ms = ctx.duration.total_milliseconds
 
-      puts({
+      io << {
         using_focus:        Test.using_focus?,
         seed:               ctx.random_seed,
         success:            !ctx.errors? && !ctx.aborted?,
@@ -26,7 +26,7 @@ module Microtest
         failure_count:      ctx.total_failure,
         total_duration:     ms,
         results:            test_results,
-      }.to_json)
+      }.to_json
     end
 
     private def convert_test_results(ctx : ExecutionContext)

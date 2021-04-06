@@ -35,7 +35,19 @@ module Microtest
     end
   end
 
-  class ProgressReporter < Reporter
+  abstract class TerminalReporter < Reporter
+    private def print(*args)
+      io.print(*args)
+      io.flush
+    end
+
+    private def puts(*args)
+      io.puts(*args)
+      io.flush
+    end
+  end
+
+  class ProgressReporter < TerminalReporter
     @chars : Helper::ResultSymbols
 
     def initialize(@chars = Helper::DOTS, io = STDOUT)
@@ -53,7 +65,7 @@ module Microtest
     end
   end
 
-  class DescriptionReporter < Reporter
+  class DescriptionReporter < TerminalReporter
     getter threshold : Time::Span
 
     def initialize(@threshold = 50.milliseconds, io = STDOUT)
@@ -80,7 +92,7 @@ module Microtest
     end
   end
 
-  class ErrorListReporter < Reporter
+  class ErrorListReporter < TerminalReporter
     def report(result : TestResult)
     end
 
@@ -128,7 +140,7 @@ module Microtest
     end
   end
 
-  class SummaryReporter < Reporter
+  class SummaryReporter < TerminalReporter
     def report(result : TestResult)
     end
 
@@ -172,7 +184,7 @@ module Microtest
     end
   end
 
-  class SlowTestsReporter < Reporter
+  class SlowTestsReporter < TerminalReporter
     getter count : Int32
     getter threshold : Time::Span
 

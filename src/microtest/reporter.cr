@@ -23,15 +23,5 @@ module Microtest
 
     def suite_finished(ctx : ExecutionContext, cls : String)
     end
-
-    private def print(*args)
-      io.print(*args)
-      io.flush
-    end
-
-    private def puts(*args)
-      io.puts(*args)
-      io.flush
-    end
   end
 end
