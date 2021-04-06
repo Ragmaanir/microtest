@@ -64,12 +64,13 @@ module Microtest
         ]
       end
 
-      def {{method_name.id}}
+      def {{method_name.id}} : Nil
         {% if block && !skip %}
           {{block.body}}
         {% else %}
           skip("not implemented")
         {% end %}
+        nil
       end
     end
   end

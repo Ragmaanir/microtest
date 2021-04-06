@@ -11,18 +11,27 @@ module Microtest
       end
 
       def_equals_and_hash value
+
+      # See performance warning in formatter
+      def inspect(io)
+        value.inspect(io)
+      end
     end
 
     abstract class Node
       getter expression : String
       getter wrapper : Value
-      delegate value, to: wrapper
 
       def initialize(@expression, value : T) forall T
         @wrapper = ValueWrapper(T).new(value)
       end
 
       def_equals_and_hash expression, wrapper
+
+      # See performance warning in formatter
+      def inspect_value
+        wrapper.inspect
+      end
     end
 
     class EmptyNode < Node
@@ -42,6 +51,8 @@ module Microtest
         super(expression, value)
       end
 
+      def_equals_and_hash method_name, expression, wrapper, receiver, arguments, @named_arguments # , @block
+
       def operator?
         method_name.in?(%w(! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~))
       end
@@ -49,8 +60,6 @@ module Microtest
       def comparator?
         method_name.in?(%w(!= < <= <=> == === > >=))
       end
-
-      def_equals_and_hash method_name, expression, wrapper, receiver, arguments, @named_arguments # , @block
     end
 
     class NamedArgNode < Node

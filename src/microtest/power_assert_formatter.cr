@@ -7,6 +7,15 @@ module Microtest
     end
 
     class ListFormatter < Formatter
+      #
+      # WARNING:
+      #
+      # Calling `node.wrapper.value.inspect` slows down the compilation
+      # by a factor of 10 (6s -> 60s in a larger project).
+      # Calling `node.inspect_value` which basically just delegates
+      # does not cause this slowdown.
+      #
+
       BAR_COLOR = :light_red
 
       getter? colorize
@@ -43,7 +52,8 @@ module Microtest
         }
       end
 
-      private def simplify_value(v : V, max_length = 64) : String forall V
+      private def simplify_value(n : Node, max_length = 64) : String
+        v = n.wrapper.value
         if v.is_a?(Array) && v.size > 1
           String.build do |io|
             s = 0
@@ -55,13 +65,13 @@ module Microtest
             io << "]"
           end
         else
-          v.inspect
+          n.wrapper.inspect
         end
       end
 
       private def literal(node : TerminalNode) : String
-        v = node.value
-        simpler_exp = simplify_value(v)
+        v = node.wrapper.value
+        simpler_exp = simplify_value(node)
 
         simplified = simpler_exp != node.expression
         is_complex_result = ![true, false].includes?(v)
@@ -77,8 +87,8 @@ module Microtest
       end
 
       private def call_only(node : CallNode) : String
-        rv = node.receiver.value
-        rstr = simplify_value(rv)
+        rv = node.receiver.wrapper.value
+        rstr = simplify_value(node.receiver)
 
         simpler_exp = String.build do |s|
           if rv
@@ -96,7 +106,7 @@ module Microtest
 
           if !node.arguments.empty?
             s << "(" if !node.operator?
-            s << node.arguments.join(", ", &.value.inspect)
+            s << node.arguments.join(", ") { |arg| arg.wrapper.inspect }
             s << ")" if !node.operator?
           end
         end
@@ -107,7 +117,7 @@ module Microtest
 
         lines << simpler_exp if simpler_exp != node.expression
 
-        lines << node.value.inspect if node.value != false
+        lines << node.wrapper.inspect if node.wrapper.value != false
 
         grouped_lines(lines)
       end
@@ -117,8 +127,8 @@ module Microtest
       private def call_compare(node : CallNode) : String
         left, right = node.receiver, node.arguments[0]
 
-        lval = left.value.inspect
-        rval = right.value.inspect
+        lval = left.wrapper.inspect
+        rval = right.wrapper.inspect
 
         simpler_exp = String.build do |s|
           s << lval

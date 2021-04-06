@@ -69,7 +69,7 @@ module Microtest
       super(io)
     end
 
-    def report(result)
+    def report(result : TestResult)
       symbol, color = result_style(result, @chars)
       write(symbol, fg: color)
       flush
@@ -93,7 +93,7 @@ module Microtest
       writeln(cls, fg: :magenta, m: :underline)
     end
 
-    def report(result)
+    def report(result : TestResult)
       symbol, color = result_style(result, TICKS)
 
       time_text = Formatter.colorize_duration(result.duration, threshold)
