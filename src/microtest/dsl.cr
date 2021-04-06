@@ -56,8 +56,10 @@ module Microtest
       end
 
       def {{method_name.id}}
-        {% if block %}
+        {% if block && !skip %}
           {{block.body}}
+        {% else %}
+          skip("not implemented")
         {% end %}
       end
     end

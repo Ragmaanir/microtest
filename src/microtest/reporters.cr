@@ -119,9 +119,12 @@ module Microtest
       ctx.skips.each do |skip|
         ex = skip.exception
 
-        writeln(skip.test_method, " : ", ex.message, fg: :yellow)
+        write(skip.test_method, ": ", ex.message, fg: :yellow)
+        write(" in ", BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
         br
       end
+
+      br if !ctx.skips.empty?
 
       ctx.errors.each_with_index do |error, i|
         print_error(i, error)
@@ -132,13 +135,14 @@ module Microtest
       ex = error.exception
 
       write("# %-3d" % (number + 1), error.test_method, " ", fg: :red)
-      write(BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
-      br
 
       case ex
       when AssertionFailure
+        write(BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
+        br
         writeln(ex.message)
       when UnexpectedError
+        br
         writeln(inspect_unexpected_error(ex))
       else Microtest.bug("Invalid Exception")
       end

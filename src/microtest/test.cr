@@ -53,16 +53,12 @@ module Microtest
           before_hooks
 
           begin
-            if meth.skip?
-              # test_exc = SkipException.new("pending", "", 0)
-              skip("pending")
-            else
-              block.call
-            end
+            block.call
           rescue ex : AssertionFailure | SkipException
             test_exc = ex
           rescue ex : Exception
-            test_exc = UnexpectedError.new(self.class.name, name, ex)
+            # test_exc = UnexpectedError.new(self.class.name, name, ex)
+            test_exc = UnexpectedError.new(ex)
           else
             test_exc = nil # passed
           end

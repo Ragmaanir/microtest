@@ -29,8 +29,8 @@ module Microtest
              when .starts_with?(PROJECT_LIB_DIR)  then :lib
              when .starts_with?(PROJECT_SRC_DIR)  then :app
              when .starts_with?(PROJECT_SPEC_DIR) then :spec
-             when .starts_with?("/eval")          then :eval
              when .starts_with?(CRYSTAL_DIR)      then :crystal
+             when .starts_with?("/eval")          then :eval
              else                                      :unknown
              end
 
@@ -38,8 +38,8 @@ module Microtest
                     when :lib     then path.sub(PROJECT_LIB_DIR, "LIB: lib")
                     when :app     then path.sub(PROJECT_SRC_DIR, "APP: src")
                     when :spec    then path.sub(PROJECT_SPEC_DIR, "SPEC: spec")
-                    when :eval    then "EVAL: #{path}"
                     when :crystal then path.sub(CRYSTAL_DIR, "CRY: ")
+                    when :eval    then "EVAL: #{path}"
                     when :unknown
                       if raise_on_unmatched_file
                         Microtest.bug("Path in backtrace could not be classified: #{path}")
