@@ -57,7 +57,6 @@ module Microtest
           rescue ex : AssertionFailure | SkipException
             test_exc = ex
           rescue ex : Exception
-            # test_exc = UnexpectedError.new(self.class.name, name, ex)
             test_exc = UnexpectedError.new(ex)
           else
             test_exc = nil # passed

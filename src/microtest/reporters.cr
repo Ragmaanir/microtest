@@ -167,7 +167,9 @@ module Microtest
         write(" ")
       end
 
-      write("Executed #{ctx.executed_tests}/#{ctx.total_tests} tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
+      write("Executed", fg: :blue)
+      write(" #{ctx.executed_tests}/#{ctx.total_tests} ", fg: (ctx.executed_tests < ctx.total_tests) ? :red : :blue)
+      write("tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
       br
 
       write("Success: ", ctx.total_success, fg: (:green if ctx.total_success > 0))
