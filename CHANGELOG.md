@@ -1,6 +1,11 @@
 # Changelog
 
-- Crystal 0.36
+### 1.2.4
+
+- Power asserts evaluate expressions only once
+- New power assert formatting
+- Adde more detailed power assert specs
+- Crystal 1.0
 
 ### 1.2.3
 

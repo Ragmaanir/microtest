@@ -1,3 +1,4 @@
+require "./microtest/version"
 require "./microtest/termart"
 require "./microtest/backtrace_printer"
 require "./microtest/exceptions"

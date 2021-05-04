@@ -24,16 +24,19 @@ module Microtest
   class BacktracePrinter
     record(Entry, kind : Symbol, path : String, line : Int32, func : String)
 
-    # ameba:disable Metrics/CyclomaticComplexity
+    def self.classify_path(path : String) : Symbol
+      case path
+      when .starts_with?(PROJECT_LIB_DIR)  then :lib
+      when .starts_with?(PROJECT_SRC_DIR)  then :app
+      when .starts_with?(PROJECT_SPEC_DIR) then :spec
+      when .starts_with?(CRYSTAL_DIR)      then :crystal
+      when .starts_with?("/eval")          then :eval
+      else                                      :unknown
+      end
+    end
+
     def self.simplify_path(path : String, raise_on_unmatched_file = false)
-      kind = case path
-             when .starts_with?(PROJECT_LIB_DIR)  then :lib
-             when .starts_with?(PROJECT_SRC_DIR)  then :app
-             when .starts_with?(PROJECT_SPEC_DIR) then :spec
-             when .starts_with?(CRYSTAL_DIR)      then :crystal
-             when .starts_with?("/eval")          then :eval
-             else                                      :unknown
-             end
+      kind = classify_path(path)
 
       simple_path = case kind
                     when :lib     then path.sub(PROJECT_LIB_DIR, "LIB: lib")

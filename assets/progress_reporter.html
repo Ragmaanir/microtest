@@ -8,24 +8,19 @@
 </head>
 <body style="color:white; background-color:black">
 <pre>
-<span style="color:yellow;">•</span><span style="color:lime;">•</span><span style="color:red;">•</span><span style="color:red;">•</span>
+<span style="color:lime;">•</span><span style="color:yellow;">•</span><span style="color:red;">•</span><span style="color:red;">•</span>
 
 <span style="color:yellow;">FirstTest#skip_this: not implemented</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> in ???: eval:5</span>
 
-<span style="color:red;"># 1  SecondTest#first_failure </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">???: eval:5</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┏</span> <span style="color:red;">assert</span> <span style="font-weight:bold;color:red;">a == (b * 2)</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┗</span> 5<span style="filter: contrast(70%) brightness(190%);color:dimgray;"> == </span>14
-
-
-<span style="color:red;"># 2  SecondTest#error </span>
+<span style="color:red;"># 1  SecondTest#error </span>
 <span style="color:red;">Unexpected error: Oh, this is wrong</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┏</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:119 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:96 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:110 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main_user_code</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">EVAL: /eval</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:7 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">__crystal_main</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:99 </span><span style="color:yellow;">run!</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:81 </span><span style="color:yellow;">run</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:83 </span><span style="color:yellow;">run</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:100 </span><span style="color:yellow;">run!</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:82 </span><span style="color:yellow;">run</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:84 </span><span style="color:yellow;">run</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/runner.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:25 </span><span style="color:yellow;">call</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:36 </span><span style="color:yellow;">run_tests</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /primitives.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:255 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">call</span>
@@ -38,7 +33,12 @@
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┗</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">EVAL: /eval</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">raise_an_error</span>
 
 
-<span style="color:#3333FF;">Executed</span><span style="color:#3333FF;"> 4/4 </span><span style="color:#3333FF;">tests in 78µs with seed 2608349527</span>
+<span style="color:red;"># 2  SecondTest#first_failure </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">???: eval:5</span>
+<span style="filter: contrast(70%) brightness(190%);color:red;">┏</span> <span style="color:red;">assert</span> <span style="font-weight:bold;color:red;">a == (b * 2)</span>
+<span style="filter: contrast(70%) brightness(190%);color:red;">┗</span> 5<span style="filter: contrast(70%) brightness(190%);color:dimgray;"> == </span>14
+
+
+<span style="color:#3333FF;">Executed</span><span style="color:#3333FF;"> 4/4 </span><span style="color:#3333FF;">tests in 107µs with seed 1686175953</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 

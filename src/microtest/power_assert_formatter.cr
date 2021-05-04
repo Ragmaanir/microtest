@@ -106,7 +106,7 @@ module Microtest
 
           if !node.arguments.empty?
             s << "(" if !node.operator?
-            s << node.arguments.join(", ") { |arg| arg.wrapper.inspect }
+            s << node.arguments.join(", ", &.wrapper.inspect)
             s << ")" if !node.operator?
           end
         end

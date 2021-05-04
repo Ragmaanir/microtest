@@ -20,10 +20,23 @@ run("crystal", ["spec"])
 
 run("./bin/ameba")
 run("./bin/build")
-run("git", ["add", "-A"])
+run("git", ["add", "README.md"])
+run("git", ["add", "-A", "./assets"])
+
+run("git", ["status"])
+print "🔬 Does commit look ok? [y/n/yes/no]: "
+
+while a = gets.not_nil!.strip.downcase
+  case a
+  when "y", "yes" then break
+  when "n", "no"  then exit
+  end
+end
 
 version_name = "v#{Microtest::VERSION}"
+
+puts "🔬 Releasing version #{version_name}"
 run("git", ["commit", "-m", "Version #{version_name}"])
 run("git", ["tag", version_name])
 run("git", ["push"])
-run("git", ["push", "origin", version_name])
+run("git", ["push", "gh", version_name])
