@@ -1,4 +1,4 @@
-# 🔬 microtest [![Build Status](https://travis-ci.org/Ragmaanir/microtest.svg?branch=master)](https://travis-ci.org/Ragmaanir/microtest)
+# 🔬 microtest [![Crystal CI](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml/badge.svg)](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml)
 
 ### Version <%= Microtest::VERSION %>
 
