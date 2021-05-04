@@ -54,13 +54,13 @@ describe Microtest::JsonSummaryReporter do
 
     assert json["total_duration"].raw.is_a?(Float64)
     duration = json["total_duration"].raw.as(Float64)
-    assert duration >= 8_i64
-    assert duration <= 20_i64
+    assert duration >= 1_i64
+    assert duration <= 100_i64
 
     assert json["results"]["SummaryTest#some_test"]["duration"].raw.is_a?(Float64)
     duration = json["results"]["SummaryTest#some_test"]["duration"].raw.as(Float64)
-    assert duration >= 8_i64
-    assert duration <= 20_i64
+    assert duration >= 1_i64
+    assert duration <= 100_i64
   end
 
   test "test results" do
