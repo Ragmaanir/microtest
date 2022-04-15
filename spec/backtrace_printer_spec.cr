@@ -11,7 +11,7 @@ describe Microtest::BacktracePrinter do
     e = generate_exception
     printer = Microtest::BacktracePrinter.new
 
-    trace = printer.simplify(e.backtrace, false)
+    trace = printer.simplify(e.backtrace)
     assert trace.size > 0
   end
 
@@ -42,7 +42,7 @@ describe Microtest::BacktracePrinter do
 
     printer = Microtest::BacktracePrinter.new
 
-    pretty_trace = printer.call(raw_trace, false, true)
+    pretty_trace = printer.call(raw_trace, false)
 
     assert pretty_trace == <<-BACKTRACE
     ┏ CRY: /crystal/main.cr:119 main
@@ -69,6 +69,6 @@ describe Microtest::BacktracePrinter do
   test "raise when path in backtrace could not be classified" do
     e = generate_exception
     printer = Microtest::BacktracePrinter.new
-    printer.call(e.backtrace, false, true)
+    printer.call(e.backtrace, false)
   end
 end

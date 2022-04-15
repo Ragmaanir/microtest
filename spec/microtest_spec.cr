@@ -36,7 +36,7 @@ describe Microtest do
   end
 
   test "test results" do
-    result = microtest_test do
+    result = record_test_json do
       describe Microtest do
         test do # unnamed
         end
@@ -101,7 +101,7 @@ describe Microtest do
   end
 
   test "focusing" do
-    result = microtest_test do
+    result = record_test_json do
       describe Focus do
         test "in focus", :focus do
           assert true
@@ -120,58 +120,4 @@ describe Microtest do
     assert results["FocusTest#in_focus"]["type"] == "Microtest::TestSuccess"
     assert !results.as_h.has_key?("FocusTest#not_in_focus")
   end
-
-  test "before and after hook" do
-    result = microtest_test do
-      {{`cat spec/examples/hooks.cr`}}
-    end
-
-    assert result.success?
-
-    results = result.json["results"]
-
-    assert results["HooksTest#first"]["type"] == "Microtest::TestSuccess"
-    assert results["HooksTest#second"]["type"] == "Microtest::TestSuccess"
-  end
-
-  test "error in before hook" do
-    result = microtest_test do
-      {{`cat spec/examples/before_hook_error.cr`}}
-    end
-
-    assert !result.success?
-    assert !result.status.success?
-
-    assert result.json["success"] == false
-    assert result.json["aborted"] == true
-    assert result.json["aborting_exception"] == "Error in hook: Before hook error"
-    assert result.json["results"].as_h.size == 1
-    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSkip"
-  end
-
-  test "error in after hook" do
-    result = microtest_test do
-      {{`cat spec/examples/after_hook_error.cr`}}
-    end
-
-    assert !result.success?
-    assert !result.status.success?
-    assert result.json["success"] == false
-    assert result.json["aborted"] == true
-    assert result.json["aborting_exception"] == "Error in hook: After hook error"
-    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
-  end
-
-  test "around hook" do
-    result = microtest_test do
-      {{`cat spec/examples/around_hook.cr`}}
-    end
-
-    assert result.json["results"]["AroundHookTest#first"]["type"] == "Microtest::TestSuccess"
-    assert result.json["results"]["AroundHookTest#second"]["type"] == "Microtest::TestSuccess"
-  end
-end
-
-# Make sure an empty describe block compiles
-describe Array do
 end

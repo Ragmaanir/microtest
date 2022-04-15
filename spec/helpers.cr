@@ -54,13 +54,18 @@ module Helpers
     output = IO::Memory.new
     err = IO::Memory.new
 
-    s = Process.run("crystal", ["spec"], {"ASSETS" => "true"}, output: output, error: err)
+    s = Process.run("crystal", ["spec"], {
+      "ASSETS"           => "true",
+      "BACKTRACE_ERRORS" => "true",
+    }, output: output, error: err)
 
     result = MicrotestStdoutResult.new(s, output.to_s, err.to_s)
 
     puts output.to_s
 
     save_console_output(result, "spec")
+
+    raise "Specs failed" if !result.success?
   end
 
   DOCKER_IMAGE_NAME = "microtest-utils"

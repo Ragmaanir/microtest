@@ -1,8 +1,8 @@
 # 🔬 microtest [![Crystal CI](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml/badge.svg)](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml)
 
-### Version 1.2.4
+### Version 1.2.5
 
-A very tiny testing framework inspired by minitest/minitest.cr.
+A small testing framework inspired by minitest/minitest.cr.
 
 ## Features
 
@@ -26,7 +26,7 @@ Add this to your application's `shard.yml`:
 development_dependencies:
   microtest:
     github: ragmaanir/microtest
-    version: ~> 1.2.4
+    version: ~> 1.2.5
 ```
 
 And add this to your `spec_helper.rb`:

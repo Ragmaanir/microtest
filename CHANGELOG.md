@@ -1,5 +1,17 @@
 # Changelog
 
+### 1.2.5
+
+- Crystal 1.4
+- Reorganize some specs (move hooks spec and hook example files)
+- Add test for order of hooks
+- Add compilation error specs
+- Move management scripts for generating README and releasing to cli.cr and ./cli
+- Abort execution in Microtest.bug
+- Abort when backtrace printer failes to classify backtrace entries (using BACKTRACE_ERRORS=true)
+- Rename context "errors" to "failures"
+- Rename spec helper macros, unify them, use "crystal run" instead of "eval" to avoid backtrace printer problems
+
 ### 1.2.4
 
 - Power asserts evaluate expressions only once

@@ -30,12 +30,12 @@ module Microtest
       when .starts_with?(PROJECT_SRC_DIR)  then :app
       when .starts_with?(PROJECT_SPEC_DIR) then :spec
       when .starts_with?(CRYSTAL_DIR)      then :crystal
-      when .starts_with?("/eval")          then :eval
+      when .starts_with?("eval")           then :eval
       else                                      :unknown
       end
     end
 
-    def self.simplify_path(path : String, raise_on_unmatched_file = false)
+    def self.simplify_path(path : String)
       kind = classify_path(path)
 
       simple_path = case kind
@@ -45,19 +45,19 @@ module Microtest
                     when :crystal then path.sub(CRYSTAL_DIR, "CRY: ")
                     when :eval    then "EVAL: #{path}"
                     when :unknown
-                      if raise_on_unmatched_file
+                      {% if env("BACKTRACE_ERRORS") %}
                         Microtest.bug("Path in backtrace could not be classified: #{path}")
-                      else
+                      {% else %}
                         "???: #{path}"
-                      end
+                      {% end %}
                     else Microtest.bug("Case not implemented: #{kind} for #{path}")
                     end
 
       {kind, simple_path}
     end
 
-    def call(backtrace : Array(String), colorize : Bool, raise_on_unmatched_file : Bool) : String
-      entries = simplify(backtrace, raise_on_unmatched_file)
+    def call(backtrace : Array(String), colorize : Bool) : String
+      entries = simplify(backtrace)
 
       list = entries.map do |entry|
         Termart.string(colorize) { |t|
@@ -84,7 +84,7 @@ module Microtest
       :unknown => :cyan,
     }
 
-    def simplify(backtrace : Array(String), raise_on_unmatched_file : Bool) : Array(Entry)
+    def simplify(backtrace : Array(String)) : Array(Entry)
       entries = [] of Entry
 
       backtrace.each do |l|
@@ -95,10 +95,7 @@ module Microtest
           func = m[4]
 
           entries << Entry.new(
-            *self.class.simplify_path(
-              File.expand_path(file),
-              raise_on_unmatched_file
-            ),
+            *self.class.simplify_path(File.expand_path(file)),
             line,
             func
           )

@@ -1,0 +1,2 @@
+#!/bin/bash
+crystal run --error-trace src/microtest/cli.cr -- "$@"

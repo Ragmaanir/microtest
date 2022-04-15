@@ -2,9 +2,10 @@ require "./spec_helper"
 
 describe Microtest::Reporter do
   test "progress reporter" do
-    result = reporter_test([Microtest::ProgressReporter.new]) do
+    result = record_test([Microtest::ProgressReporter.new]) do
       describe Microtest do
         test "success" do
+          puts "A"
           assert true == true
         end
 
@@ -30,7 +31,7 @@ end
 
 describe Microtest::JsonSummaryReporter do
   test "summary" do
-    result = microtest_test do
+    result = record_test_json do
       describe Summary do
         test "some test" do
           sleep 0.01
@@ -64,7 +65,7 @@ describe Microtest::JsonSummaryReporter do
   end
 
   test "test results" do
-    result = microtest_test do
+    result = record_test_json do
       describe Failure do
         test "pass" do
         end

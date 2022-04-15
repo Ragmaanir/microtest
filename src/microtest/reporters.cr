@@ -54,7 +54,7 @@ module Microtest
         io << "\n"
 
         if ex.exception.backtrace?
-          io << BacktracePrinter.new.call(ex.exception.backtrace, true, false)
+          io << BacktracePrinter.new.call(ex.exception.backtrace, true)
         else
           io << "(no backtrace)"
         end
@@ -90,7 +90,7 @@ module Microtest
 
     def suite_started(ctx : ExecutionContext, cls : String)
       br
-      writeln(cls, fg: :magenta, m: :underline)
+      writeln(cls, fg: :magenta, m: Colorize::Mode::Underline)
     end
 
     def report(result : TestResult)
@@ -126,15 +126,15 @@ module Microtest
 
       br if !ctx.skips.empty?
 
-      ctx.errors.each_with_index do |error, i|
-        print_error(i, error)
+      ctx.failures.each_with_index do |failure, i|
+        print_failure(i, failure)
       end
     end
 
-    private def print_error(number : Int32, error : TestFailure)
-      ex = error.exception
+    private def print_failure(number : Int32, failure : TestFailure)
+      ex = failure.exception
 
-      write("# %-3d" % (number + 1), error.test_method, " ", fg: :red)
+      write("# %-3d" % (number + 1), failure.test_method, " ", fg: :red)
 
       case ex
       when AssertionFailure

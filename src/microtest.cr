@@ -65,7 +65,7 @@ module Microtest
   MEHTOD_SEPARATOR = "#"
 
   def self.bug(msg : String)
-    raise("MICROTEST BUG: #{msg}")
+    abort("MICROTEST BUG: #{msg}")
   end
 
   def self.power_assert_formatter
@@ -79,20 +79,29 @@ module Microtest
   COMMON_REPORTERS  = [ErrorListReporter.new, SlowTestsReporter.new, SummaryReporter.new] of Reporter
   DEFAULT_REPORTERS = [ProgressReporter.new] + COMMON_REPORTERS
 
-  def self.run(reporters : Array(Reporter), random_seed = fetch_seed)
+  def self.reporter_types(reporting : Symbol = :progress)
+    case reporting
+    when :descriptions, :description
+      [Microtest::DescriptionReporter.new] + COMMON_REPORTERS
+    when :progress
+      DEFAULT_REPORTERS
+    else
+      raise "Invalid reporting type: #{reporting}"
+    end
+  end
+
+  def self.run(reporting : Symbol = :progress, *args)
+    reporters = reporter_types(reporting)
+    run(reporters, *args)
+  end
+
+  def self.run(reporters, random_seed = fetch_seed)
     runner = DefaultRunner.new(reporters, random_seed)
     runner.call
   end
 
   def self.run!(reporting : Symbol = :progress, *args)
-    reporters = case reporting
-                when :descriptions
-                  [Microtest::DescriptionReporter.new] + COMMON_REPORTERS
-                when :progress
-                  DEFAULT_REPORTERS
-                else raise "Invalid reporting type: #{reporting}"
-                end
-
+    reporters = reporter_types(reporting)
     run!(reporters, *args)
   end
 

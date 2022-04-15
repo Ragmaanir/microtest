@@ -25,16 +25,16 @@ module Microtest
       ended_at - started_at
     end
 
-    def errors : Array(TestFailure)
+    def failures : Array(TestFailure)
       results.compact_map(&.as?(TestFailure))
     end
 
-    def errors?
-      !errors.empty?
+    def failures?
+      !failures.empty?
     end
 
     def success?
-      !(errors? || aborted?)
+      !(failures? || aborted?)
     end
 
     def manually_abort!

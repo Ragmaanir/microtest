@@ -4,7 +4,8 @@ module Microtest
     getter suites
     getter random_seed : UInt32
 
-    def initialize(@reporters : Array(Reporter), @random_seed : UInt32, @suites = Test.test_classes)
+    def initialize(reporters, @random_seed : UInt32, @suites = Test.test_classes)
+      @reporters = reporters.map { |r| r.as(Reporter) }
     end
 
     abstract def call

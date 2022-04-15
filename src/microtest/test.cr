@@ -54,12 +54,11 @@ module Microtest
 
           begin
             block.call
+            test_exc = nil
           rescue ex : AssertionFailure | SkipException
             test_exc = ex
           rescue ex : Exception
             test_exc = UnexpectedError.new(ex)
-          else
-            test_exc = nil # passed
           end
 
           after_hooks
@@ -71,7 +70,6 @@ module Microtest
       end
 
       duration = Time.local - time
-
       context.record_result(self.class.name, meth, duration, test_exc, hook_exc)
 
       nil

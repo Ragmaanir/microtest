@@ -10,10 +10,14 @@ def uncolor(str)
   str.gsub(COLOR_REGEX, "")
 end
 
-macro microtest_test(&block)
+def generate_assets?
+  ENV.has_key?("ASSETS")
+end
+
+macro run_block(&block)
   {%
     c = <<-CRYSTAL
-      require "./src/microtest"
+      require "../src/microtest"
 
       include Microtest::DSL
 
@@ -25,40 +29,53 @@ macro microtest_test(&block)
     CRYSTAL
   %}
 
-  output = IO::Memory.new
+  stdout = IO::Memory.new
+  stderr = IO::Memory.new
+  input = IO::Memory.new({{c}})
 
-  s = Process.run("crystal", ["eval", {{c}}, "--error-trace"], output: output, error: STDERR)
+  result = Process.run(
+    "crystal", ["run", "--no-color", "--no-codegen", "--error-trace", "--stdin-filename", "#{__DIR__}/test.cr"],
+    input: input, output: stdout, error: stderr
+  )
+
+  {result, stdout, stderr}
+end
+
+macro record_test_json(&block)
+  result = record_test([Microtest::JsonSummaryReporter.new] of Microtest::Reporter) {{block}}
 
   begin
-    MicrotestJsonResult.new(s, JSON.parse(output.to_s))
+    MicrotestJsonResult.new(result.status, JSON.parse(result.stdout.to_s))
   rescue e
-    raise "Error parsing JSON: #{output.to_s.inspect}"
+    raise "Error parsing JSON: #{result.stdout.to_s.inspect}"
   end
 end
 
-macro reporter_test(reporters, &block)
+macro record_test(reporters = [] of Microtest::Reporter, &block)
   {%
     c = <<-CRYSTAL
-      require "./src/microtest"
+      require "../src/microtest"
 
       include Microtest::DSL
 
       #{block.body.id}
 
-      Microtest.run!(#{reporters} of Microtest::Reporter)
+      Microtest.run!(#{reporters})
     CRYSTAL
   %}
 
-  output = IO::Memory.new
-  err = IO::Memory.new
+  input = IO::Memory.new({{c}})
+  stdout = IO::Memory.new
+  stderr = IO::Memory.new
 
-  s = Process.run("crystal", ["eval", {{c}}, "--error-trace"], output: output, error: err)
+  s = Process.run(
+    "crystal", ["run", "--error-trace", "--stdin-filename", "#{__DIR__}/test.cr"],
+    input: input, output: stdout, error: stderr
+  )
 
-  MicrotestStdoutResult.new(s, output.to_s, err.to_s)
-end
+  raise "Error running tests: #{stderr}" if !stderr.empty?
 
-def generate_assets?
-  ENV.has_key?("ASSETS")
+  MicrotestStdoutResult.new(s, stdout.to_s, stderr.to_s)
 end
 
 Microtest.run!

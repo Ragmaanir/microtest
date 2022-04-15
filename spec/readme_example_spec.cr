@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe WaterPumpExample do
   test "waterpump example" do
-    res = microtest_test do
+    res = record_test_json do
       {{`cat spec/examples/waterpump.cr`}}
     end
 
@@ -22,7 +22,7 @@ end
 
 describe AssertionFailureExample do
   test "assertion failure example" do
-    res = reporter_test([Microtest::ErrorListReporter.new]) do
+    res = record_test([Microtest::ErrorListReporter.new]) do
       {{`cat spec/examples/assertion_failure.cr`}}
     end
 
@@ -34,7 +34,7 @@ end
 
 describe SummaryAndProgressRepoterExample do
   test "image" do
-    res = reporter_test([Microtest::ProgressReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
+    res = record_test([Microtest::ProgressReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
       {{`cat spec/examples/multiple_tests.cr`}}
     end
 
@@ -45,7 +45,7 @@ end
 
 describe SummaryAndDescriptionRepoterExample do
   test "image" do
-    res = reporter_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
+    res = record_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
       {{`cat spec/examples/multiple_tests.cr`}}
     end
 
@@ -56,7 +56,7 @@ end
 
 describe FocusExample do
   test "image" do
-    res = reporter_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
+    res = record_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
       {{`cat spec/examples/focus.cr`}}
     end
 

@@ -1,14 +1,12 @@
 name: microtest
-version: 1.2.4
+version: 1.2.5
+crystal: '>= 1.4.0'
+license: MIT
 
 authors:
   - ragmaanir <ragmaanir@gmail.com>
 
-crystal: '>= 0.35.1'
-
-license: MIT
-
 development_dependencies:
   ameba:
     github: veelenga/ameba
-    version: ~> 0.14
+    version: ~> 1.0

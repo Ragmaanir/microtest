@@ -21,7 +21,7 @@ module Microtest
     def initialize(@io, @colorize : Bool = true)
     end
 
-    private def colorized_io(fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
+    private def colorized_io(fg : Symbol? = nil, bg : Symbol? = nil, m : Colorize::Mode? = nil)
       if colorize?
         c = Colorize.with
         c = c.fore(fg) if fg
@@ -36,7 +36,7 @@ module Microtest
       end
     end
 
-    def w(*strs : String | Int32 | Nil, fg : Symbol? = nil, bg : Symbol? = nil, m : Symbol? = nil)
+    def w(*strs : String | Int32 | Nil, fg : Symbol? = nil, bg : Symbol? = nil, m : Colorize::Mode? = nil)
       colorized_io(fg, bg, m) do |cio|
         strs.each { |s| cio << s }
       end
