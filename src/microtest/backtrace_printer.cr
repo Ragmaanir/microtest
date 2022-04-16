@@ -1,7 +1,7 @@
 module Microtest
   def self.find_crystal_root_path
     # find the backtrace entry for crystals main method
-    first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || Microtest.bug("Could not determine crystal path from caller stacktrace")
+    first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || Microtest.bug("Could not determine crystal path from caller backtrace")
 
     path = first_entry.split(":").first
 
@@ -19,7 +19,7 @@ module Microtest
   PROJECT_SPEC_DIR = File.join(PROJECT_DIR, "spec")
 
   # e.g.: "spec/spec_helper.cr:64:1 in '__crystal_main'"
-  STRACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
+  BACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
 
   class BacktracePrinter
     record(Entry, kind : Symbol, path : String, line : Int32, func : String)
@@ -88,7 +88,7 @@ module Microtest
       entries = [] of Entry
 
       backtrace.each do |l|
-        if m = STRACKTRACE_LINE_REGEX.match(l)
+        if m = BACKTRACE_LINE_REGEX.match(l)
           file = m[1]
           line = m[2].to_i
           # column = m[3]
