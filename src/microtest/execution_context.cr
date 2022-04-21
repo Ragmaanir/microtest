@@ -1,11 +1,19 @@
 module Microtest
+  class AbortionInfo
+    getter exception : Exception
+    getter test : TestMethod
+
+    def initialize(@test, @exception)
+    end
+  end
+
   class ExecutionContext
     getter results : Array(TestResult)
     getter reporters : Array(Reporter)
     getter suites : Array(Test.class)
     getter random_seed : UInt32
     getter random : Random
-    getter aborting_exception : HookException? = nil
+    getter abortion_info : AbortionInfo? = nil
     getter? manually_aborted : Bool = false
     getter started_at : Time = Time.local
     getter! ended_at : Time
@@ -42,7 +50,7 @@ module Microtest
     end
 
     def aborted?
-      !!aborting_exception
+      !!abortion_info
     end
 
     def halted?
@@ -68,26 +76,22 @@ module Microtest
       reporters.each(&.suite_finished(self, name))
     end
 
-    def record_result(
-      suite_name : String,
-      meth : TestMethod,
-      duration : Time::Span,
-      exc : TestException?,
-      hook_exc : HookException?
-    )
-      result = TestResult.from(suite_name, meth, duration, exc, hook_exc)
+    def record_result(meth : TestMethod, duration : Time::Span, exc : TestException?)
+      record_result(TestResult.from(meth, duration, exc))
+    end
+
+    def record_abortion(meth : TestMethod, duration : Time::Span)
+      record_result(TestAbortion.new(meth, duration))
+    end
+
+    private def record_result(result : TestResult)
       @results << result
       @reporters.each(&.report(result))
     end
 
-    def record_result(result : TestResult)
-      @results << result
-      @reporters.each(&.report(result))
-    end
-
-    def abort!(exception : HookException)
-      @reporters.each(&.abort(self, exception))
-      @aborting_exception = exception
+    def abort!(info : AbortionInfo)
+      @reporters.each(&.abort(self, info))
+      @abortion_info = info
     end
 
     def total_tests

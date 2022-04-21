@@ -2,17 +2,19 @@ require "./formatter"
 
 module Microtest
   abstract class TerminalReporter < Reporter
-    alias ResultSymbols = {success: String, failure: String, skip: String}
-    alias ResultColors = {success: Symbol, failure: Symbol, skip: Symbol}
+    alias ResultSymbols = {success: String, failure: String, skip: String, abortion: String}
+    alias ResultColors = {success: Symbol, failure: Symbol, skip: Symbol, abortion: Symbol}
 
-    DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow}
+    DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow, abortion: :yellow}
 
     DOT   = "•" # Bullet "\u2022"
     TICK  = "✓" # Check Mark "\u2713"
     CROSS = "✕" # Multiplication "\u2715"
+    SKULL = "💀"
+    BANG  = "💥"
 
-    DOTS  = {success: DOT, failure: DOT, skip: DOT}
-    TICKS = {success: TICK, failure: CROSS, skip: TICK}
+    DOTS  = {success: DOT, failure: DOT, skip: DOT, abortion: BANG}
+    TICKS = {success: TICK, failure: CROSS, skip: TICK, abortion: BANG}
 
     private getter t : Termart
 
@@ -48,13 +50,13 @@ module Microtest
       }
     end
 
-    private def inspect_unexpected_error(ex : UnexpectedError | HookException) : String
+    private def exception_to_string(ex : Exception) : String
       String.build { |io|
         io << ex.message.colorize(:red)
         io << "\n"
 
-        if ex.exception.backtrace?
-          io << BacktracePrinter.new.call(ex.exception.backtrace, true)
+        if b = ex.backtrace?
+          io << BacktracePrinter.new.call(b, true)
         else
           io << "(no backtrace)"
         end
@@ -102,7 +104,7 @@ module Microtest
       write(symbol, fg: color)
       write(time_text.to_s)
       write(" ")
-      write(result.test, fg: color)
+      write(result.test.name, fg: color)
       br
     end
 
@@ -119,7 +121,7 @@ module Microtest
       ctx.skips.each do |skip|
         ex = skip.exception
 
-        write(skip.test_method, ": ", ex.message, fg: :yellow)
+        write(skip.test.sanitized_name, ": ", ex.message, fg: :yellow)
         write(" in ", BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
         br
       end
@@ -129,12 +131,17 @@ module Microtest
       ctx.failures.each_with_index do |failure, i|
         print_failure(i, failure)
       end
+
+      if a = ctx.abortion_info
+        br
+        writeln(exception_to_string(a.exception))
+      end
     end
 
     private def print_failure(number : Int32, failure : TestFailure)
       ex = failure.exception
 
-      write("# %-3d" % (number + 1), failure.test_method, " ", fg: :red)
+      write("# %-3d" % (number + 1), failure.test.full_name, " ", fg: :red)
 
       case ex
       when AssertionFailure
@@ -143,7 +150,7 @@ module Microtest
         writeln(ex.message)
       when UnexpectedError
         br
-        writeln(inspect_unexpected_error(ex))
+        writeln(exception_to_string(ex.exception))
       else Microtest.bug("Invalid Exception")
       end
 
@@ -184,11 +191,9 @@ module Microtest
       if ctx.manually_aborted?
         br
         writeln("Test run was aborted manually", fg: :white, bg: :red)
-      elsif ex = ctx.aborting_exception
+      elsif a = ctx.abortion_info
         br
-        writeln("Test run was aborted by exception in hooks for ", ex.test_method, fg: :white, bg: :red)
-
-        writeln(inspect_unexpected_error(ex))
+        writeln("Test run was aborted by exception in hooks for ", a.test.name.inspect, fg: :white, bg: :red)
       end
 
       br
@@ -226,7 +231,7 @@ module Microtest
           write(symbol, fg: color)
           write(Formatter.colorize_duration(r.duration, threshold).to_s)
           write(" ")
-          write(r.suite, MEHTOD_SEPARATOR, r.test, fg: color)
+          write(r.test.full_name, fg: color)
           br
         end
       end

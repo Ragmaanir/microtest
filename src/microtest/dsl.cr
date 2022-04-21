@@ -52,7 +52,10 @@ module Microtest
         # collect all test methods using the previous_def-hack
         previous_def + [
           Microtest::TestMethod.new(
+            suite: self,
             name: {{name}},
+            sanitized_name: {{sanitized_name}},
+            method_name: {{method_name}},
             focus: {{focus}},
             skip: {{skip}},
             # __filename: {{__filename}},
@@ -65,10 +68,11 @@ module Microtest
       end
 
       def {{method_name.id}} : Nil
-        {% if block && !skip %}
-          {{block.body}}
-        {% else %}
+        {% if skip %}
           skip("not implemented")
+        {% end %}
+        {% if block %}
+          {{block.body}}
         {% end %}
         nil
       end

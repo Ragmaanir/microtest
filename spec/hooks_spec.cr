@@ -18,11 +18,11 @@ describe MicrotestHooks do
     result = record_test_json do
       describe Hooks do
         before do
-          raise "Before hook error"
+          raise "Raised exception"
         end
 
-        test "first" do
-          assert true == true
+        test "failing test" do
+          assert false
         end
       end
     end
@@ -32,9 +32,16 @@ describe MicrotestHooks do
 
     assert result.json["success"] == false
     assert result.json["aborted"] == true
-    assert result.json["aborting_exception"] == "Error in hook: Before hook error"
+
+    a = result.json["abortion"]
+    assert a["message"] == "Raised exception"
+    assert a["suite"] == "HooksTest"
+    assert a["test_name"] == "failing test"
+    assert a["test_method"] == "test__failing_test"
+    assert a["backtrace"].as_a.any? { |e| e.as_s.includes?("before_hooks") }
+
     assert result.json["results"].as_h.size == 1
-    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSkip"
+    assert result.json["results"]["HooksTest#failing_test"]["type"] == "Microtest::TestAbortion"
   end
 
   test "error in after hook" do
@@ -45,12 +52,11 @@ describe MicrotestHooks do
         end
 
         after do
-          raise "After hook error"
+          raise "Raised exception"
         end
 
-        test "first" do
+        test "failing test" do
           assert @value == true
-          @value = false
         end
       end
     end
@@ -59,8 +65,15 @@ describe MicrotestHooks do
     assert !result.status.success?
     assert result.json["success"] == false
     assert result.json["aborted"] == true
-    assert result.json["aborting_exception"] == "Error in hook: After hook error"
-    assert result.json["results"]["HooksTest#first"]["type"] == "Microtest::TestSuccess"
+
+    a = result.json["abortion"]
+    assert a["message"] == "Raised exception"
+    assert a["suite"] == "HooksTest"
+    assert a["test_name"] == "failing test"
+    assert a["test_method"] == "test__failing_test"
+    assert a["backtrace"].as_a.any? { |e| e.as_s.includes?("after_hooks") }
+
+    assert result.json["results"]["HooksTest#failing_test"]["type"] == "Microtest::TestSuccess"
   end
 
   test "around hook" do

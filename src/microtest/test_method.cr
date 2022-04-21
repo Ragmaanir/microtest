@@ -1,9 +1,14 @@
 module Microtest
   class TestMethod
-    getter name : String, focus : Bool | String, skip : Bool
+    getter suite : Test.class
+    getter name : String
+    getter sanitized_name : String
+    getter method_name : String
+    getter focus : Bool | String
+    getter skip : Bool
     getter block : (TestMethod, ExecutionContext) ->
 
-    def initialize(@name, @focus, @skip, &@block : (TestMethod, ExecutionContext) ->)
+    def initialize(@suite, @name, @sanitized_name, @method_name, @focus, @skip, &@block : (TestMethod, ExecutionContext) ->)
     end
 
     def focus?
@@ -14,12 +19,8 @@ module Microtest
       skip
     end
 
-    def sanitized_name
-      name.gsub(/[^a-zA-Z0-9_]/, "_")
-    end
-
-    def method_name
-      "test__#{sanitized_name}"
+    def full_name
+      [suite, sanitized_name].join(MEHTOD_SEPARATOR)
     end
 
     def call(ctx : ExecutionContext)

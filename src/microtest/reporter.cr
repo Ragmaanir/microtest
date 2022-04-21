@@ -9,7 +9,7 @@ module Microtest
 
     abstract def report(result : TestResult)
 
-    def abort(ctx : ExecutionContext, exception : HookException)
+    def abort(ctx : ExecutionContext, info : AbortionInfo)
     end
 
     def started(ctx : ExecutionContext)

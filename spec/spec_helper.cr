@@ -41,8 +41,8 @@ macro run_block(&block)
   {result, stdout, stderr}
 end
 
-macro record_test_json(&block)
-  result = record_test([Microtest::JsonSummaryReporter.new] of Microtest::Reporter) {{block}}
+macro record_test_json(seed = 1, &block)
+  result = record_test([Microtest::JsonSummaryReporter.new] of Microtest::Reporter, {{seed}}) {{block}}
 
   begin
     MicrotestJsonResult.new(result.status, JSON.parse(result.stdout.to_s))
@@ -51,7 +51,7 @@ macro record_test_json(&block)
   end
 end
 
-macro record_test(reporters = [] of Microtest::Reporter, &block)
+macro record_test(reporters = [] of Microtest::Reporter, seed = 1, &block)
   {%
     c = <<-CRYSTAL
       require "../src/microtest"
@@ -70,6 +70,7 @@ macro record_test(reporters = [] of Microtest::Reporter, &block)
 
   s = Process.run(
     "crystal", ["run", "--error-trace", "--stdin-filename", "#{__DIR__}/test.cr"],
+    env: {"SEED" => {{seed}}.to_s},
     input: input, output: stdout, error: stderr
   )
 

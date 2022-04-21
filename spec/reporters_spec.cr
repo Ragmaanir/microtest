@@ -5,8 +5,7 @@ describe Microtest::Reporter do
     result = record_test([Microtest::ProgressReporter.new]) do
       describe Microtest do
         test "success" do
-          puts "A"
-          assert true == true
+          assert true
         end
 
         test "failure" do
@@ -27,54 +26,39 @@ describe Microtest::Reporter do
     assert result.stdout.includes?(dot.colorize(:yellow).to_s)
     assert result.stdout.includes?(dot.colorize(:green).to_s)
   end
-end
 
-describe Microtest::JsonSummaryReporter do
-  test "summary" do
-    result = record_test_json do
-      describe Summary do
-        test "some test" do
-          sleep 0.01
-          assert true
+  test "progress reporter abortion" do
+    result = record_test([Microtest::ProgressReporter.new]) do
+      describe Microtest do
+        before do
+          raise "aborted"
+        end
+
+        test "failure" do
+          assert false
         end
       end
     end
 
-    json = result.json
+    assert !result.success?
 
-    assert json["using_focus"] == false
-    assert json["seed"].raw.is_a?(Int64)
-    assert json["aborted"] == false
-    assert json["aborting_exception"] == nil
+    bang = Microtest::TerminalReporter::DOTS[:abortion]
 
-    assert json["total_count"] == 1
-    assert json["executed_count"] == 1
-    assert json["success_count"] == 1
-    assert json["skip_count"] == 0
-    assert json["failure_count"] == 0
-
-    assert json["total_duration"].raw.is_a?(Float64)
-    duration = json["total_duration"].raw.as(Float64)
-    assert duration >= 1_i64
-    assert duration <= 100_i64
-
-    assert json["results"]["SummaryTest#some_test"]["duration"].raw.is_a?(Float64)
-    duration = json["results"]["SummaryTest#some_test"]["duration"].raw.as(Float64)
-    assert duration >= 1_i64
-    assert duration <= 100_i64
+    assert result.stdout.includes?(bang.colorize(:yellow).to_s)
   end
 
-  test "test results" do
-    result = record_test_json do
-      describe Failure do
-        test "pass" do
+  test "error list reporter" do
+    result = record_test([Microtest::ErrorListReporter.new]) do
+      describe Microtest do
+        test "success" do
+          assert true
         end
 
         test "failure" do
           assert 3 > 5
         end
 
-        test "unexpected" do
+        test "error" do
           raise "unexpected"
         end
 
@@ -84,27 +68,75 @@ describe Microtest::JsonSummaryReporter do
       end
     end
 
-    json = result.json
+    assert !result.success?
 
-    assert json["using_focus"] == false
-    assert json["seed"].raw.is_a?(Int64)
-    assert json["aborted"] == false
-    assert json["aborting_exception"] == nil
+    output = uncolor(result.stdout)
 
-    assert json["total_count"] == 4
-    assert json["executed_count"] == 4
-    assert json["success_count"] == 1
-    assert json["skip_count"] == 1
-    assert json["failure_count"] == 2
+    assert output.matches?(%r{skip: skip this one in SPEC: spec/test.cr:16})
+    assert output.matches?(%r{# 1  MicrotestTest#error \nunexpected\n┏})
+    assert output.matches?(%r{# 2  MicrotestTest#failure SPEC: spec/test.cr:\d+\n◆ assert 3 > 5})
+  end
 
-    assert json["total_duration"].raw.is_a?(Float64)
-    duration = json["total_duration"].raw.as(Float64)
-    assert duration > 0_i64
-    assert duration <= 100_i64
+  test "error list reporter abortion" do
+    result = record_test([Microtest::ErrorListReporter.new]) do
+      describe Microtest do
+        before do
+          raise "ABORTED"
+        end
 
-    assert json["results"]["FailureTest#pass"]["type"] == "Microtest::TestSuccess"
-    assert json["results"]["FailureTest#failure"]["type"] == "Microtest::TestFailure"
-    assert json["results"]["FailureTest#unexpected"]["type"] == "Microtest::TestFailure"
-    assert json["results"]["FailureTest#skip"]["type"] == "Microtest::TestSkip"
+        test "failure" do
+          assert false
+        end
+      end
+    end
+
+    assert !result.success?
+
+    output = uncolor(result.stdout)
+
+    assert output.matches?(/ABORTED/)
+    assert output.matches?(%r{┗ SPEC: spec/test.cr:\d+ before_hooks})
+  end
+
+  test "summary reporter" do
+    result = record_test([Microtest::SummaryReporter.new]) do
+      describe Microtest do
+        test "success" do
+          assert true
+        end
+
+        test "failure" do
+          assert 3 > 5
+        end
+
+        test "skip" do
+          skip "skip this one"
+        end
+      end
+    end
+
+    assert !result.success?
+
+    output = uncolor(result.stdout)
+    assert output.matches?(%r{Executed 3/3 tests in \d+µs with seed 1})
+    assert output.includes?("Success: 1, Skips: 1, Failures: 1")
+  end
+
+  test "summary reporter abortion" do
+    result = record_test([Microtest::SummaryReporter.new]) do
+      describe Microtest do
+        before do
+          raise "aborted"
+        end
+
+        test "failure" do
+          assert false
+        end
+      end
+    end
+
+    assert !result.success?
+
+    assert result.stdout.includes?("Test run was aborted by exception in hooks for \"failure\"")
   end
 end

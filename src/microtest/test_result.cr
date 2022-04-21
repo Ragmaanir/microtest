@@ -1,34 +1,22 @@
 module Microtest
   abstract class TestResult
-    def self.from(
-      suite_name : String,
-      meth : TestMethod,
-      duration : Time::Span,
-      test_exc : TestException?,
-      hook_exc : HookException?
-    )
+    def self.from(test : TestMethod, duration : Time::Span, test_exc : TestException?)
       case test_exc
       when AssertionFailure, UnexpectedError
-        TestFailure.new(suite_name, meth.sanitized_name, duration, test_exc)
+        TestFailure.new(test, duration, test_exc)
       when SkipException
-        TestSkip.new(suite_name, meth.sanitized_name, duration, test_exc)
+        TestSkip.new(test, duration, test_exc)
       when nil
-        TestSuccess.new(suite_name, meth.sanitized_name, duration)
+        TestSuccess.new(test, duration)
       else
         Microtest.bug("Unhandled internal exception: #{test_exc}")
       end
     end
 
-    # getter suite : Test.class
-    getter suite : String
-    getter test : String
+    getter test : TestMethod
     getter duration : Time::Span
 
-    def initialize(@suite, @test, @duration)
-    end
-
-    def test_method
-      [suite, test].join(MEHTOD_SEPARATOR)
+    def initialize(@test, @duration)
     end
 
     abstract def kind : Symbol
@@ -37,8 +25,8 @@ module Microtest
   class TestFailure < TestResult
     getter exception : AssertionFailure | UnexpectedError
 
-    def initialize(suite, test, duration : Time::Span, @exception)
-      super(suite, test, duration)
+    def initialize(test, duration : Time::Span, @exception)
+      super(test, duration)
     end
 
     def kind : Symbol
@@ -49,12 +37,18 @@ module Microtest
   class TestSkip < TestResult
     getter exception : SkipException
 
-    def initialize(suite, test, duration : Time::Span, @exception)
-      super(suite, test, duration)
+    def initialize(test, duration : Time::Span, @exception)
+      super(test, duration)
     end
 
     def kind : Symbol
       :skip
+    end
+  end
+
+  class TestAbortion < TestResult
+    def kind : Symbol
+      :abortion
     end
   end
 

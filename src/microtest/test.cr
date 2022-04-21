@@ -32,6 +32,7 @@ module Microtest
       if !tests.empty?
         ctx.test_suite(self.name) do
           tests.shuffle(ctx.random).each do |c|
+            Fiber.yield # make sure signals are handled
             break if ctx.halted?
             c.call(ctx)
           end
@@ -42,11 +43,10 @@ module Microtest
     end
 
     def run_test(meth : TestMethod, &block)
-      name = meth.sanitized_name
       time = Time.local
 
-      test_exc = SkipException.new("before-hook failed", "", 0)
-      hook_exc = nil
+      test_exc = nil
+      test_executed = false
 
       begin
         around_hooks do
@@ -54,23 +54,27 @@ module Microtest
 
           begin
             block.call
-            test_exc = nil
           rescue ex : AssertionFailure | SkipException
             test_exc = ex
           rescue ex : Exception
             test_exc = UnexpectedError.new(ex)
+          ensure
+            test_executed = true
           end
 
           after_hooks
         end
       rescue e
-        hook_exc = HookException.new(self.class.name, name, e)
-
-        context.abort!(hook_exc)
+        context.abort!(AbortionInfo.new(meth, e))
       end
 
       duration = Time.local - time
-      context.record_result(self.class.name, meth, duration, test_exc, hook_exc)
+
+      if test_executed
+        context.record_result(meth, duration, test_exc)
+      else
+        context.record_abortion(meth, duration)
+      end
 
       nil
     end

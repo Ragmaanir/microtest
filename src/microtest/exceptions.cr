@@ -30,18 +30,4 @@ module Microtest
       super("Unexpected error: #{exception}")
     end
   end
-
-  class HookException < Exception
-    getter exception : Exception
-    getter suite : String
-    getter test : String
-
-    def initialize(@suite, @test, @exception)
-      super("Error in hook: #{exception}")
-    end
-
-    def test_method
-      [suite, test].join(MEHTOD_SEPARATOR)
-    end
-  end
 end
