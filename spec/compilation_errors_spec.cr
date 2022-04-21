@@ -10,6 +10,18 @@ describe CompilationErrors do
     assert result.success?
   end
 
+  test "empty test name does not compile" do
+    result, stdout, stderr = run_block do
+      describe C do
+        test "" do
+        end
+      end
+    end
+
+    assert !result.success?
+    assert stderr.to_s.matches?(%r{Test name cant be empty in .*:\d+})
+  end
+
   test "duplicate describe does not compile" do
     result, stdout, stderr = run_block do
       describe C do

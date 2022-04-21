@@ -32,7 +32,7 @@ module Microtest
 
     macro test(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
       {%
-        raise "Test name cant be empty" if name == ""
+        raise "Test name cant be empty in #{__filename.id}:#{__line_number}" if name == ""
 
         name = "unnamed_in_line_#{__line_number}" if name == nil
 
