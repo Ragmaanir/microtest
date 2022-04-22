@@ -12,6 +12,10 @@ describe Microtest::Reporter do
           assert 3 > 5
         end
 
+        test "error" do
+          raise "unexpected"
+        end
+
         test "skip" do
           skip "skip this one"
         end
@@ -22,9 +26,13 @@ describe Microtest::Reporter do
 
     dot = Microtest::TerminalReporter::DOTS[:success]
 
-    assert result.stdout.includes?(dot.colorize(:red).to_s)
-    assert result.stdout.includes?(dot.colorize(:yellow).to_s)
-    assert result.stdout.includes?(dot.colorize(:green).to_s)
+    assert result.stdout == [
+      dot.colorize(:green),
+      dot.colorize(:red),
+      dot.colorize(:yellow),
+      dot.colorize(:red),
+      "\n\n",
+    ].join
   end
 
   test "progress reporter abortion" do
@@ -45,6 +53,60 @@ describe Microtest::Reporter do
     bang = Microtest::TerminalReporter::DOTS[:abortion]
 
     assert result.stdout.includes?(bang.colorize(:yellow).to_s)
+  end
+
+  test "description reporter" do
+    result = record_test([Microtest::DescriptionReporter.new]) do
+      describe DescriptionReporter do
+        test "success" do
+          assert true
+        end
+
+        test "failure" do
+          assert 3 > 5
+        end
+
+        test "error" do
+          raise "unexpected"
+        end
+
+        test "skip" do
+          skip "skip this one"
+        end
+      end
+    end
+
+    assert !result.success?
+
+    dot = Microtest::TerminalReporter::DOTS[:success]
+
+    output = uncolor(result.stdout)
+    assert output.includes?("DescriptionReporterTest")
+    assert output.matches?(%r{ ✓\s+\d+ .s success})
+    assert output.matches?(%r{ ✕\s+\d+ .s error})
+    assert output.matches?(%r{ ✕\s+\d+ .s failure})
+    assert output.matches?(%r{ ✓\s+\d+ .s skip})
+  end
+
+  test "description reporter abortion" do
+    result = record_test([Microtest::DescriptionReporter.new]) do
+      describe DescriptionReporter do
+        before do
+          raise "ABORTED"
+        end
+
+        test "failure" do
+          assert false
+        end
+      end
+    end
+
+    assert !result.success?
+
+    output = uncolor(result.stdout)
+
+    assert output.includes?("DescriptionReporterTest")
+    assert output.matches?(%r{ 💥\s+\d+ .s failure})
   end
 
   test "error list reporter" do
