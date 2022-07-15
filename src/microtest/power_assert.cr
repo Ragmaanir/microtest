@@ -155,12 +155,12 @@ module Microtest
     end
 
     macro assert(expression)
-      %result = {{ expression }}
+      %result = Microtest::PowerAssert.reflect_tuple({{ expression }})
 
-      if %result
+      if %result[:value]
         pass
       else
-        %ast = reflect({{ expression }})
+        %ast = %result[:node]
 
         %message = Microtest.power_assert_formatter.call(%ast)
 

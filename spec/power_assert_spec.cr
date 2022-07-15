@@ -62,10 +62,13 @@ describe Microtest::PowerAssert do
     a
   end
 
-  test "reflect evaluates expressions only once" do
+  test "assert evaluates expressions only once" do
     arr = [] of Int32
 
-    reflect(append(append(append(arr))))
+    begin
+      assert(append(append(append(arr))) == 0)
+    rescue AssertionFailure
+    end
 
     assert arr.size == 3
   end
