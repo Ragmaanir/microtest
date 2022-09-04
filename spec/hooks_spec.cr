@@ -38,7 +38,7 @@ describe MicrotestHooks do
     assert a["suite"] == "HooksTest"
     assert a["test_name"] == "failing test"
     assert a["test_method"] == "test__failing_test"
-    assert a["backtrace"].as_a.any? { |e| e.as_s.includes?("before_hooks") }
+    assert a["backtrace"].as_a.any?(&.as_s.includes?("before_hooks"))
 
     assert result.json["results"].as_h.size == 1
     assert result.json["results"]["HooksTest#failing_test"]["type"] == "Microtest::TestAbortion"
@@ -71,7 +71,7 @@ describe MicrotestHooks do
     assert a["suite"] == "HooksTest"
     assert a["test_name"] == "failing test"
     assert a["test_method"] == "test__failing_test"
-    assert a["backtrace"].as_a.any? { |e| e.as_s.includes?("after_hooks") }
+    assert a["backtrace"].as_a.any?(&.as_s.includes?("after_hooks"))
 
     assert result.json["results"]["HooksTest#failing_test"]["type"] == "Microtest::TestSuccess"
   end

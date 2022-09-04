@@ -11,7 +11,7 @@ describe CompilationErrors do
   end
 
   test "empty test name does not compile" do
-    result, stdout, stderr = run_block do
+    result, _stdout, stderr = run_block do
       describe C do
         test "" do
         end
@@ -23,7 +23,7 @@ describe CompilationErrors do
   end
 
   test "duplicate describe does not compile" do
-    result, stdout, stderr = run_block do
+    result, _stdout, stderr = run_block do
       describe C do
       end
 
@@ -36,7 +36,7 @@ describe CompilationErrors do
   end
 
   test "duplicate test does not compile" do
-    result, stdout, stderr = run_block do
+    result, _stdout, stderr = run_block do
       describe C do
         test "a" do
         end

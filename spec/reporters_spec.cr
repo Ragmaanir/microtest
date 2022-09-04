@@ -78,7 +78,7 @@ describe Microtest::Reporter do
 
     assert !result.success?
 
-    dot = Microtest::TerminalReporter::DOTS[:success]
+    # dot = Microtest::TerminalReporter::DOTS[:success]
 
     output = uncolor(result.stdout)
     assert output.includes?("DescriptionReporterTest")
