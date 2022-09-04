@@ -9,18 +9,23 @@
 <body style="color:white; background-color:black">
 <pre>
 
-<span style="text-decoration:underline;color:fuchsia;">SecondTest</span>
- <span style="color:red;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  23 µs</span> <span style="color:red;">error</span>
- <span style="color:red;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  15 µs</span> <span style="color:red;">first_failure</span>
-
 <span style="text-decoration:underline;color:fuchsia;">FirstTest</span>
- <span style="color:lime;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> 160 ns</span> <span style="color:lime;">success</span>
- <span style="color:yellow;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">   7 µs</span> <span style="color:yellow;">skip_this</span>
+ <span style="color:lime;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> 159 ns</span> <span style="color:lime;">success</span>
+ <span style="color:yellow;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  16 µs</span> <span style="color:yellow;">skip this</span>
 
-<span style="color:yellow;">FirstTest#skip_this: not implemented</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> in SPEC: spec/test.cr:5</span>
+<span style="text-decoration:underline;color:fuchsia;">SecondTest</span>
+ <span style="color:red;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  15 µs</span> <span style="color:red;">first failure</span>
+ <span style="color:red;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">   9 µs</span> <span style="color:red;">error</span>
 
-<span style="color:red;"># 1  SecondTest#error </span>
-<span style="color:red;">Unexpected error: Oh, this is wrong</span>
+<span style="color:yellow;">skip_this: not implemented</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> in SPEC: spec/test.cr:5</span>
+
+<span style="color:red;"># 1  SecondTest#first_failure </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">SPEC: spec/test.cr:5</span>
+<span style="filter: contrast(70%) brightness(190%);color:red;">┏</span> <span style="color:red;">assert</span> <span style="font-weight:bold;color:red;">a == (b * 2)</span>
+<span style="filter: contrast(70%) brightness(190%);color:red;">┗</span> 5<span style="filter: contrast(70%) brightness(190%);color:dimgray;"> == </span>14
+
+
+<span style="color:red;"># 2  SecondTest#error </span>
+<span style="color:red;">Oh, this is wrong</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┏</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:127 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:101 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:115 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main_user_code</span>
@@ -29,23 +34,18 @@
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:98 </span><span style="color:yellow;">run</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:100 </span><span style="color:yellow;">run</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/runner.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:26 </span><span style="color:yellow;">call</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:36 </span><span style="color:yellow;">run_tests</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test_method.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:26 </span><span style="color:yellow;">call</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:37 </span><span style="color:yellow;">run_tests</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test_method.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:27 </span><span style="color:yellow;">call</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">-&gt;</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:52 </span><span style="color:yellow;">run_test</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:79 </span><span style="color:yellow;">around_hooks</span>
+<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:83 </span><span style="color:yellow;">around_hooks</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:56 </span><span style="color:yellow;">-&gt;</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">-&gt;</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">test__error</span>
 <span style="filter: contrast(70%) brightness(190%);color:dimgray;">┗</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">raise_an_error</span>
 
 
-<span style="color:red;"># 2  SecondTest#first_failure </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">SPEC: spec/test.cr:5</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┏</span> <span style="color:red;">assert</span> <span style="font-weight:bold;color:red;">a == (b * 2)</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┗</span> 5<span style="filter: contrast(70%) brightness(190%);color:dimgray;"> == </span>14
-
-
-<span style="color:#3333FF;">Executed</span><span style="color:#3333FF;"> 4/4 </span><span style="color:#3333FF;">tests in 141µs with seed 3811900918</span>
+<span style="color:#3333FF;">Executed</span><span style="color:#3333FF;"> 4/4 </span><span style="color:#3333FF;">tests in 157µs with seed 1</span>
 <span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
 
 
