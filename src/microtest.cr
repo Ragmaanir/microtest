@@ -65,7 +65,7 @@ module Microtest
   MEHTOD_SEPARATOR = "#"
 
   def self.bug(msg : String)
-    abort("MICROTEST BUG: #{msg}")
+    abort("MICROTEST BUG: #{msg}".colorize(:red))
   end
 
   def self.power_assert_formatter

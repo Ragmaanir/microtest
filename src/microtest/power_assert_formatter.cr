@@ -151,10 +151,12 @@ module Microtest
             # FIXME: indicate that these two lines are not simplifications,
             # but different values.
 
-            diff_idx = StringUtils.diff_index(lval, rval) || Microtest.bug("Strings are not different")
-
-            lines << highlight_split_char(lval, diff_idx)
-            lines << highlight_split_char(rval, diff_idx)
+            if diff_idx = StringUtils.diff_index(lval, rval)
+              lines << highlight_split_char(lval, diff_idx)
+              lines << highlight_split_char(rval, diff_idx)
+            else
+              lines << "inspect returned the same result for both values: #{lval}"
+            end
           else
             lines << build_string { |t|
               t.w(lval)
