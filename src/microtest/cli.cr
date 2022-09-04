@@ -52,7 +52,7 @@ class ReleaseCommand
     run("crystal", ["spec"])
 
     run("./bin/ameba")
-    run("./bin/build")
+    run("./cli", ["readme"])
     run("git", ["add", "README.md"])
     run("git", ["add", "-A", "./assets"])
 
