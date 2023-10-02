@@ -27,11 +27,6 @@ module Microtest
       end
 
       def_equals_and_hash expression, wrapper
-
-      # See performance warning in formatter
-      def inspect_value
-        wrapper.inspect
-      end
     end
 
     class EmptyNode < Node
@@ -112,19 +107,28 @@ module Microtest
 
         %named_args = [] of Microtest::PowerAssert::NamedArgNode
 
+        # This tuple will contain the actual values, not reflection-nodes (NamedArgNode)
+        # We need this to pass it to the actual invocation of the Call
+        %na = NamedTuple.new
+
         {% if expression.named_args.is_a?(ArrayLiteral) %}
           {% for arg in expression.named_args %}
-            %named_args.push Microtest::PowerAssert::NamedArgNode.new(
-              {{ arg.name }},
-              Microtest::PowerAssert.reflect_tuple({{ arg.value }})
-            )
+            %v = Microtest::PowerAssert.reflect_tuple({{ arg.value }})
+
+            # merge all of the tuples into one
+            %na = %na.merge({ {{ arg.name }}: %v[:value] })
+
+            %named_args.push(Microtest::PowerAssert::NamedArgNode.new(
+              {{ arg.name.stringify }},
+              %v[:node]
+            ))
           {% end %}
         {% end %}
 
         %value = {% if expression.receiver.is_a?(Nop) %}
-            {{expression.name}}(*%arg_vals) {{expression.block}}
+            {{expression.name}}(*%arg_vals, **%na) {{expression.block}}
           {% else %}
-            %receiver[:value].{{expression.name}}(*%arg_vals) {{expression.block}}
+            %receiver[:value].{{expression.name}}(*%arg_vals, **%na) {{expression.block}}
           {% end %}
 
         {

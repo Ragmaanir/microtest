@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.6
+
+- Crystal 1.10.0-dev (no fixes needed)
+- Fixed named argument inspection in power asserts
+
 ### 1.2.5
 
 - Crystal 1.4

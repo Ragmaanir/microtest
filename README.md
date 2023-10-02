@@ -1,6 +1,6 @@
 # 🔬 microtest [![Crystal CI](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml/badge.svg)](https://github.com/Ragmaanir/microtest/actions/workflows/crystal.yml)
 
-### Version 1.2.5
+### Version 1.2.6
 
 A small testing framework inspired by minitest/minitest.cr.
 
@@ -26,7 +26,7 @@ Add this to your application's `shard.yml`:
 development_dependencies:
   microtest:
     github: ragmaanir/microtest
-    version: ~> 1.2.5
+    version: ~> 1.2.6
 ```
 
 And add this to your `spec_helper.rb`:
@@ -181,4 +181,4 @@ end
 
 ## Development
 
-Run `bin/build` to run tests and generate `README.md` from `README.md.template` and generate the images of the test outputs (using an alpine docker image).
+Run `./cli readme` to run tests and generate `README.md` from `README.md.ecr` and generate the images of the test outputs (using an alpine docker image).

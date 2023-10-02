@@ -7,15 +7,6 @@ module Microtest
     end
 
     class ListFormatter < Formatter
-      #
-      # WARNING:
-      #
-      # Calling `node.wrapper.value.inspect` slows down the compilation
-      # by a factor of 10 (6s -> 60s in a larger project).
-      # Calling `node.inspect_value` which basically just delegates
-      # does not cause this slowdown.
-      #
-
       BAR_COLOR = :light_red
 
       getter? colorize
