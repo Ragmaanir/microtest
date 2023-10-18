@@ -50,13 +50,13 @@ module Microtest
       }
     end
 
-    private def exception_to_string(ex : Exception) : String
+    private def exception_to_string(ex : Exception, highlight : String? = nil) : String
       String.build { |io|
         io << ex.message.colorize(:red)
         io << "\n"
 
         if b = ex.backtrace?
-          io << BacktracePrinter.new.call(b, true)
+          io << BacktracePrinter.new.call(b, highlight)
         else
           io << "(no backtrace)"
         end
@@ -140,17 +140,22 @@ module Microtest
 
     private def print_failure(number : Int32, failure : TestFailure)
       ex = failure.exception
+      test = failure.test
+      bold = Colorize::Mode::Bold
 
-      write("# %-3d" % (number + 1), failure.test.full_name, " ", fg: :red)
+      write("# %-3d" % (number + 1), test.full_name, " ", fg: :red, m: bold)
 
       case ex
       when AssertionFailure
-        write(BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
+        path = BacktracePrinter.simplify_path(ex.file)[1]
+        write(path, ":", ex.line, fg: :light_gray, m: bold)
         br
         writeln(ex.message)
       when UnexpectedError
+        path = BacktracePrinter.simplify_path(test.filename)[1]
+        write(path, ":", test.line_number, fg: :light_gray, m: bold)
         br
-        writeln(exception_to_string(ex.exception))
+        writeln(exception_to_string(ex.exception, test.method_name))
       else Microtest.bug("Invalid Exception")
       end
 
@@ -174,9 +179,11 @@ module Microtest
         write(" ")
       end
 
-      write("Executed", fg: :blue)
-      write(" #{ctx.executed_tests}/#{ctx.total_tests} ", fg: (ctx.executed_tests < ctx.total_tests) ? :red : :blue)
-      write("tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: :blue)
+      fg = :light_blue
+
+      write("Executed", fg: fg)
+      write(" #{ctx.executed_tests}/#{ctx.total_tests} ", fg: (ctx.executed_tests < ctx.total_tests) ? :red : fg)
+      write("tests in #{total}#{unit} with seed #{ctx.random_seed}", fg: fg)
       br
 
       write("Success: ", ctx.total_success, fg: (:green if ctx.total_success > 0))
@@ -221,7 +228,7 @@ module Microtest
         num, unit = Formatter.format_duration(threshold)
         writeln("No slow tests (threshold: #{num}#{unit})", fg: :dark_gray)
       else
-        writeln("Slowest #{res.size} tests", fg: :blue)
+        writeln("Slowest #{res.size} tests", fg: :light_blue)
         br
 
         res.each do |r|

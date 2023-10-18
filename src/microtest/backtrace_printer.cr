@@ -56,7 +56,7 @@ module Microtest
       {kind, simple_path}
     end
 
-    def call(backtrace : Array(String), colorize : Bool) : String
+    def call(backtrace : Array(String), highlight : String? = nil, colorize : Bool = true) : String
       entries = simplify(backtrace)
 
       list = entries.map do |entry|
@@ -65,9 +65,12 @@ module Microtest
 
           t.w(":", entry.line.to_s, " ", fg: :dark_gray)
 
+          m = Colorize::Mode::None
+          m = Colorize::Mode::Bold if highlight && entry.func.includes?(highlight)
+
           case entry.kind
-          when :app, :spec then t.w(entry.func, fg: :yellow)
-          else                  t.w(entry.func, fg: :dark_gray)
+          when :app, :spec then t.w(entry.func, fg: :yellow, m: m)
+          else                  t.w(entry.func, fg: :dark_gray, m: m)
           end
         }
       end

@@ -32,9 +32,17 @@ module Microtest
 
     macro test(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
       {%
-        raise "Test name cant be empty in #{__filename.id}:#{__line_number}" if name == ""
+        file = __filename
+        line = __line_number
 
-        name = "unnamed_in_line_#{__line_number}" if name == nil
+        if block
+          file = block.filename
+          line = block.line_number
+        end
+
+        raise "Test name cant be empty in #{file}:#{line}" if name == ""
+
+        name = "unnamed_in_line_#{line}" if name == nil
 
         sanitized_name = name.gsub(/[^a-zA-Z0-9_]/, "_")
         method_name = "test__#{sanitized_name.id}"
@@ -58,8 +66,8 @@ module Microtest
             method_name: {{method_name}},
             focus: {{focus}},
             skip: {{skip}},
-            # __filename: {{__filename}},
-            # __line_number: {{__line_number}},
+            filename: {{file}},
+            line_number: {{line}},
           ) do |m, ctx|
             test = new(ctx)
             test.run_test(m) { test.{{ method_name.id }} }

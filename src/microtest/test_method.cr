@@ -6,9 +6,11 @@ module Microtest
     getter method_name : String
     getter focus : Bool | String
     getter skip : Bool
+    getter filename : String
+    getter line_number : Int32
     getter block : (TestMethod, ExecutionContext) ->
 
-    def initialize(@suite, @name, @sanitized_name, @method_name, @focus, @skip, &@block : (TestMethod, ExecutionContext) ->)
+    def initialize(@suite, @name, @sanitized_name, @method_name, @focus, @skip, @filename, @line_number, &@block : (TestMethod, ExecutionContext) ->)
     end
 
     def focus?

@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.2.7
+
+- Changed dark blue in reporter to light blue
+- Highlight errors headline in error list reporter
+- Highlight test method in backtraces
+
 ### 1.2.6
 
 - Crystal 1.10.0-dev (no fixes needed)
