@@ -7,7 +7,9 @@ module Microtest
     end
 
     class ListFormatter < Formatter
-      BAR_COLOR = :light_red
+      BAR_COLOR        = RGB.new(200, 50, 50)
+      ASSERT_COLOR     = RGB.new(200, 0, 0)
+      ASSERT_EXP_COLOR = RGB.new(250, 80, 80)
 
       getter? colorize
 
@@ -37,9 +39,9 @@ module Microtest
       # Returns colorized "assert x == y"
       private def formatted_assert_statement(node : CallNode | TerminalNode) : String
         build_string { |t|
-          t.w("assert", fg: :red)
+          t.w("assert", fg: ASSERT_COLOR)
           t.w(" ")
-          t.w(node.expression, fg: :red, m: :bold)
+          t.w(node.expression, fg: ASSERT_EXP_COLOR, m: :bold)
         }
       end
 
@@ -151,7 +153,7 @@ module Microtest
           else
             lines << build_string { |t|
               t.w(lval)
-              t.w(" ", node.method_name, " ", fg: :dark_gray)
+              t.w(" ", node.method_name, " ", fg: DARK_GRAY)
               t.w(rval)
             }
           end
@@ -165,7 +167,7 @@ module Microtest
 
         build_string { |a|
           a.w(parts[0])
-          a.w(parts[1], fg: :white, bg: :red)
+          a.w(parts[1], fg: WHITE, bg: RED)
           a.w(parts[2])
         }
       end

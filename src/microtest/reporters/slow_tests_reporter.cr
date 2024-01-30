@@ -18,9 +18,9 @@ module Microtest
 
       if res.empty?
         num, unit = Formatter.format_duration(threshold)
-        writeln("No slow tests (threshold: #{num}#{unit})", fg: :dark_gray)
+        writeln("No slow tests (threshold: #{num}#{unit})", fg: DARK_GRAY)
       else
-        writeln("Slowest #{res.size} tests", fg: :light_blue)
+        writeln("Slowest #{res.size} tests", fg: LIGHT_BLUE)
         br
 
         res.each do |r|

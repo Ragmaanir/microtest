@@ -7,8 +7,8 @@ module Microtest
       ctx.skips.each do |skip|
         ex = skip.exception
 
-        write(skip.test.sanitized_name, ": ", ex.message, fg: :yellow)
-        write(" in ", BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: :dark_gray)
+        write(skip.test.sanitized_name, ": ", ex.message, fg: YELLOW)
+        write(" in ", BacktracePrinter.simplify_path(ex.file)[1], ":", ex.line, fg: DARK_GRAY)
         br
       end
 
@@ -29,17 +29,17 @@ module Microtest
       test = failure.test
       bold = Colorize::Mode::Bold
 
-      write("# %-3d" % (number + 1), test.full_name, " ", fg: :red, m: bold)
+      write("# %-3d" % (number + 1), test.full_name, " ", fg: RED, m: bold)
 
       case ex
       when AssertionFailure
         path = BacktracePrinter.simplify_path(ex.file)[1]
-        write(path, ":", ex.line, fg: :light_gray, m: bold)
+        write(path, ":", ex.line, fg: LIGHT_GRAY, m: bold)
         br
         writeln(ex.message)
       when UnexpectedError
         path = BacktracePrinter.simplify_path(test.filename)[1]
-        write(path, ":", test.line_number, fg: :light_gray, m: bold)
+        write(path, ":", test.line_number, fg: LIGHT_GRAY, m: bold)
         br
         writeln(exception_to_string(ex.exception, test.method_name))
       else Microtest.bug("Invalid Exception")

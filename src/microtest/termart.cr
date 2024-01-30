@@ -1,6 +1,19 @@
 require "colorize"
 
 module Microtest
+  alias RGB = Colorize::ColorRGB
+
+  GREEN         = RGB.new(0, 220, 0)
+  RED           = RGB.new(220, 0, 0)
+  YELLOW        = RGB.new(220, 220, 0)
+  WHITE         = RGB.new(255, 255, 255)
+  DARK_GRAY     = RGB.new(100, 100, 100)
+  LIGHT_GRAY    = RGB.new(200, 200, 200)
+  MAGENTA       = RGB.new(205, 0, 205)
+  LIGHT_MAGENTA = RGB.new(220, 0, 220)
+  CYAN          = RGB.new(0, 205, 205)
+  LIGHT_BLUE    = RGB.new(90, 90, 250)
+
   class Termart
     def self.string(colorize : Bool) : String
       String.build do |io|
@@ -21,7 +34,7 @@ module Microtest
     def initialize(@io, @colorize : Bool = true)
     end
 
-    private def colorized_io(fg : Symbol? = nil, bg : Symbol? = nil, m : Colorize::Mode? = nil)
+    private def colorized_io(fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil)
       if colorize?
         c = Colorize.with
         c = c.fore(fg) if fg
@@ -36,7 +49,7 @@ module Microtest
       end
     end
 
-    def w(*strs : String | Int32 | Nil, fg : Symbol? = nil, bg : Symbol? = nil, m : Colorize::Mode? = nil)
+    def w(*strs : String | Int32 | Nil, fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil)
       colorized_io(fg, bg, m) do |cio|
         strs.each { |s| cio << s }
       end
@@ -55,7 +68,7 @@ module Microtest
       io.flush
     end
 
-    def grouped_lines(lines : Array(String), bar_color : Symbol? = nil)
+    def grouped_lines(lines : Array(String), bar_color : RGB? = nil)
       if lines.size == 1
         w("◆", fg: bar_color)
         w(" ", lines.shift, "\n")

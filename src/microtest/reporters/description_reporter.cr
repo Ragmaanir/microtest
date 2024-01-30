@@ -8,7 +8,7 @@ module Microtest
 
     def suite_started(ctx : ExecutionContext, cls : String)
       br
-      writeln(cls, fg: :magenta, m: Colorize::Mode::Underline)
+      writeln(cls, fg: MAGENTA, m: Colorize::Mode::Underline)
     end
 
     def report(result : TestResult)

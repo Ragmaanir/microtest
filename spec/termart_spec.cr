@@ -9,11 +9,11 @@ describe Microtest::Termart do
   end
 
   test "grouped_lines without color" do
-    res = grouped_lines(["A: aaa"], :red)
+    res = grouped_lines(["A: aaa"], RED)
 
     assert res == %{◆ A: aaa\n}
 
-    res = grouped_lines(["A: aaa", "B: bbb", "C: ccc"], :white)
+    res = grouped_lines(["A: aaa", "B: bbb", "C: ccc"], WHITE)
 
     assert res == <<-STR
     ┏ A: aaa
@@ -23,16 +23,16 @@ describe Microtest::Termart do
   end
 
   test "grouped_lines with color" do
-    res = grouped_lines(["A: aaa"], :red, colorize: true)
+    res = grouped_lines(["A: aaa"], RED, colorize: true)
 
-    assert res == %{\e[31m◆\e[0m A: aaa\n}
+    assert res == %{\e[38;2;220;0;0m◆\e[0m A: aaa\n}
 
-    res = grouped_lines(["A: aaa", "B: bbb", "C: ccc"], :red, colorize: true)
+    res = grouped_lines(["A: aaa", "B: bbb", "C: ccc"], RED, colorize: true)
 
     assert res == <<-STR
-    \e[31m┏\e[0m A: aaa
-    \e[31m┃\e[0m B: bbb
-    \e[31m┗\e[0m C: ccc\n
+    \e[38;2;220;0;0m┏\e[0m A: aaa
+    \e[38;2;220;0;0m┃\e[0m B: bbb
+    \e[38;2;220;0;0m┗\e[0m C: ccc\n
     STR
   end
 end

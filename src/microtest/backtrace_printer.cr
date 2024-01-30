@@ -63,28 +63,28 @@ module Microtest
         Termart.string(colorize) { |t|
           t.w(entry.path, fg: BACKTRACE_KIND_COLORS[entry.kind])
 
-          t.w(":", entry.line.to_s, " ", fg: :dark_gray)
+          t.w(":", entry.line.to_s, " ", fg: DARK_GRAY)
 
           m = Colorize::Mode::None
           m = Colorize::Mode::Bold if highlight && entry.func.includes?(highlight)
 
           case entry.kind
-          when :app, :spec then t.w(entry.func, fg: :yellow, m: m)
-          else                  t.w(entry.func, fg: :dark_gray, m: m)
+          when :app, :spec then t.w(entry.func, fg: YELLOW, m: m)
+          else                  t.w(entry.func, fg: DARK_GRAY, m: m)
           end
         }
       end
 
-      Termart.string(colorize) { |t| t.grouped_lines(list, :dark_gray) }
+      Termart.string(colorize) { |t| t.grouped_lines(list, DARK_GRAY) }
     end
 
     BACKTRACE_KIND_COLORS = {
-      :app     => :light_magenta,
-      :spec    => :light_magenta,
-      :eval    => :dark_gray,
-      :crystal => :dark_gray,
-      :lib     => :magenta,
-      :unknown => :cyan,
+      :app     => LIGHT_MAGENTA,
+      :spec    => LIGHT_MAGENTA,
+      :eval    => DARK_GRAY,
+      :crystal => DARK_GRAY,
+      :lib     => MAGENTA,
+      :unknown => CYAN,
     }
 
     def simplify(backtrace : Array(String)) : Array(Entry)

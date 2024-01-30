@@ -1,9 +1,9 @@
 module Microtest
   abstract class TerminalReporter < Reporter
     alias ResultSymbols = {success: String, failure: String, skip: String, abortion: String}
-    alias ResultColors = {success: Symbol, failure: Symbol, skip: Symbol, abortion: Symbol}
+    alias ResultColors = {success: RGB, failure: RGB, skip: RGB, abortion: RGB}
 
-    DEFAULT_COLORS = {success: :green, failure: :red, skip: :yellow, abortion: :yellow}
+    DEFAULT_COLORS = {success: GREEN, failure: RED, skip: YELLOW, abortion: YELLOW}
 
     DOT   = "•" # Bullet "\u2022"
     TICK  = "✓" # Check Mark "\u2713"
@@ -41,7 +41,7 @@ module Microtest
       result : TestResult,
       symbols : ResultSymbols = TICKS,
       colors : ResultColors = DEFAULT_COLORS
-    ) : Tuple(String, Symbol)
+    ) : Tuple(String, RGB)
       {
         symbols[result.kind],
         colors[result.kind],

@@ -5,7 +5,7 @@ include Microtest::DSL
 include Helpers
 
 SPEC_ROOT   = __DIR__
-COLOR_REGEX = %r{\e\[\d\d?(;\d)?m}
+COLOR_REGEX = %r{\e\[\d\d?(;\d+)*m}
 
 def uncolor(str)
   str.gsub(COLOR_REGEX, "")

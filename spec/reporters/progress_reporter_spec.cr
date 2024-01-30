@@ -27,10 +27,10 @@ describe Microtest::ProgressReporter do
     dot = Microtest::TerminalReporter::DOTS[:success]
 
     assert result.stdout == [
-      dot.colorize(:green),
-      dot.colorize(:red),
-      dot.colorize(:yellow),
-      dot.colorize(:red),
+      dot.colorize(GREEN),
+      dot.colorize(RED),
+      dot.colorize(YELLOW),
+      dot.colorize(RED),
       "\n\n",
     ].join
   end
@@ -52,6 +52,6 @@ describe Microtest::ProgressReporter do
 
     bang = Microtest::TerminalReporter::DOTS[:abortion]
 
-    assert result.stdout.includes?(bang.colorize(:yellow).to_s)
+    assert result.stdout.includes?(bang.colorize(YELLOW).to_s)
   end
 end
