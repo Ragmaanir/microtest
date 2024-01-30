@@ -23,11 +23,11 @@ module Microtest
     end
 
     macro pending(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
-      test({{name}}, {{*(args + [:skip])}}, {{**options}}) {{block}}
+      test({{name}}, {{(args + [:skip]).splat}}, {{options.double_splat}}) {{block}}
     end
 
     macro test!(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
-      test({{name}}, {{*(args + [:focus])}}, {{**options}}) {{block}}
+      test({{name}}, {{(args + [:focus]).splat}}, {{options.double_splat}}) {{block}}
     end
 
     macro test(name = nil, *args, __filename = __FILE__, __line_number = __LINE__, **options, &block)
