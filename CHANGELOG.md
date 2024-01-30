@@ -5,6 +5,8 @@
 - Changed dark blue in reporter to light blue
 - Highlight errors headline in error list reporter
 - Highlight test method in backtraces
+- Use Colorize::ColorRGB for better colors
+- Fix deprecated `splat/double_splat`
 
 ### 1.2.6
 

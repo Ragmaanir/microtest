@@ -8,38 +8,38 @@
 </head>
 <body style="color:white; background-color:black">
 <pre>
-<span style="color:lime;">•</span><span style="color:yellow;">•</span><span style="color:red;">•</span><span style="color:red;">•</span>
+<span style="color:#00dc00;">•</span><span style="color:#dcdc00;">•</span><span style="color:#dc0000;">•</span><span style="color:#dc0000;">•</span>
 
-<span style="color:yellow;">skip_this: not implemented</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> in SPEC: spec/test.cr:5</span>
+<span style="color:#dcdc00;">skip_this: not implemented</span><span style="color:#646464;"> in SPEC: spec/test.cr:5</span>
 
-<span style="color:red;"># 1  SecondTest#first_failure </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">SPEC: spec/test.cr:5</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┏</span> <span style="color:red;">assert</span> <span style="font-weight:bold;color:red;">a == (b * 2)</span>
-<span style="filter: contrast(70%) brightness(190%);color:red;">┗</span> 5<span style="filter: contrast(70%) brightness(190%);color:dimgray;"> == </span>14
+<span style="font-weight:bold;color:#dc0000;"># 1  SecondTest#first_failure </span><span style="font-weight:bold;color:#c8c8c8;">SPEC: spec/test.cr:5</span>
+<span style="color:#c83232;">┏</span> <span style="color:#c80000;">assert</span> <span style="font-weight:bold;color:#fa5050;">a == (b * 2)</span>
+<span style="color:#c83232;">┗</span> 5<span style="color:#646464;"> == </span>14
 
 
-<span style="color:red;"># 2  SecondTest#error </span>
+<span style="font-weight:bold;color:#dc0000;"># 2  SecondTest#error </span><span style="font-weight:bold;color:#c8c8c8;">SPEC: spec/test.cr:5</span>
 <span style="color:red;">Oh, this is wrong</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┏</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:141 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:115 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:dimgray;">CRY: /crystal/main.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:129 </span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">main_user_code</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:7 </span><span style="color:yellow;">__crystal_main</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:109 </span><span style="color:yellow;">run!</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:98 </span><span style="color:yellow;">run</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:100 </span><span style="color:yellow;">run</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/runner.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:26 </span><span style="color:yellow;">call</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:37 </span><span style="color:yellow;">run_tests</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test_method.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:27 </span><span style="color:yellow;">call</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">-&gt;</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:52 </span><span style="color:yellow;">run_test</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:83 </span><span style="color:yellow;">around_hooks</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">APP: src/microtest/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:56 </span><span style="color:yellow;">-&gt;</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">-&gt;</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┃</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">test__error</span>
-<span style="filter: contrast(70%) brightness(190%);color:dimgray;">┗</span> <span style="filter: contrast(70%) brightness(190%);color:fuchsia;">SPEC: spec/test.cr</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">:5 </span><span style="color:yellow;">raise_an_error</span>
+<span style="color:#646464;">┏</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:141 </span><span style="color:#646464;">main</span>
+<span style="color:#646464;">┃</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:115 </span><span style="color:#646464;">main</span>
+<span style="color:#646464;">┃</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:129 </span><span style="color:#646464;">main_user_code</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:7 </span><span style="color:#dcdc00;">__crystal_main</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:108 </span><span style="color:#dcdc00;">run!</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:97 </span><span style="color:#dcdc00;">run</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:99 </span><span style="color:#dcdc00;">run</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/runner.cr</span><span style="color:#646464;">:26 </span><span style="color:#dcdc00;">call</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test.cr</span><span style="color:#646464;">:37 </span><span style="color:#dcdc00;">run_tests</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test_method.cr</span><span style="color:#646464;">:29 </span><span style="color:#dcdc00;">call</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:5 </span><span style="color:#dcdc00;">-&gt;</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test.cr</span><span style="color:#646464;">:52 </span><span style="color:#dcdc00;">run_test</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test.cr</span><span style="color:#646464;">:83 </span><span style="color:#dcdc00;">around_hooks</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test.cr</span><span style="color:#646464;">:56 </span><span style="color:#dcdc00;">-&gt;</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:5 </span><span style="color:#dcdc00;">-&gt;</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:5 </span><span style="font-weight:bold;color:#dcdc00;">test__error</span>
+<span style="color:#646464;">┗</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:5 </span><span style="color:#dcdc00;">raise_an_error</span>
 
 
-<span style="color:#3333FF;">Executed</span><span style="color:#3333FF;"> 4/4 </span><span style="color:#3333FF;">tests in 183µs with seed 1</span>
-<span style="color:lime;">Success: 1</span>, <span style="color:yellow;">Skips: 1</span>, <span style="color:red;">Failures: 2</span>
+<span style="color:#5a5afa;">Executed</span><span style="color:#5a5afa;"> 4/4 </span><span style="color:#5a5afa;">tests in 209µs with seed 1</span>
+<span style="color:#00dc00;">Success: 1</span>, <span style="color:#dcdc00;">Skips: 1</span>, <span style="color:#dc0000;">Failures: 2</span>
 
 
 </pre>

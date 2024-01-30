@@ -71,7 +71,7 @@ class ReleaseCommand
     run("git", ["push", "gh", version_name])
   end
 
-  def self.confirm(msg : String)
+  def confirm(msg : String)
     print "❓ #{msg} [y/n/yes/no]: "
 
     while a = gets.not_nil!.strip.downcase

@@ -1,7 +1,5 @@
 require "json"
 
-require "./formatter"
-
 module Microtest
   class JsonSummaryReporter < Reporter
     def report(result : TestResult)
