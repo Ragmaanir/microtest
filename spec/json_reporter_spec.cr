@@ -7,7 +7,7 @@ describe Microtest::JsonSummaryReporter do
     result = record_test_json(seed) do
       describe Summary do
         test "some test" do
-          sleep 0.01
+          sleep 1.millisecond
           assert true
         end
       end
