@@ -11,7 +11,7 @@ describe Microtest::PowerAssert do
     n + 1000
   end
 
-  def yielding(n : Int32)
+  def yielding(n : Int32, &)
     yield(n + 2000)
   end
 

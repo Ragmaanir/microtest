@@ -12,7 +12,33 @@ else
   raise "Commands are 'readme' or 'release'"
 end
 
-class GenerateReadmeCommand
+abstract class Command
+  def confirm(msg : String)
+    print "❓ #{msg} [y/n/yes/no]: "
+
+    while a = gets.not_nil!.strip.downcase
+      case a
+      when "y", "yes" then break
+      when "n", "no"  then exit
+      end
+    end
+  end
+
+  def run(cmd, args = [] of String, msg = "Command failed: #{cmd} #{args.join(" ")}")
+    puts "Running: #{cmd} #{args.join(" ")}"
+
+    s = Process.run(
+      cmd,
+      args,
+      output: Process::Redirect::Inherit,
+      error: Process::Redirect::Inherit
+    )
+
+    abort(msg) unless s.success?
+  end
+end
+
+class GenerateReadmeCommand < Command
   class Readme
     def image(asset_name : String)
       generate_image_from_html(asset_name)
@@ -39,6 +65,9 @@ class GenerateReadmeCommand
 
     Helpers.build_docker_image
 
+    puts "🔬 Running crystal tool format --check"
+    run("crystal", ["tool", "format", "--check"])
+
     puts "🔬 Running tests"
     Helpers.run_and_record_specs
 
@@ -47,7 +76,7 @@ class GenerateReadmeCommand
   end
 end
 
-class ReleaseCommand
+class ReleaseCommand < Command
   def call
     run("crystal", ["spec"])
 
@@ -69,29 +98,5 @@ class ReleaseCommand
     run("git", ["tag", version_name])
     run("git", ["push"])
     run("git", ["push", "gh", version_name])
-  end
-
-  def confirm(msg : String)
-    print "❓ #{msg} [y/n/yes/no]: "
-
-    while a = gets.not_nil!.strip.downcase
-      case a
-      when "y", "yes" then break
-      when "n", "no"  then exit
-      end
-    end
-  end
-
-  def run(cmd, args = [] of String, msg = "Command failed: #{cmd} #{args.join(" ")}")
-    puts "Running: #{cmd} #{args.join(" ")}"
-
-    s = Process.run(
-      cmd,
-      args,
-      output: Process::Redirect::Inherit,
-      error: Process::Redirect::Inherit
-    )
-
-    abort(msg) unless s.success?
   end
 end

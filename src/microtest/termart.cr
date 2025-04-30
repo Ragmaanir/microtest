@@ -15,14 +15,14 @@ module Microtest
   LIGHT_BLUE    = RGB.new(90, 90, 250)
 
   class Termart
-    def self.string(colorize : Bool) : String
+    def self.string(colorize : Bool, &) : String
       String.build do |io|
         t = new(io, colorize)
         yield t
       end
     end
 
-    def self.io(io : IO, colorize : Bool)
+    def self.io(io : IO, colorize : Bool, &)
       t = new(io, colorize)
       yield t
       nil
@@ -34,7 +34,7 @@ module Microtest
     def initialize(@io, @colorize : Bool = true)
     end
 
-    private def colorized_io(fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil)
+    private def colorized_io(fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil, &)
       if colorize?
         c = Colorize.with
         c = c.fore(fg) if fg

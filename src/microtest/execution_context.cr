@@ -70,7 +70,7 @@ module Microtest
       reporters.each(&.finished(self))
     end
 
-    def test_suite(name : String)
+    def test_suite(name : String, &)
       reporters.each(&.suite_started(self, name))
       yield
       reporters.each(&.suite_finished(self, name))

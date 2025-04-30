@@ -40,7 +40,7 @@ module Microtest
     private def result_style(
       result : TestResult,
       symbols : ResultSymbols = TICKS,
-      colors : ResultColors = DEFAULT_COLORS
+      colors : ResultColors = DEFAULT_COLORS,
     ) : Tuple(String, RGB)
       {
         symbols[result.kind],

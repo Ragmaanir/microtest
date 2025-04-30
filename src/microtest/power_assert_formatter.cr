@@ -28,7 +28,7 @@ module Microtest
         end
       end
 
-      private def build_string : String
+      private def build_string(&) : String
         Termart.string(colorize?) { |t| yield t }
       end
 
