@@ -1,15 +1,18 @@
 module Microtest
-  def self.find_crystal_root_path
+  def self.find_crystal_root_path : String
     # find the backtrace entry for crystals main method
     first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || Microtest.bug("Could not determine crystal path from caller backtrace")
 
-    path = first_entry.split(":").first
+    raw_path = Path.new(first_entry.split(":").first)
 
-    # move up from:
-    #   "?/crystal-1.0.0/share/crystal/src/crystal/main.cr"
-    # to:
-    #   "?/crystal-1.0.0/share/crystal/src"
-    File.expand_path(File.join(path, "..", ".."))
+    parts = raw_path.parts
+
+    # Move up from /???/crystal-1.16.0-1/share/crystal/src/crystal/system/unix/main.cr
+    while parts.last != "src"
+      parts.pop
+    end
+
+    Path.new(parts).to_s
   end
 
   CRYSTAL_DIR      = find_crystal_root_path

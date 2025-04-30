@@ -64,7 +64,7 @@ module Microtest
   MEHTOD_SEPARATOR = "#"
 
   def self.bug(msg : String)
-    abort("MICROTEST BUG: #{msg}".colorize(:red))
+    raise "MICROTEST BUG: #{msg}"
   end
 
   def self.power_assert_formatter
@@ -75,15 +75,14 @@ module Microtest
     ENV.fetch("SEED", Random.new.next_u.to_s).to_u32
   end
 
-  COMMON_REPORTERS  = [ErrorListReporter.new, SlowTestsReporter.new, SummaryReporter.new] of Reporter
-  DEFAULT_REPORTERS = [ProgressReporter.new] + COMMON_REPORTERS
+  COMMON_REPORTERS = [ErrorListReporter.new, SlowTestsReporter.new, SummaryReporter.new] of Reporter
 
-  def self.reporter_types(reporting : Symbol = :progress)
+  def self.reporter_types(reporting : Symbol)
     case reporting
     when :descriptions, :description
       [Microtest::DescriptionReporter.new] + COMMON_REPORTERS
     when :progress
-      DEFAULT_REPORTERS
+      [ProgressReporter.new] + COMMON_REPORTERS
     else
       raise "Invalid reporting type: #{reporting}"
     end
