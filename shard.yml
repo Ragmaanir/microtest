@@ -1,6 +1,6 @@
 name: microtest
-version: 1.2.7
-crystal: '>= 1.4.0'
+version: 1.2.8
+crystal: '>= 1.16.0'
 license: MIT
 
 authors:
@@ -9,4 +9,4 @@ authors:
 development_dependencies:
   ameba:
     github: veelenga/ameba
-    version: ~> 1.0
+    version: ~> 1.6

@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.8
+
+- Minor line number fix for crystal 1.16.0
+- Backtrace fix for crystal 1.16.0
+
 ### 1.2.7
 
 - Changed dark blue in reporter to light blue

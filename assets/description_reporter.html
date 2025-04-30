@@ -10,11 +10,11 @@
 <pre>
 
 <span style="text-decoration:underline;color:#cd00cd;">FirstTest</span>
- <span style="color:#00dc00;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> 202 ns</span> <span style="color:#00dc00;">success</span>
- <span style="color:#dcdc00;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  19 µs</span> <span style="color:#dcdc00;">skip this</span>
+ <span style="color:#00dc00;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;"> 261 ns</span> <span style="color:#00dc00;">success</span>
+ <span style="color:#dcdc00;">✓</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  20 µs</span> <span style="color:#dcdc00;">skip this</span>
 
 <span style="text-decoration:underline;color:#cd00cd;">SecondTest</span>
- <span style="color:#dc0000;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  20 µs</span> <span style="color:#dc0000;">first failure</span>
+ <span style="color:#dc0000;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">  17 µs</span> <span style="color:#dc0000;">first failure</span>
  <span style="color:#dc0000;">✕</span><span style="filter: contrast(70%) brightness(190%);color:dimgray;">   7 µs</span> <span style="color:#dc0000;">error</span>
 
 <span style="color:#dcdc00;">skip_this: not implemented</span><span style="color:#646464;"> in SPEC: spec/test.cr:5</span>
@@ -26,12 +26,13 @@
 
 <span style="font-weight:bold;color:#dc0000;"># 2  SecondTest#error </span><span style="font-weight:bold;color:#c8c8c8;">SPEC: spec/test.cr:5</span>
 <span style="color:red;">Oh, this is wrong</span>
-<span style="color:#646464;">┏</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:141 </span><span style="color:#646464;">main</span>
+<span style="color:#646464;">┏</span> <span style="color:#646464;">CRY: /crystal/system/unix/main.cr</span><span style="color:#646464;">:9 </span><span style="color:#646464;">main</span>
 <span style="color:#646464;">┃</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:115 </span><span style="color:#646464;">main</span>
 <span style="color:#646464;">┃</span> <span style="color:#646464;">CRY: /crystal/main.cr</span><span style="color:#646464;">:129 </span><span style="color:#646464;">main_user_code</span>
-<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:108 </span><span style="color:#dcdc00;">run!</span>
-<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:97 </span><span style="color:#dcdc00;">run</span>
-<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:99 </span><span style="color:#dcdc00;">run</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:7 </span><span style="color:#dcdc00;">__crystal_main</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:107 </span><span style="color:#dcdc00;">run!</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:96 </span><span style="color:#dcdc00;">run</span>
+<span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest.cr</span><span style="color:#646464;">:98 </span><span style="color:#dcdc00;">run</span>
 <span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/runner.cr</span><span style="color:#646464;">:26 </span><span style="color:#dcdc00;">call</span>
 <span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test.cr</span><span style="color:#646464;">:37 </span><span style="color:#dcdc00;">run_tests</span>
 <span style="color:#646464;">┃</span> <span style="color:#dc00dc;">APP: src/microtest/test_method.cr</span><span style="color:#646464;">:29 </span><span style="color:#dcdc00;">call</span>
@@ -44,7 +45,7 @@
 <span style="color:#646464;">┗</span> <span style="color:#dc00dc;">SPEC: spec/test.cr</span><span style="color:#646464;">:5 </span><span style="color:#dcdc00;">raise_an_error</span>
 
 
-<span style="color:#5a5afa;">Executed</span><span style="color:#5a5afa;"> 4/4 </span><span style="color:#5a5afa;">tests in 200µs with seed 1</span>
+<span style="color:#5a5afa;">Executed</span><span style="color:#5a5afa;"> 4/4 </span><span style="color:#5a5afa;">tests in 177µs with seed 1</span>
 <span style="color:#00dc00;">Success: 1</span>, <span style="color:#dcdc00;">Skips: 1</span>, <span style="color:#dc0000;">Failures: 2</span>
 
 
