@@ -49,6 +49,6 @@ describe Microtest::ErrorListReporter do
     output = uncolor(result.stdout)
 
     assert output.matches?(/ABORTED/)
-    assert output.matches?(%r{┗ SPEC: spec/test.cr:\d+ before_hooks})
+    assert output.matches?(%r{┗ SPEC: spec[/\\]test.cr:\d+ before_hooks})
   end
 end

@@ -21,7 +21,7 @@ describe Microtest::SummaryReporter do
     assert !result.success?
 
     output = uncolor(result.stdout)
-    assert output.matches?(%r{Executed 3/3 tests in \d+µs with seed 1})
+    assert output.matches?(%r{Executed 3/3 tests in \d+[µm]s with seed 1})
     assert output.includes?("Success: 1, Skips: 1, Failures: 1")
   end
 
