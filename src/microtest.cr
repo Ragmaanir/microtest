@@ -105,6 +105,6 @@ module Microtest
 
   def self.run!(*args)
     success = run(*args)
-    exit(success ? 0 : -1)
+    exit(success ? 0 : 1)
   end
 end
