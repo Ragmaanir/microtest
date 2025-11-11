@@ -3,7 +3,7 @@ require "./spec_helper"
 describe WaterPumpExample do
   test "waterpump example" do
     res = record_test_json do
-      {{`cat spec/examples/waterpump.cr`}}
+      {{ read_file("#{__DIR__}/examples/waterpump.cr").id }}
     end
 
     assert res.json["results"].as_h.keys.sort! == [
@@ -23,7 +23,7 @@ end
 describe AssertionFailureExample do
   test "assertion failure example" do
     res = record_test([Microtest::ErrorListReporter.new]) do
-      {{`cat spec/examples/assertion_failure.cr`}}
+      {{ read_file("#{__DIR__}/examples/assertion_failure.cr").id }}
     end
 
     assert !res.success?
@@ -35,7 +35,7 @@ end
 describe SummaryAndProgressRepoterExample do
   test "image" do
     res = record_test([Microtest::ProgressReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
-      {{`cat spec/examples/multiple_tests.cr`}}
+      {{ read_file("#{__DIR__}/examples/multiple_tests.cr").id }}
     end
 
     assert !res.success?
@@ -46,7 +46,7 @@ end
 describe SummaryAndDescriptionRepoterExample do
   test "image" do
     res = record_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
-      {{`cat spec/examples/multiple_tests.cr`}}
+      {{ read_file("#{__DIR__}/examples/multiple_tests.cr").id }}
     end
 
     assert !res.success?
@@ -57,7 +57,7 @@ end
 describe FocusExample do
   test "image" do
     res = record_test([Microtest::DescriptionReporter.new, Microtest::ErrorListReporter.new, Microtest::SummaryReporter.new]) do
-      {{`cat spec/examples/focus.cr`}}
+      {{ read_file("#{__DIR__}/examples/focus.cr").id }}
     end
 
     assert res.success?

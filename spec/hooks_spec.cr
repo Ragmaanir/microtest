@@ -3,7 +3,7 @@ require "./spec_helper"
 describe MicrotestHooks do
   test "before and after hook" do
     result = record_test_json do
-      {{`cat spec/hook_examples/before_and_after_hooks.cr`}}
+      {{ read_file("#{__DIR__}/hook_examples/before_and_after_hooks.cr").id }}
     end
 
     assert result.success?
@@ -78,7 +78,7 @@ describe MicrotestHooks do
 
   test "around hook" do
     result = record_test_json do
-      {{`cat spec/hook_examples/around_hook.cr`}}
+      {{ read_file("#{__DIR__}/hook_examples/around_hook.cr").id }}
     end
 
     assert result.json["results"]["AroundHookTest#first"]["type"] == "Microtest::TestSuccess"
@@ -90,7 +90,7 @@ describe MicrotestHooks do
     # and crystal would interpret the yield as belonging to the test method, which makes
     # it fail to compile because that parameter would be missing.
     result = record_test do
-      {{`cat spec/hook_examples/hook_order.cr`}}
+      {{ read_file("#{__DIR__}/hook_examples/hook_order.cr").id }}
     end
 
     assert result.success?
