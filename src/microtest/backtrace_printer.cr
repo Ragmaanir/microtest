@@ -3,9 +3,15 @@ module Microtest
     # find the backtrace entry for crystals main method
     first_entry = caller.reverse.find { |l| %r{in 'main'} === l } || Microtest.bug("Could not determine crystal path from caller backtrace")
 
-    raw_path = Path.new(first_entry.split(":").first)
+    # file:line:column in 'symbol'
+    # (backtraces on MSVC do not have column numbers)
+    raw_path, _, _ = first_entry.partition(" in '")
+    raw_path, _, _ = raw_path.rpartition(":")
+    {% unless flag?(:msvc) %}
+      raw_path, _, _ = raw_path.rpartition(":")
+    {% end %}
 
-    parts = raw_path.parts
+    parts = Path.new(raw_path).parts
 
     # Move up from /???/crystal-1.16.0-1/share/crystal/src/crystal/system/unix/main.cr
     while parts.last != "src"
