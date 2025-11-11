@@ -49,7 +49,7 @@ describe Microtest::PowerAssert do
 
     assert reflect(yielding(1) { |x| x }) == CallNode.new(
       %[yielding],
-      %[yielding(1) do |x|\n  x\nend],
+      %[yielding(1) do |x| x end],
       2001,
       EmptyNode.new,
       [TerminalNode.new("1", 1)] of Node,
