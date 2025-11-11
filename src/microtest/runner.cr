@@ -16,10 +16,10 @@ module Microtest
       ctx = ExecutionContext.new(reporters, suites, random_seed)
       ctx.started
 
-      Signal::INT.trap {
+      Process.on_terminate do |reason|
         ctx.manually_abort!
-        Signal::INT.reset
-      }
+        Process.restore_interrupts!
+      end
 
       suites.shuffle(ctx.random).each do |suite|
         break if ctx.halted?
