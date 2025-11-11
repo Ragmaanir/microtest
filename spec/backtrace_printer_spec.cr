@@ -40,6 +40,11 @@ describe Microtest::BacktracePrinter do
     ???
     BACKTRACE
 
+    # backtraces on MSVC do not have column numbers
+    {% if flag?(:msvc) %}
+      raw_trace.map! &.sub(/:\d+ in/, " in")
+    {% end %}
+
     printer = Microtest::BacktracePrinter.new
 
     pretty_trace = printer.call(raw_trace, colorize: false)
