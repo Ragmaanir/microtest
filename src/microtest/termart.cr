@@ -36,7 +36,7 @@ module Microtest
 
     private def colorized_io(fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil, &)
       if colorize?
-        c = Colorize.with
+        c = Colorize.with.toggle(true)
         c = c.fore(fg) if fg
         c = c.mode(m) if m
         c = c.back(bg) if bg
