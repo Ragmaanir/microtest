@@ -25,14 +25,14 @@ describe Microtest::Termart do
   test "grouped_lines with color" do
     res = grouped_lines(["A: aaa"], RED, colorize: true)
 
-    assert res == %{\e[38;2;220;0;0m◆\e[0m A: aaa\n}
+    assert res == %{\e[38;2;220;0;0m◆\e[39m A: aaa\n}
 
     res = grouped_lines(["A: aaa", "B: bbb", "C: ccc"], RED, colorize: true)
 
     assert res == <<-STR
-    \e[38;2;220;0;0m┏\e[0m A: aaa
-    \e[38;2;220;0;0m┃\e[0m B: bbb
-    \e[38;2;220;0;0m┗\e[0m C: ccc\n
+    \e[38;2;220;0;0m┏\e[39m A: aaa
+    \e[38;2;220;0;0m┃\e[39m B: bbb
+    \e[38;2;220;0;0m┗\e[39m C: ccc\n
     STR
   end
 end
