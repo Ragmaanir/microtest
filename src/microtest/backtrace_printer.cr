@@ -28,7 +28,13 @@ module Microtest
   PROJECT_SPEC_DIR = File.join(PROJECT_DIR, "spec")
 
   # e.g.: "spec/spec_helper.cr:64:1 in '__crystal_main'"
-  BACKTRACE_LINE_REGEX = /\A(.+):(\d+):(\d+) in \'(\S+)\'\z/
+  # (backtraces on MSVC do not have column numbers)
+  BACKTRACE_LINE_REGEX =
+    {% if flag?(:msvc) %}
+      /\A(?<file>.+):(?<line>\d+) in \'(?<func>\S+)\'\z/
+    {% else %}
+      /\A(?<file>.+):(?<line>\d+):(?<column>\d+) in \'(?<func>\S+)\'\z/
+    {% end %}
 
   class BacktracePrinter
     record(Entry, kind : Symbol, path : String, line : Int32, func : String)
@@ -101,10 +107,10 @@ module Microtest
 
       backtrace.each do |l|
         if m = BACKTRACE_LINE_REGEX.match(l)
-          file = m[1]
-          line = m[2].to_i
-          # column = m[3]
-          func = m[4]
+          file = m["file"]
+          line = m["line"].to_i
+          # column = m["column"]
+          func = m["func"]
 
           entries << Entry.new(
             *self.class.simplify_path(File.expand_path(file)),
