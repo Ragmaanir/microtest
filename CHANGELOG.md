@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.2.9
+
+- Crystal 1.18
+- Fix miscellaneous spec failures for Crystal 1.18 (#3, Thanks @HertzDevil)
+- Support Windows MSVC / MinGW-w64 (#4, Thanks @HertzDevil)
+
 ### 1.2.8
 
 - Minor line number fix for crystal 1.16.0

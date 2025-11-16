@@ -84,9 +84,11 @@ class ReleaseCommand < Command
     # run("./bin/ameba")
     run("./cli", ["readme"])
     run("git", ["add", "README.md"])
+    run("git", ["add", "shard.yml"])
+    run("git", ["add", "CHANGELOG.md"])
     run("git", ["add", "-A", "./assets"])
 
-    confirm("Did you update CHANGLEOG.md?")
+    confirm("Did you update CHANGELOG.md?")
 
     run("git", ["status"])
     confirm("Does commit look ok?")
