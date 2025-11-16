@@ -1,6 +1,10 @@
 require "../spec_helper"
 
 describe Microtest::ProgressReporter do
+  def force_colorize(s : String, c : Colorize::ColorRGB)
+    s.colorize(c).toggle(true)
+  end
+
   test "progress reporter" do
     result = record_test([Microtest::ProgressReporter.new]) do
       describe Microtest do
@@ -27,10 +31,10 @@ describe Microtest::ProgressReporter do
     dot = Microtest::TerminalReporter::DOTS[:success]
 
     assert result.stdout == [
-      dot.colorize(GREEN),
-      dot.colorize(RED),
-      dot.colorize(YELLOW),
-      dot.colorize(RED),
+      force_colorize(dot, GREEN),
+      force_colorize(dot, RED),
+      force_colorize(dot, YELLOW),
+      force_colorize(dot, RED),
       "\n\n",
     ].join
   end
