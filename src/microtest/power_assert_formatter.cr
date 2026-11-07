@@ -45,29 +45,38 @@ module Microtest
         }
       end
 
+      # The one place the formatter reads a value, so the compiler dispatches
+      # over every wrapped type at a single call site.
+      private def facts(n : Node) : Facts
+        wrapper_facts(n.wrapper)
+      end
+
+      private def wrapper_facts(wrapper : Value) : Facts
+        wrapper.facts
+      end
+
       private def simplify_value(n : Node, max_length = 64) : String
-        v = n.wrapper.value
-        if v.is_a?(Array) && v.size > 1
+        items = facts(n).items
+        if items && items.size > 1
           String.build do |io|
             s = 0
             io << "["
-            io << v.map(&.inspect).take_while { |str|
+            io << items.take_while { |str|
               s += str.size + 2
               s < max_length
             }.join(", ")
             io << "]"
           end
         else
-          n.wrapper.inspect
+          facts(n).inspected
         end
       end
 
       private def literal(node : TerminalNode) : String
-        v = node.wrapper.value
         simpler_exp = simplify_value(node)
 
         simplified = simpler_exp != node.expression
-        is_complex_result = ![true, false].includes?(v)
+        is_complex_result = !facts(node).boolean
         nest = simplified && is_complex_result
 
         lines = [] of String
@@ -80,7 +89,7 @@ module Microtest
       end
 
       private def call_only(node : CallNode) : String
-        rv = node.receiver.wrapper.value
+        rv = facts(node.receiver).truthy
         rstr = simplify_value(node.receiver)
 
         simpler_exp = String.build do |s|
@@ -99,7 +108,7 @@ module Microtest
 
           if !node.arguments.empty?
             s << "(" if !node.operator?
-            s << node.arguments.join(", ", &.wrapper.inspect)
+            s << node.arguments.join(", ") { |arg| facts(arg).inspected }
             s << ")" if !node.operator?
           end
         end
@@ -110,7 +119,8 @@ module Microtest
 
         lines << simpler_exp if simpler_exp != node.expression
 
-        lines << node.wrapper.inspect if node.wrapper.value != false
+        node_facts = facts(node)
+        lines << node_facts.inspected if node_facts.not_false
 
         grouped_lines(lines)
       end
@@ -120,8 +130,8 @@ module Microtest
       private def call_compare(node : CallNode) : String
         left, right = node.receiver, node.arguments[0]
 
-        lval = left.wrapper.inspect
-        rval = right.wrapper.inspect
+        lval = facts(left).inspected
+        rval = facts(right).inspected
 
         simpler_exp = String.build do |s|
           s << lval

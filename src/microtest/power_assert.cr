@@ -1,6 +1,20 @@
 module Microtest
   module PowerAssert
+    # What the formatter needs of a value, in types that do not depend on the
+    # value's type. Made only when an assert fails.
+    record Facts,
+      inspected : String,
+      items : Array(String)?,
+      boolean : Bool,
+      truthy : Bool,
+      not_false : Bool
+
+    # The formatter reads a wrapped value only through `facts`, at a single
+    # call site. Reading `value` through `Value` instead would type it as the
+    # union of every type asserted in the program, and every use of it
+    # against that whole union.
     abstract class Value
+      abstract def facts : Facts
     end
 
     # There is no "Object" class in crystal, so we have to use this wrapper
@@ -15,6 +29,17 @@ module Microtest
       # See performance warning in formatter
       def inspect(io)
         value.inspect(io)
+      end
+
+      def facts : Facts
+        v = @value
+        Facts.new(
+          inspected: inspect,
+          items: v.is_a?(Array) ? v.map(&.inspect) : nil,
+          boolean: [true, false].includes?(v),
+          truthy: !!v,
+          not_false: !!(v != false),
+        )
       end
     end
 
