@@ -143,9 +143,12 @@ module Microtest
             # merge all of the tuples into one
             %na = %na.merge({ {{ arg.name }}: %v[:value] })
 
+            # Wrap the argument's value, not its node: inspecting a wrapped node
+            # would reach `Node#wrapper` through `Value`, and type `inspect` for
+            # every type asserted in the program.
             %named_args.push(Microtest::PowerAssert::NamedArgNode.new(
               {{ arg.name.stringify }},
-              %v[:node]
+              %v[:value]
             ))
           {% end %}
         {% end %}

@@ -57,6 +57,21 @@ describe Microtest::PowerAssert do
     )
   end
 
+  def named(*, n : Int32)
+    n + 3000
+  end
+
+  test "reflect_named_argument" do
+    assert reflect(named(n: 1)) == CallNode.new(
+      %[named],
+      %[named(n: 1)],
+      3001,
+      EmptyNode.new,
+      [] of Node,
+      [NamedArgNode.new("n", 1)]
+    )
+  end
+
   def append(a : Array(Int32))
     a << 1
     a
