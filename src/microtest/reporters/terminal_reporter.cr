@@ -18,7 +18,7 @@ module Microtest
 
     def initialize(io : IO = STDOUT)
       super
-      @t = Termart.new(io, true)
+      @t = Termart.new(io)
     end
 
     private def write(*args, **opts)

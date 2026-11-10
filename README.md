@@ -13,6 +13,7 @@ A small testing framework inspired by minitest/minitest.cr.
 - No let-definitions. Only before / after hooks. Use local variables mostly.
 - Tests have to be started explicitly by `Microtest.run!`, no at-exit hook.
 - Colorized and abbreviated exception stacktraces
+- Colored output, turned off by setting `NO_COLOR` to a non-empty value ([no-color.org](https://no-color.org))
 - Randomized test order (SEED can be specified as environment variable)
 - Focus individual tests (`test! "my test" do ...`)
 - Different reportes (progress, descriptions, slow tests)

@@ -71,7 +71,7 @@ module Microtest
       {kind, simple_path}
     end
 
-    def call(backtrace : Array(String), highlight : String? = nil, colorize : Bool = true) : String
+    def call(backtrace : Array(String), highlight : String? = nil, colorize : Bool = Termart.color_default?) : String
       entries = simplify(backtrace)
 
       list = entries.map do |entry|
