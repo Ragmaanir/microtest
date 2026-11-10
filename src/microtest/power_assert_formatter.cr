@@ -13,7 +13,7 @@ module Microtest
 
       getter? colorize
 
-      def initialize(@colorize : Bool = true)
+      def initialize(@colorize : Bool = Termart.color_default?)
       end
 
       def call(node : Node) : String

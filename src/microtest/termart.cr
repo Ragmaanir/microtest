@@ -15,6 +15,12 @@ module Microtest
   LIGHT_BLUE    = RGB.new(90, 90, 250)
 
   class Termart
+    # Whether output is colored when no caller decides: yes, unless `NO_COLOR`
+    # is set to a non-empty value (https://no-color.org).
+    def self.color_default?(no_color : String? = ENV["NO_COLOR"]?) : Bool
+      no_color.nil? || no_color.empty?
+    end
+
     def self.string(colorize : Bool, &) : String
       String.build do |io|
         t = new(io, colorize)
@@ -31,7 +37,7 @@ module Microtest
     getter io : IO
     getter? colorize
 
-    def initialize(@io, @colorize : Bool = true)
+    def initialize(@io, @colorize : Bool = Termart.color_default?)
     end
 
     private def colorized_io(fg : RGB? = nil, bg : RGB? = nil, m : Colorize::Mode? = nil, &)

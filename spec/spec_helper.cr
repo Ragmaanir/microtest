@@ -52,7 +52,10 @@ macro record_test_json(seed = 1, &block)
   end
 end
 
-macro record_test(reporters = [] of Microtest::Reporter, seed = 1, &block)
+# Runs *block* as a test program. The program sees no `NO_COLOR` from the
+# environment, so its colors don't depend on how the specs were started; *env*
+# adds to or overrides that environment.
+macro record_test(reporters = [] of Microtest::Reporter, seed = 1, env = {} of String => String?, &block)
   {%
     c = <<-CRYSTAL
       require "../src/microtest"
@@ -71,7 +74,7 @@ macro record_test(reporters = [] of Microtest::Reporter, seed = 1, &block)
 
   %s = Process.run(
     "crystal", ["run", "--error-trace", "--stdin-filename", "#{SPEC_ROOT}/test.cr"],
-    env: {"SEED" => {{seed}}.to_s},
+    env: {"SEED" => {{seed}}.to_s, "NO_COLOR" => nil}.merge({{env}}),
     input: %input, output: %stdout, error: %stderr
   )
 
