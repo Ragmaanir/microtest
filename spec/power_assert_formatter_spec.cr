@@ -19,6 +19,63 @@ describe Microtest::PowerAssert::ListFormatter do
     x == 0
   end
 
+  class ObservedValue
+    getter inspections = 0
+
+    def ==(other : Bool)
+      raise "unexpected comparison with Bool"
+    end
+
+    def inspect(io : IO)
+      @inspections += 1
+      io << "value"
+    end
+
+    def empty?
+      false
+    end
+  end
+
+  private def reject(value : ObservedValue)
+    false
+  end
+
+  test "comparison only inspects its operands" do
+    a = ObservedValue.new
+    b = ObservedValue.new
+
+    assert_out(a == b, %[┏ assert a == b\n┗ value == value\n])
+    assert a.inspections == 1
+    assert b.inspections == 1
+  end
+
+  test "call only inspects its positional argument" do
+    a = ObservedValue.new
+
+    assert_out(reject(a), %[┏ assert reject(a)\n┗ reject(value)\n])
+    assert a.inspections == 1
+  end
+
+  test "receiver and literal are inspected once" do
+    a = ObservedValue.new
+    assert_out(a.empty?, %[┏ assert a.empty?\n┗ value.empty?\n])
+    assert a.inspections == 1
+
+    b = ObservedValue.new
+    assert_out(b, %[┏ assert b\n┗ value\n])
+    assert b.inspections == 1
+  end
+
+  test "array simplification inspects each element once" do
+    a = ObservedValue.new
+    b = ObservedValue.new
+    values = [a, b]
+
+    assert_out(values.empty?, %[┏ assert values.empty?\n┗ [value, value].empty?\n])
+    assert a.inspections == 1
+    assert b.inspections == 1
+  end
+
   test "literal value without comparison" do
     assert_out(1, %[◆ assert 1\n])
     assert_out("1", %[◆ assert "1"\n])
