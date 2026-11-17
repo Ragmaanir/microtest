@@ -2,7 +2,11 @@ module Microtest
   module StringUtils
     # return the index of the first different character
     def self.diff_index(left : String, right : String) : Int32?
-      left.chars.zip?(right.chars).index { |(l, r)| l != r }
+      right_chars = right.each_char
+      left.each_char.with_index do |char, index|
+        return index if char != right_chars.next
+      end
+      nil
     end
 
     # split the string into three parts: before, at, and after the passed index
