@@ -46,7 +46,7 @@ module Microtest
       end
 
       def boolean? : Bool
-        [true, false].includes?(@value)
+        true == @value || false == @value
       end
 
       def truthy? : Bool
@@ -89,11 +89,11 @@ module Microtest
       def_equals_and_hash method_name, expression, wrapper, receiver, arguments, @named_arguments # , @block
 
       def operator?
-        method_name.in?(%w(! != % & * ** + - / < << <= <=> == === > >= >> ^ | ~))
+        method_name.in?("!", "!=", "%", "&", "*", "**", "+", "-", "/", "<", "<<", "<=", "<=>", "==", "===", ">", ">=", ">>", "^", "|", "~")
       end
 
       def comparator?
-        method_name.in?(%w(!= < <= <=> == === > >=))
+        method_name.in?("!=", "<", "<=", "<=>", "==", "===", ">", ">=")
       end
     end
 
