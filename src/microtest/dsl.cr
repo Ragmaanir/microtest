@@ -58,7 +58,7 @@ module Microtest
 
       def self.test_methods
         # collect all test methods using the previous_def-hack
-        previous_def + [
+        previous_def.push(
           Microtest::TestMethod.new(
             suite: self,
             name: {{name}},
@@ -72,7 +72,7 @@ module Microtest
             test = new(ctx)
             test.run_test(m) { test.{{ method_name.id }} }
           end
-        ]
+        )
       end
 
       def {{method_name.id}} : Nil
