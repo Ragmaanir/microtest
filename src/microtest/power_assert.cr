@@ -153,17 +153,17 @@ module Microtest
 
         {% if expression.named_args.is_a?(ArrayLiteral) %}
           {% for arg in expression.named_args %}
-            %v = Microtest::PowerAssert.reflect_tuple({{ arg.value }})
+            %v = {{ arg.value }}
 
             # merge all of the tuples into one
-            %na = %na.merge({ {{ arg.name }}: %v[:value] })
+            %na = %na.merge({ {{ arg.name }}: %v })
 
             # Wrap the argument's value, not its node: inspecting a wrapped node
             # would reach `Node#wrapper` through `Value`, and type `inspect` for
             # every type asserted in the program.
             %named_args.push(Microtest::PowerAssert::NamedArgNode.new(
               {{ arg.name.stringify }},
-              %v[:value]
+              %v
             ))
           {% end %}
         {% end %}
